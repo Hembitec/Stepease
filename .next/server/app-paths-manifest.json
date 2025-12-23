@@ -1,0 +1,15 @@
+{
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/analyze-sop/route": "app/api/analyze-sop/route.js",
+  "/api/chat/generate-sop/route": "app/api/chat/generate-sop/route.js",
+  "/api/chat/sop/route": "app/api/chat/sop/route.js",
+  "/create/page": "app/create/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/improve/page": "app/improve/page.js",
+  "/library/page": "app/library/page.js",
+  "/page": "app/page.js",
+  "/preview/[id]/page": "app/preview/[id]/page.js",
+  "/review/[id]/page": "app/review/[id]/page.js",
+  "/settings/page": "app/settings/page.js"
+}

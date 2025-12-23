@@ -1,0 +1,7 @@
+{
+  "/api/analyze-sop/route": "app/api/analyze-sop/route.js",
+  "/api/chat/sop/route": "app/api/chat/sop/route.js",
+  "/create/page": "app/create/page.js",
+  "/improve/page": "app/improve/page.js",
+  "/page": "app/page.js"
+}

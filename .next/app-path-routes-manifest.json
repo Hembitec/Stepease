@@ -1,0 +1,15 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/api/analyze-sop/route": "/api/analyze-sop",
+  "/api/chat/generate-sop/route": "/api/chat/generate-sop",
+  "/api/chat/sop/route": "/api/chat/sop",
+  "/create/page": "/create",
+  "/dashboard/page": "/dashboard",
+  "/improve/page": "/improve",
+  "/library/page": "/library",
+  "/page": "/",
+  "/preview/[id]/page": "/preview/[id]",
+  "/review/[id]/page": "/review/[id]",
+  "/settings/page": "/settings"
+}
