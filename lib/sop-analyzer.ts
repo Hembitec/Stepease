@@ -71,7 +71,7 @@ const analysisResultSchema = z.object({
 export async function analyzeSOPText(text: string): Promise<AnalysisResult> {
     try {
         const { object } = await generateObject({
-            model: google("gemini-3-flash-preview", { structuredOutputs: true }),
+            model: google("gemini-3-flash-preview"),
             schema: analysisResultSchema,
             system: SOP_ANALYSIS_PROMPT,
             prompt: `Please analyze the following SOP text:\n\n${text}`,

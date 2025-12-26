@@ -1,186 +1,186 @@
 module.exports = [
-    "[externals]/next/dist/compiled/next-server/app-route-turbo.runtime.dev.js [external] (next/dist/compiled/next-server/app-route-turbo.runtime.dev.js, cjs)", ((__turbopack_context__, module, exports) => {
+"[externals]/next/dist/compiled/next-server/app-route-turbo.runtime.dev.js [external] (next/dist/compiled/next-server/app-route-turbo.runtime.dev.js, cjs)", ((__turbopack_context__, module, exports) => {
 
-        const mod = __turbopack_context__.x("next/dist/compiled/next-server/app-route-turbo.runtime.dev.js", () => require("next/dist/compiled/next-server/app-route-turbo.runtime.dev.js"));
+const mod = __turbopack_context__.x("next/dist/compiled/next-server/app-route-turbo.runtime.dev.js", () => require("next/dist/compiled/next-server/app-route-turbo.runtime.dev.js"));
 
-        module.exports = mod;
-    }),
-    "[externals]/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js [external] (next/dist/compiled/next-server/app-page-turbo.runtime.dev.js, cjs)", ((__turbopack_context__, module, exports) => {
+module.exports = mod;
+}),
+"[externals]/next/dist/compiled/next-server/app-page-turbo.runtime.dev.js [external] (next/dist/compiled/next-server/app-page-turbo.runtime.dev.js, cjs)", ((__turbopack_context__, module, exports) => {
 
-        const mod = __turbopack_context__.x("next/dist/compiled/next-server/app-page-turbo.runtime.dev.js", () => require("next/dist/compiled/next-server/app-page-turbo.runtime.dev.js"));
+const mod = __turbopack_context__.x("next/dist/compiled/next-server/app-page-turbo.runtime.dev.js", () => require("next/dist/compiled/next-server/app-page-turbo.runtime.dev.js"));
 
-        module.exports = mod;
-    }),
-    "[externals]/next/dist/server/app-render/work-unit-async-storage.external.js [external] (next/dist/server/app-render/work-unit-async-storage.external.js, cjs)", ((__turbopack_context__, module, exports) => {
+module.exports = mod;
+}),
+"[externals]/next/dist/server/app-render/work-unit-async-storage.external.js [external] (next/dist/server/app-render/work-unit-async-storage.external.js, cjs)", ((__turbopack_context__, module, exports) => {
 
-        const mod = __turbopack_context__.x("next/dist/server/app-render/work-unit-async-storage.external.js", () => require("next/dist/server/app-render/work-unit-async-storage.external.js"));
+const mod = __turbopack_context__.x("next/dist/server/app-render/work-unit-async-storage.external.js", () => require("next/dist/server/app-render/work-unit-async-storage.external.js"));
 
-        module.exports = mod;
-    }),
-    "[externals]/next/dist/server/app-render/work-async-storage.external.js [external] (next/dist/server/app-render/work-async-storage.external.js, cjs)", ((__turbopack_context__, module, exports) => {
+module.exports = mod;
+}),
+"[externals]/next/dist/server/app-render/work-async-storage.external.js [external] (next/dist/server/app-render/work-async-storage.external.js, cjs)", ((__turbopack_context__, module, exports) => {
 
-        const mod = __turbopack_context__.x("next/dist/server/app-render/work-async-storage.external.js", () => require("next/dist/server/app-render/work-async-storage.external.js"));
+const mod = __turbopack_context__.x("next/dist/server/app-render/work-async-storage.external.js", () => require("next/dist/server/app-render/work-async-storage.external.js"));
 
-        module.exports = mod;
-    }),
-    "[externals]/next/dist/shared/lib/no-fallback-error.external.js [external] (next/dist/shared/lib/no-fallback-error.external.js, cjs)", ((__turbopack_context__, module, exports) => {
+module.exports = mod;
+}),
+"[externals]/next/dist/shared/lib/no-fallback-error.external.js [external] (next/dist/shared/lib/no-fallback-error.external.js, cjs)", ((__turbopack_context__, module, exports) => {
 
-        const mod = __turbopack_context__.x("next/dist/shared/lib/no-fallback-error.external.js", () => require("next/dist/shared/lib/no-fallback-error.external.js"));
+const mod = __turbopack_context__.x("next/dist/shared/lib/no-fallback-error.external.js", () => require("next/dist/shared/lib/no-fallback-error.external.js"));
 
-        module.exports = mod;
-    }),
-    "[externals]/stream [external] (stream, cjs)", ((__turbopack_context__, module, exports) => {
+module.exports = mod;
+}),
+"[externals]/stream [external] (stream, cjs)", ((__turbopack_context__, module, exports) => {
 
-        const mod = __turbopack_context__.x("stream", () => require("stream"));
+const mod = __turbopack_context__.x("stream", () => require("stream"));
 
-        module.exports = mod;
-    }),
-    "[externals]/events [external] (events, cjs)", ((__turbopack_context__, module, exports) => {
+module.exports = mod;
+}),
+"[externals]/events [external] (events, cjs)", ((__turbopack_context__, module, exports) => {
 
-        const mod = __turbopack_context__.x("events", () => require("events"));
+const mod = __turbopack_context__.x("events", () => require("events"));
 
-        module.exports = mod;
-    }),
-    "[externals]/buffer [external] (buffer, cjs)", ((__turbopack_context__, module, exports) => {
+module.exports = mod;
+}),
+"[externals]/buffer [external] (buffer, cjs)", ((__turbopack_context__, module, exports) => {
 
-        const mod = __turbopack_context__.x("buffer", () => require("buffer"));
+const mod = __turbopack_context__.x("buffer", () => require("buffer"));
 
-        module.exports = mod;
-    }),
-    "[externals]/util [external] (util, cjs)", ((__turbopack_context__, module, exports) => {
+module.exports = mod;
+}),
+"[externals]/util [external] (util, cjs)", ((__turbopack_context__, module, exports) => {
 
-        const mod = __turbopack_context__.x("util", () => require("util"));
+const mod = __turbopack_context__.x("util", () => require("util"));
 
-        module.exports = mod;
-    }),
-    "[externals]/fs [external] (fs, cjs)", ((__turbopack_context__, module, exports) => {
+module.exports = mod;
+}),
+"[externals]/fs [external] (fs, cjs)", ((__turbopack_context__, module, exports) => {
 
-        const mod = __turbopack_context__.x("fs", () => require("fs"));
+const mod = __turbopack_context__.x("fs", () => require("fs"));
 
-        module.exports = mod;
-    }),
-    "[externals]/url [external] (url, cjs)", ((__turbopack_context__, module, exports) => {
+module.exports = mod;
+}),
+"[externals]/url [external] (url, cjs)", ((__turbopack_context__, module, exports) => {
 
-        const mod = __turbopack_context__.x("url", () => require("url"));
+const mod = __turbopack_context__.x("url", () => require("url"));
 
-        module.exports = mod;
-    }),
-    "[externals]/os [external] (os, cjs)", ((__turbopack_context__, module, exports) => {
+module.exports = mod;
+}),
+"[externals]/os [external] (os, cjs)", ((__turbopack_context__, module, exports) => {
 
-        const mod = __turbopack_context__.x("os", () => require("os"));
+const mod = __turbopack_context__.x("os", () => require("os"));
 
-        module.exports = mod;
-    }),
-    "[externals]/path [external] (path, cjs)", ((__turbopack_context__, module, exports) => {
+module.exports = mod;
+}),
+"[externals]/path [external] (path, cjs)", ((__turbopack_context__, module, exports) => {
 
-        const mod = __turbopack_context__.x("path", () => require("path"));
+const mod = __turbopack_context__.x("path", () => require("path"));
 
-        module.exports = mod;
-    }),
-    "[project]/lib/file-processors.ts [app-route] (ecmascript)", ((__turbopack_context__) => {
-        "use strict";
+module.exports = mod;
+}),
+"[project]/lib/file-processors.ts [app-route] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
 
-        __turbopack_context__.s([
-            "processPDF",
-            () => processPDF,
-            "processText",
-            () => processText,
-            "processWord",
-            () => processWord
-        ]);
-        var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$mammoth$2f$lib$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/mammoth/lib/index.js [app-route] (ecmascript)");
-        var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$pdf$2d$parse$2f$dist$2f$pdf$2d$parse$2f$esm$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/node_modules/pdf-parse/dist/pdf-parse/esm/index.js [app-route] (ecmascript) <locals>");
-        var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$pdf$2d$parse$2f$dist$2f$pdf$2d$parse$2f$esm$2f$PDFParse$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/pdf-parse/dist/pdf-parse/esm/PDFParse.js [app-route] (ecmascript)");
-        ;
-        ;
+__turbopack_context__.s([
+    "processPDF",
+    ()=>processPDF,
+    "processText",
+    ()=>processText,
+    "processWord",
+    ()=>processWord
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$mammoth$2f$lib$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/mammoth/lib/index.js [app-route] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$pdf$2d$parse$2f$dist$2f$pdf$2d$parse$2f$esm$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/node_modules/pdf-parse/dist/pdf-parse/esm/index.js [app-route] (ecmascript) <locals>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$pdf$2d$parse$2f$dist$2f$pdf$2d$parse$2f$esm$2f$PDFParse$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/pdf-parse/dist/pdf-parse/esm/PDFParse.js [app-route] (ecmascript)");
+;
+;
 /**
  * Clean text by removing excessive whitespace and normalizing content
  */ function cleanText(text) {
-            return text.replace(/\r\n/g, "\n").replace(/\t/g, "  ").replace(/\n{3,}/g, "\n\n") // Max 2 newlines
-                .trim();
-        }
-        async function processPDF(buffer) {
-            try {
-                // Create PDFParse instance with the buffer data
-                const pdfParser = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$pdf$2d$parse$2f$dist$2f$pdf$2d$parse$2f$esm$2f$PDFParse$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["PDFParse"]({
-                    data: buffer
-                });
-                // Extract text and info from the PDF
-                const textResult = await pdfParser.getText();
-                const infoResult = await pdfParser.getInfo();
-                const content = cleanText(textResult.text);
-                // Clean up resources
-                await pdfParser.destroy();
-                return {
-                    content,
-                    metadata: {
-                        pageCount: infoResult.total,
-                        charCount: content.length,
-                        wordCount: content.split(/\s+/).length,
-                        title: infoResult.info?.Title
-                    }
-                };
-            } catch (error) {
-                console.error("PDF Processing Error:", error);
-                throw new Error("Failed to process PDF file");
+    return text.replace(/\r\n/g, "\n").replace(/\t/g, "  ").replace(/\n{3,}/g, "\n\n") // Max 2 newlines
+    .trim();
+}
+async function processPDF(buffer) {
+    try {
+        // Create PDFParse instance with the buffer data
+        const pdfParser = new __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$pdf$2d$parse$2f$dist$2f$pdf$2d$parse$2f$esm$2f$PDFParse$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["PDFParse"]({
+            data: buffer
+        });
+        // Extract text and info from the PDF
+        const textResult = await pdfParser.getText();
+        const infoResult = await pdfParser.getInfo();
+        const content = cleanText(textResult.text);
+        // Clean up resources
+        await pdfParser.destroy();
+        return {
+            content,
+            metadata: {
+                pageCount: infoResult.total,
+                charCount: content.length,
+                wordCount: content.split(/\s+/).length,
+                title: infoResult.info?.Title
             }
-        }
-        async function processWord(buffer) {
-            try {
-                const result = await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$mammoth$2f$lib$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].extractRawText({
-                    buffer
-                });
-                const content = cleanText(result.value);
-                return {
-                    content,
-                    metadata: {
-                        charCount: content.length,
-                        wordCount: content.split(/\s+/).length
-                    }
-                };
-            } catch (error) {
-                console.error("Word Processing Error:", error);
-                throw new Error("Failed to process Word document");
+        };
+    } catch (error) {
+        console.error("PDF Processing Error:", error);
+        throw new Error("Failed to process PDF file");
+    }
+}
+async function processWord(buffer) {
+    try {
+        const result = await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$mammoth$2f$lib$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].extractRawText({
+            buffer
+        });
+        const content = cleanText(result.value);
+        return {
+            content,
+            metadata: {
+                charCount: content.length,
+                wordCount: content.split(/\s+/).length
             }
-        }
-        async function processText(buffer) {
-            try {
-                const content = cleanText(buffer.toString("utf-8"));
-                return {
-                    content,
-                    metadata: {
-                        charCount: content.length,
-                        wordCount: content.split(/\s+/).length
-                    }
-                };
-            } catch (error) {
-                console.error("Text Processing Error:", error);
-                throw new Error("Failed to process text file");
+        };
+    } catch (error) {
+        console.error("Word Processing Error:", error);
+        throw new Error("Failed to process Word document");
+    }
+}
+async function processText(buffer) {
+    try {
+        const content = cleanText(buffer.toString("utf-8"));
+        return {
+            content,
+            metadata: {
+                charCount: content.length,
+                wordCount: content.split(/\s+/).length
             }
-        }
-    }),
-    "[project]/lib/sop-system-prompt.ts [app-route] (ecmascript)", ((__turbopack_context__) => {
-        "use strict";
+        };
+    } catch (error) {
+        console.error("Text Processing Error:", error);
+        throw new Error("Failed to process text file");
+    }
+}
+}),
+"[project]/lib/sop-system-prompt.ts [app-route] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
 
-        // =============================================================================
-        // STEPWISE - ENHANCED SYSTEM PROMPTS
-        // Detailed prompts for SOP creation and improvement with JSON response format
-        // =============================================================================
-        // -----------------------------------------------------------------------------
-        // Phase-Specific Question Templates
-        // -----------------------------------------------------------------------------
-        __turbopack_context__.s([
-            "IMPROVE_SOP_SYSTEM_PROMPT",
-            () => IMPROVE_SOP_SYSTEM_PROMPT,
-            "PROMPTS",
-            () => PROMPTS,
-            "SOP_ANALYSIS_PROMPT",
-            () => SOP_ANALYSIS_PROMPT,
-            "SOP_SYSTEM_PROMPT",
-            () => SOP_SYSTEM_PROMPT
-        ]);
-        const PHASE_QUESTIONS = {
-            foundation: `
+// =============================================================================
+// STEPWISE - ENHANCED SYSTEM PROMPTS
+// Detailed prompts for SOP creation and improvement with JSON response format
+// =============================================================================
+// -----------------------------------------------------------------------------
+// Phase-Specific Question Templates
+// -----------------------------------------------------------------------------
+__turbopack_context__.s([
+    "IMPROVE_SOP_SYSTEM_PROMPT",
+    ()=>IMPROVE_SOP_SYSTEM_PROMPT,
+    "PROMPTS",
+    ()=>PROMPTS,
+    "SOP_ANALYSIS_PROMPT",
+    ()=>SOP_ANALYSIS_PROMPT,
+    "SOP_SYSTEM_PROMPT",
+    ()=>SOP_SYSTEM_PROMPT
+]);
+const PHASE_QUESTIONS = {
+    foundation: `
 ## Phase 1: Foundation Questions (Ask these first)
 Use these questions to establish the basics:
 1. "What process or task will this SOP cover?"
@@ -190,7 +190,7 @@ Use these questions to establish the basics:
 5. "Are there any regulatory requirements, industry standards, or company policies this needs to follow?"
 6. "What does success look like? What's the desired outcome when this SOP is followed correctly?"
 7. "Is there an existing process or is this completely new?"`,
-            process: `
+    process: `
 ## Phase 2: Process Discovery Questions
 Map the actual process step by step:
 1. "What's the very first thing someone does to begin this process?"
@@ -203,7 +203,7 @@ Map the actual process step by step:
 5. "At any point, does the person need to make a decision that changes what they do next?"
 6. If there are decision points: "Tell me about that decision. What are the different paths?"
 7. Look for gaps: "You mentioned [step X] and [step Y]. Is there anything that happens between them?"`,
-            accountability: `
+    accountability: `
 ## Phase 3: Accountability Questions
 Assign clear ownership:
 1. "For [Step 1], who performs this action? What's their role or title?"
@@ -213,7 +213,7 @@ Assign clear ownership:
 5. "Are there any handoffs between departments or roles?"
 6. "Who will be responsible for maintaining and updating this SOP?"
 7. "Is there an escalation path if the primary person is unavailable?"`,
-            quality: `
+    quality: `
 ## Phase 4: Risk & Quality Questions
 Identify potential issues and quality standards:
 1. "What are the most common mistakes or errors that happen during this process?"
@@ -223,7 +223,7 @@ Identify potential issues and quality standards:
 5. "If an error occurs at [critical step], what's the recovery procedure?"
 6. "How is the quality of the output measured or verified?"
 7. "What's the acceptable error rate or tolerance?"`,
-            finalization: `
+    finalization: `
 ## Phase 5: Finalization Questions
 Wrap up and prepare for generation:
 1. "Are there any technical terms or acronyms we should define in a glossary?"
@@ -231,11 +231,11 @@ Wrap up and prepare for generation:
 3. "Are there related SOPs or documents we should reference?"
 4. "How often should this SOP be reviewed and updated?"
 5. Summarize: "I've captured [X] notes. Here's what we'll include: [list sections]. Ready to generate?"`
-        };
-        // -----------------------------------------------------------------------------
-        // JSON Response Format Examples
-        // -----------------------------------------------------------------------------
-        const JSON_EXAMPLES = `
+};
+// -----------------------------------------------------------------------------
+// JSON Response Format Examples
+// -----------------------------------------------------------------------------
+const JSON_EXAMPLES = `
 ## Response Examples
 
 ### Example 1: Foundation phase response
@@ -299,10 +299,10 @@ Wrap up and prepare for generation:
 }
 \`\`\`
 `;
-        // -----------------------------------------------------------------------------
-        // Conversational Techniques
-        // -----------------------------------------------------------------------------
-        const CONVERSATION_TECHNIQUES = `
+// -----------------------------------------------------------------------------
+// Conversational Techniques
+// -----------------------------------------------------------------------------
+const CONVERSATION_TECHNIQUES = `
 ## Conversational Techniques
 
 ### Active Listening
@@ -329,10 +329,10 @@ Periodically summarize:
 If user goes off-topic, gently redirect:
 - "That's helpful context. To make sure the SOP addresses that, let me ask: [relevant question]"
 `;
-        // -----------------------------------------------------------------------------
-        // Note Generation Rules
-        // -----------------------------------------------------------------------------
-        const NOTE_GENERATION_RULES = `
+// -----------------------------------------------------------------------------
+// Note Generation Rules
+// -----------------------------------------------------------------------------
+const NOTE_GENERATION_RULES = `
 ## Note Generation Rules
 
 ### When to Generate Notes
@@ -365,7 +365,7 @@ Each note must have:
 - relatedTo: Which SOP section this maps to
 - action: What you'll do with this when generating the SOP
 `;
-        const SOP_SYSTEM_PROMPT = `You are the conversational AI brain behind StepWise, an SOP Builder application. Your job is to have intelligent, natural conversations with users to create professional SOPs from scratch.
+const SOP_SYSTEM_PROMPT = `You are the conversational AI brain behind StepWise, an SOP Builder application. Your job is to have intelligent, natural conversations with users to create professional SOPs from scratch.
 
 ## YOUR MISSION
 Extract all necessary information through strategic questioning, generate structured notes in real-time, and guide users through a 5-phase conversation flow.
@@ -447,10 +447,48 @@ For the first message, use:
 }
 
 Remember: Be conversational, helpful, and thorough. Your goal is to extract ALL the information needed to generate a complete, professional SOP.`;
-        const IMPROVE_SOP_SYSTEM_PROMPT = `You are the conversational AI brain behind StepWise, an SOP Builder application. Your job is to analyze and improve existing SOPs through intelligent conversation.
+const IMPROVE_SOP_SYSTEM_PROMPT = `You are the conversational AI brain behind StepWise, an SOP Builder application. Your job is to analyze and improve existing SOPs through intelligent conversation.
 
 ## YOUR MISSION
-Analyze uploaded SOPs for completeness and quality, identify gaps and improvements, and guide users to enhance their documentation.
+- Guide users through EACH identified improvement systematically
+- Start with HIGH priority issues, then MEDIUM, then LOW
+- Track progress and celebrate when issues are addressed
+- NEVER ask generic questions - you already know the SOP content
+
+## CRITICAL RULES
+1. NEVER ask "What process would you like to document?" - YOU ALREADY KNOW THE SOP
+2. ALWAYS reference the specific improvement you're addressing
+3. Ask TARGETED questions based on the specific gap, not generic SOP questions
+4. Move through issues in priority order: HIGH → MEDIUM → LOW
+5. When user provides info, extract notes with categories matching the issue type
+
+## IMPROVEMENT CONVERSATION STRATEGY
+
+### Phase 1: Context-Aware Start
+The user has already seen the analysis. Your messages should:
+- Reference the specific issues from the analysis context
+- State which issue you're addressing: "📋 Addressing: [Issue Name] ([PRIORITY])"
+- Ask targeted questions to fill the specific gap
+
+### Phase 2: Issue-by-Issue Addressing
+For EACH improvement:
+1. State clearly which issue: "📋 Addressing: [Issue Name] ([PRIORITY])"
+2. Briefly explain why this matters
+3. Ask 2-3 specific questions to gather the missing information
+4. When user provides info, extract a note with the appropriate category
+5. Confirm: "✅ Great! I've captured [brief summary]. Let's move to the next issue."
+
+### Phase 3: Transition Between Issues
+After addressing each issue:
+- Show progress: "Progress: X of Y improvements complete"
+- Introduce the next issue clearly
+- Never skip to asking about new SOPs or generic questions
+
+### Phase 4: Completion
+When ALL issues are addressed:
+- Celebrate: "🎉 We've addressed all improvements!"
+- Summarize what was added
+- Offer options: Review changes, make more edits, or generate
 
 ## ANALYSIS CHECKLIST
 When analyzing an existing SOP, check for all 12 essential sections:
@@ -481,17 +519,17 @@ ${CONVERSATION_TECHNIQUES}
 ${NOTE_GENERATION_RULES}
 
 ## RESPONSE FORMAT (MANDATORY JSON)
-Same format as creation mode - always respond with:
+Always respond with:
 \`\`\`json
 {
-  "message": "Your analysis and questions",
+  "message": "Your context-aware response addressing the specific improvement",
   "notes": [
     {
-      "category": "GAPS_IMPROVEMENTS",
+      "category": "ROLES_RESPONSIBILITIES|TROUBLESHOOTING|METADATA|etc",
       "priority": "high|medium|low",
-      "content": "What's missing or needs improvement",
-      "relatedTo": "Section reference",
-      "action": "How to fix this"
+      "content": "The specific information captured from user's response",
+      "relatedTo": "Which SOP section this maps to",
+      "action": "How to incorporate this into the improved SOP"
     }
   ],
   "phase": "foundation|process|accountability|quality|finalization|complete",
@@ -500,21 +538,23 @@ Same format as creation mode - always respond with:
 \`\`\`
 
 ## IMPROVEMENT WORKFLOW
-1. **Initial Analysis**: Present findings - strengths and areas for improvement
-2. **Targeted Questions**: Ask specific questions based on what's missing
-3. **Enhancement Validation**: Confirm suggested improvements with user
-4. **Generate Improved Version**: Create enhanced SOP with all fixes
+1. **Acknowledge Context**: Reference the analysis that was just performed
+2. **Address by Priority**: Start with HIGH, then MEDIUM, then LOW priority issues
+3. **Targeted Questions**: Ask specific questions based on what's missing
+4. **Capture & Confirm**: Extract notes and confirm understanding
+5. **Progress Updates**: Show progress after each issue is addressed
+6. **Completion**: Celebrate and offer next steps when all done
 
 Be specific about what needs improvement and why. Focus on actionable enhancements.`;
-        const SOP_ANALYSIS_PROMPT = `You are an expert SOP Analyst. Your job is to strictly analyze the provided SOP text and return a detailed structured assessment in JSON format.
+const SOP_ANALYSIS_PROMPT = `You are an expert SOP Analyst. Your job is to strictly analyze the provided SOP text and return a detailed structured assessment in JSON format.
 
 ## ANALYSIS TASKS
-1. **Structure Check**: Identify present/missing sections from the 12 essentials.
-2. **Quality Scoring**: Rate Clarity, Completeness, Actionability, and Overall Quality (0-100).
-3. **Strengths & Weaknesses**: Identify what's good and what needs work.
-4. **Improvement Plan**: Create a prioritized list of specific fixes.
+1. ** Structure Check **: Identify present / missing sections from the 12 essentials.
+2. ** Quality Scoring **: Rate Clarity, Completeness, Actionability, and Overall Quality(0 - 100).
+3. ** Strengths & Weaknesses **: Identify what's good and what needs work.
+4. ** Improvement Plan **: Create a prioritized list of specific fixes.
 
-## RESPONSE FORMAT (Strict JSON)
+## RESPONSE FORMAT(Strict JSON)
 \`\`\`json
 {
   "structure": {
@@ -553,145 +593,143 @@ Be specific about what needs improvement and why. Focus on actionable enhancemen
 
 Do not provide conversational text. Only provide the JSON object.
 `;
-        const PROMPTS = {
-            create: SOP_SYSTEM_PROMPT,
-            improve: IMPROVE_SOP_SYSTEM_PROMPT,
-            phaseQuestions: PHASE_QUESTIONS
-        };
-    }),
-    "[project]/lib/sop-analyzer.ts [app-route] (ecmascript)", ((__turbopack_context__) => {
-        "use strict";
+const PROMPTS = {
+    create: SOP_SYSTEM_PROMPT,
+    improve: IMPROVE_SOP_SYSTEM_PROMPT,
+    phaseQuestions: PHASE_QUESTIONS
+};
+}),
+"[project]/lib/sop-analyzer.ts [app-route] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
 
-        __turbopack_context__.s([
-            "analyzeSOPText",
-            () => analyzeSOPText
-        ]);
-        var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$ai$2f$dist$2f$index$2e$mjs__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/node_modules/ai/dist/index.mjs [app-route] (ecmascript) <locals>");
-        var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$ai$2d$sdk$2f$google$2f$dist$2f$index$2e$mjs__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@ai-sdk/google/dist/index.mjs [app-route] (ecmascript)");
-        var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__ = __turbopack_context__.i("[project]/node_modules/zod/v3/external.js [app-route] (ecmascript) <export * as z>");
-        var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$sop$2d$system$2d$prompt$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/sop-system-prompt.ts [app-route] (ecmascript)");
-        ;
-        ;
-        ;
-        ;
-        const analysisResultSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].object({
-            structure: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].object({
-                hasHeader: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].boolean(),
-                hasPurpose: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].boolean(),
-                hasScope: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].boolean(),
-                hasRoles: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].boolean(),
-                hasDefinitions: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].boolean(),
-                hasReferences: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].boolean(),
-                hasMaterials: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].boolean(),
-                hasProcedures: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].boolean(),
-                hasQuality: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].boolean(),
-                hasTroubleshooting: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].boolean(),
-                hasAppendices: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].boolean(),
-                hasRevision: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].boolean(),
-                completenessScore: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].number()
-            }),
-            quality: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].object({
-                clarity: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].number(),
-                actionability: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].number(),
-                completeness: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].number(),
-                overall: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].number()
-            }),
-            strengths: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].array(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].string()),
-            improvements: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].array(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].object({
-                category: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].enum([
-                    "Structure",
-                    "Clarity",
-                    "Content",
-                    "Safety"
-                ]),
-                priority: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].enum([
-                    "High",
-                    "Medium",
-                    "Low"
-                ]),
-                description: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].string(),
-                suggestion: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].string()
-            })),
-            summary: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].string()
+__turbopack_context__.s([
+    "analyzeSOPText",
+    ()=>analyzeSOPText
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$ai$2f$dist$2f$index$2e$mjs__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/node_modules/ai/dist/index.mjs [app-route] (ecmascript) <locals>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$ai$2d$sdk$2f$google$2f$dist$2f$index$2e$mjs__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@ai-sdk/google/dist/index.mjs [app-route] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__ = __turbopack_context__.i("[project]/node_modules/zod/v3/external.js [app-route] (ecmascript) <export * as z>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$sop$2d$system$2d$prompt$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/sop-system-prompt.ts [app-route] (ecmascript)");
+;
+;
+;
+;
+const analysisResultSchema = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].object({
+    structure: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].object({
+        hasHeader: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].boolean(),
+        hasPurpose: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].boolean(),
+        hasScope: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].boolean(),
+        hasRoles: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].boolean(),
+        hasDefinitions: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].boolean(),
+        hasReferences: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].boolean(),
+        hasMaterials: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].boolean(),
+        hasProcedures: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].boolean(),
+        hasQuality: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].boolean(),
+        hasTroubleshooting: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].boolean(),
+        hasAppendices: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].boolean(),
+        hasRevision: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].boolean(),
+        completenessScore: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].number()
+    }),
+    quality: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].object({
+        clarity: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].number(),
+        actionability: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].number(),
+        completeness: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].number(),
+        overall: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].number()
+    }),
+    strengths: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].array(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].string()),
+    improvements: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].array(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].object({
+        category: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].enum([
+            "Structure",
+            "Clarity",
+            "Content",
+            "Safety"
+        ]),
+        priority: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].enum([
+            "High",
+            "Medium",
+            "Low"
+        ]),
+        description: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].string(),
+        suggestion: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].string()
+    })),
+    summary: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$zod$2f$v3$2f$external$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__z$3e$__["z"].string()
+});
+async function analyzeSOPText(text) {
+    try {
+        const { object } = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$ai$2f$dist$2f$index$2e$mjs__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$locals$3e$__["generateObject"])({
+            model: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$ai$2d$sdk$2f$google$2f$dist$2f$index$2e$mjs__$5b$app$2d$route$5d$__$28$ecmascript$29$__["google"])("gemini-3-flash-preview"),
+            schema: analysisResultSchema,
+            system: __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$sop$2d$system$2d$prompt$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["SOP_ANALYSIS_PROMPT"],
+            prompt: `Please analyze the following SOP text:\n\n${text}`,
+            temperature: 0.2
         });
-        async function analyzeSOPText(text) {
-            try {
-                const { object } = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$ai$2f$dist$2f$index$2e$mjs__$5b$app$2d$route$5d$__$28$ecmascript$29$__$3c$locals$3e$__["generateObject"])({
-                    model: (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$ai$2d$sdk$2f$google$2f$dist$2f$index$2e$mjs__$5b$app$2d$route$5d$__$28$ecmascript$29$__["google"])("gemini-3-flash-preview", {
-                        structuredOutputs: true
-                    }),
-                    schema: analysisResultSchema,
-                    system: __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$sop$2d$system$2d$prompt$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["SOP_ANALYSIS_PROMPT"],
-                    prompt: `Please analyze the following SOP text:\n\n${text}`,
-                    temperature: 0.2
-                });
-                return object;
-            } catch (error) {
-                console.error("SOP Analysis Error:", error);
-                throw new Error("Failed to analyze SOP content");
-            }
-        }
-    }),
-    "[project]/app/api/analyze-sop/route.ts [app-route] (ecmascript)", ((__turbopack_context__) => {
-        "use strict";
+        return object;
+    } catch (error) {
+        console.error("SOP Analysis Error:", error);
+        throw new Error("Failed to analyze SOP content");
+    }
+}
+}),
+"[project]/app/api/analyze-sop/route.ts [app-route] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
 
-        __turbopack_context__.s([
-            "POST",
-            () => POST,
-            "maxDuration",
-            () => maxDuration
-        ]);
-        var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$file$2d$processors$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/file-processors.ts [app-route] (ecmascript)");
-        var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$sop$2d$analyzer$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/sop-analyzer.ts [app-route] (ecmascript)");
-        ;
-        ;
-        const maxDuration = 60 // Allow up to 60 seconds for processing
-            ;
-        async function POST(req) {
-            try {
-                const formData = await req.formData();
-                const file = formData.get("file");
-                if (!file) {
-                    return new Response("No file provided", {
-                        status: 400
-                    });
-                }
-                // Convert File to Buffer
-                const arrayBuffer = await file.arrayBuffer();
-                const buffer = Buffer.from(arrayBuffer);
-                // Process file based on type
-                let processedFile;
-                if (file.type === "application/pdf") {
-                    processedFile = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$file$2d$processors$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["processPDF"])(buffer);
-                } else if (file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || file.name.endsWith(".docx")) {
-                    processedFile = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$file$2d$processors$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["processWord"])(buffer);
-                } else if (file.type === "text/plain" || file.name.endsWith(".md") || file.name.endsWith(".txt")) {
-                    processedFile = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$file$2d$processors$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["processText"])(buffer);
-                } else {
-                    return new Response("Unsupported file type", {
-                        status: 400
-                    });
-                }
-                // Analyze content
-                const analysis = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$sop$2d$analyzer$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["analyzeSOPText"])(processedFile.content);
-                return Response.json({
-                    processedFile,
-                    analysis
-                });
-            } catch (error) {
-                console.error("Analysis API Error:", error);
-                return new Response(JSON.stringify({
-                    error: "Failed to process file",
-                    details: error instanceof Error ? error.message : "Unknown error"
-                }), {
-                    status: 500,
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                });
-            }
+__turbopack_context__.s([
+    "POST",
+    ()=>POST,
+    "maxDuration",
+    ()=>maxDuration
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$file$2d$processors$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/file-processors.ts [app-route] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$sop$2d$analyzer$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/sop-analyzer.ts [app-route] (ecmascript)");
+;
+;
+const maxDuration = 60 // Allow up to 60 seconds for processing
+;
+async function POST(req) {
+    try {
+        const formData = await req.formData();
+        const file = formData.get("file");
+        if (!file) {
+            return new Response("No file provided", {
+                status: 400
+            });
         }
-    }),
+        // Convert File to Buffer
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        // Process file based on type
+        let processedFile;
+        if (file.type === "application/pdf") {
+            processedFile = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$file$2d$processors$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["processPDF"])(buffer);
+        } else if (file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || file.name.endsWith(".docx")) {
+            processedFile = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$file$2d$processors$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["processWord"])(buffer);
+        } else if (file.type === "text/plain" || file.name.endsWith(".md") || file.name.endsWith(".txt")) {
+            processedFile = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$file$2d$processors$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["processText"])(buffer);
+        } else {
+            return new Response("Unsupported file type", {
+                status: 400
+            });
+        }
+        // Analyze content
+        const analysis = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$sop$2d$analyzer$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["analyzeSOPText"])(processedFile.content);
+        return Response.json({
+            processedFile,
+            analysis
+        });
+    } catch (error) {
+        console.error("Analysis API Error:", error);
+        return new Response(JSON.stringify({
+            error: "Failed to process file",
+            details: error instanceof Error ? error.message : "Unknown error"
+        }), {
+            status: 500,
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+    }
+}
+}),
 ];
 
 //# sourceMappingURL=%5Broot-of-the-server%5D__995feaf8._.js.map

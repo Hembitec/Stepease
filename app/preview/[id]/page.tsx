@@ -56,7 +56,7 @@ export default function SOPPreviewPage() {
       <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-10">
         <Link href={`/review/${params.id}`} className="text-gray-600 hover:text-gray-900 flex items-center gap-2">
           <ArrowLeft className="w-5 h-5" />
-          <span className="hidden sm:inline">Edit Notes</span>
+          <span className="hidden sm:inline">Back</span>
         </Link>
         <h1 className="text-lg font-semibold text-gray-900">Your Generated SOP</h1>
         <DownloadMenu content={content} title={sop?.title || "SOP"} />

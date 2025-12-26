@@ -449,28 +449,10 @@ function SOPProvider({ children }) {
                 relatedTo: imp.category,
                 action: "Needs addressing"
             }));
-        // Detailed context message for the AI
-        const contextMessage = `I need you to help me improve this SOP.
-    
-ANALYSIS SUMMARY:
-${analysis.summary}
-
-STRENGTHS:
-${analysis.strengths.map((s)=>`- ${s}`).join("\n")}
-
-CONTENT TO IMPROVE:
-${content}`;
         const newSession = {
             id: newId,
             title: "SOP Improvement",
-            messages: [
-                {
-                    id: "context-chk",
-                    role: "user",
-                    content: contextMessage,
-                    timestamp: new Date().toISOString()
-                }
-            ],
+            messages: [],
             notes: improvementNotes,
             phase: "foundation",
             phaseProgress: 0,
@@ -654,7 +636,7 @@ ${content}`;
         children: children
     }, void 0, false, {
         fileName: "[project]/lib/sop-context.tsx",
-        lineNumber: 460,
+        lineNumber: 441,
         columnNumber: 5
     }, this);
 }

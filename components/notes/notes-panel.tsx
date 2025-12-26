@@ -19,6 +19,8 @@ import {
 } from "@/lib/types"
 import { PhaseIndicator } from "@/components/chat/phase-indicator"
 import type { ConversationPhase } from "@/lib/types"
+import type { AnalysisResult } from "@/lib/sop-analyzer"
+import type { ImprovementStatus } from "@/lib/improvement-helpers"
 
 // -----------------------------------------------------------------------------
 // Types
@@ -31,6 +33,10 @@ interface NotesPanelProps {
   onReview?: () => void
   progress: number
   phase: ConversationPhase | string
+  // Improvement mode props
+  isImprovementMode?: boolean
+  analysisResult?: AnalysisResult
+  improvementStatus?: Record<string, ImprovementStatus>
 }
 
 // -----------------------------------------------------------------------------
@@ -174,6 +180,114 @@ function CategoryGroup({
 }
 
 // -----------------------------------------------------------------------------
+// Analysis Summary Component (for Improvement Mode)
+// -----------------------------------------------------------------------------
+
+function AnalysisSummary({
+  analysisResult,
+  improvementStatus,
+}: {
+  analysisResult: AnalysisResult
+  improvementStatus: Record<string, ImprovementStatus>
+}) {
+  const totalImprovements = analysisResult.improvements.length
+  const addressedCount = Object.values(improvementStatus).filter(s => s === 'addressed').length
+  const progressPercent = totalImprovements > 0
+    ? Math.round((addressedCount / totalImprovements) * 100)
+    : 0
+
+  const highPriority = analysisResult.improvements.filter(i => i.priority === 'High')
+  const mediumPriority = analysisResult.improvements.filter(i => i.priority === 'Medium')
+  const lowPriority = analysisResult.improvements.filter(i => i.priority === 'Low')
+
+  const getStatusIcon = (idx: number) => {
+    const status = improvementStatus[`improvement-${idx}`]
+    return status === 'addressed' ? '✅' : '⏳'
+  }
+
+  const getImprovementIndex = (improvement: AnalysisResult['improvements'][0]) => {
+    return analysisResult.improvements.indexOf(improvement)
+  }
+
+  return (
+    <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-lg p-4 border border-slate-200">
+      <h4 className="font-semibold text-slate-800 mb-3 flex items-center gap-2">
+        📊 Analysis Summary
+      </h4>
+
+      {/* Score and Progress */}
+      <div className="flex gap-3 text-sm mb-3">
+        <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded font-medium">
+          Quality: {analysisResult.quality.overall}/100
+        </span>
+        <span className="px-2 py-1 bg-green-100 text-green-700 rounded font-medium">
+          Progress: {addressedCount}/{totalImprovements}
+        </span>
+      </div>
+
+      {/* Progress Bar */}
+      <div className="w-full bg-slate-200 rounded-full h-2 mb-4">
+        <div
+          className="bg-green-500 h-2 rounded-full transition-all duration-500"
+          style={{ width: `${progressPercent}%` }}
+        />
+      </div>
+
+      {/* Priority Sections */}
+      <div className="space-y-3">
+        {highPriority.length > 0 && (
+          <div>
+            <span className="text-xs font-semibold text-red-600 flex items-center gap-1">
+              🔴 HIGH PRIORITY ({highPriority.length})
+            </span>
+            <ul className="mt-1 space-y-1">
+              {highPriority.map((imp) => (
+                <li key={getImprovementIndex(imp)} className="text-xs text-slate-600 flex items-center gap-2">
+                  <span>{getStatusIcon(getImprovementIndex(imp))}</span>
+                  <span className="truncate">{imp.description.slice(0, 45)}...</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {mediumPriority.length > 0 && (
+          <div>
+            <span className="text-xs font-semibold text-yellow-600 flex items-center gap-1">
+              🟡 MEDIUM PRIORITY ({mediumPriority.length})
+            </span>
+            <ul className="mt-1 space-y-1">
+              {mediumPriority.map((imp) => (
+                <li key={getImprovementIndex(imp)} className="text-xs text-slate-600 flex items-center gap-2">
+                  <span>{getStatusIcon(getImprovementIndex(imp))}</span>
+                  <span className="truncate">{imp.description.slice(0, 45)}...</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {lowPriority.length > 0 && (
+          <div>
+            <span className="text-xs font-semibold text-blue-600 flex items-center gap-1">
+              🔵 LOW PRIORITY ({lowPriority.length})
+            </span>
+            <ul className="mt-1 space-y-1">
+              {lowPriority.map((imp) => (
+                <li key={getImprovementIndex(imp)} className="text-xs text-slate-600 flex items-center gap-2">
+                  <span>{getStatusIcon(getImprovementIndex(imp))}</span>
+                  <span className="truncate">{imp.description.slice(0, 45)}...</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// -----------------------------------------------------------------------------
 // Main Notes Panel
 // -----------------------------------------------------------------------------
 
@@ -184,6 +298,9 @@ export function NotesPanel({
   onReview,
   progress,
   phase,
+  isImprovementMode = false,
+  analysisResult,
+  improvementStatus = {},
 }: NotesPanelProps) {
   const [viewMode, setViewMode] = useState<"grouped" | "list">("grouped")
 
@@ -241,43 +358,54 @@ export function NotesPanel({
         />
       </div>
 
-      {/* Notes Content */}
-      <ScrollArea className="flex-1 p-4">
-        {notes.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <FileEdit className="w-6 h-6 text-slate-400" />
+      {/* Notes Content - Everything in ScrollArea for proper overflow handling */}
+      <ScrollArea className="flex-1 min-h-0">
+        <div className="p-4 space-y-4">
+          {/* Analysis Summary - Inside scroll area */}
+          {isImprovementMode && analysisResult && (
+            <AnalysisSummary
+              analysisResult={analysisResult}
+              improvementStatus={improvementStatus}
+            />
+          )}
+
+          {/* Notes */}
+          {notes.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <FileEdit className="w-6 h-6 text-slate-400" />
+              </div>
+              <p className="text-sm text-slate-500 mb-1">No notes yet</p>
+              <p className="text-xs text-slate-400">
+                Notes will appear here as you chat with the AI
+              </p>
             </div>
-            <p className="text-sm text-slate-500 mb-1">No notes yet</p>
-            <p className="text-xs text-slate-400">
-              Notes will appear here as you chat with the AI
-            </p>
-          </div>
-        ) : viewMode === "grouped" ? (
-          <div className="space-y-4">
-            {sortedCategories.map((category) => (
-              <CategoryGroup
-                key={category}
-                category={category}
-                notes={groupedNotes[category]!}
-                onDeleteNote={onDeleteNote}
-                onEditNote={onEditNote}
-                defaultExpanded={true}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {notes.map((note) => (
-              <NoteCard
-                key={note.id}
-                note={note}
-                onDelete={onDeleteNote ? () => onDeleteNote(note.id) : undefined}
-                onEdit={onEditNote ? () => onEditNote(note) : undefined}
-              />
-            ))}
-          </div>
-        )}
+          ) : viewMode === "grouped" ? (
+            <div className="space-y-4">
+              {sortedCategories.map((category) => (
+                <CategoryGroup
+                  key={category}
+                  category={category}
+                  notes={groupedNotes[category]!}
+                  onDeleteNote={onDeleteNote}
+                  onEditNote={onEditNote}
+                  defaultExpanded={true}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {notes.map((note) => (
+                <NoteCard
+                  key={note.id}
+                  note={note}
+                  onDelete={onDeleteNote ? () => onDeleteNote(note.id) : undefined}
+                  onEdit={onEditNote ? () => onEditNote(note) : undefined}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </ScrollArea>
 
       {/* Footer Actions */}

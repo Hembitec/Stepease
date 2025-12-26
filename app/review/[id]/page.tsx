@@ -3,12 +3,12 @@
 import { useState, useMemo } from "react"
 import Link from "next/link"
 import { useRouter, useParams } from "next/navigation"
-import { ArrowLeft, ArrowRight, Plus, Search, AlertTriangle } from "lucide-react"
+import { ArrowLeft, ArrowRight, Plus, Search, AlertTriangle, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ExpandedNoteCard } from "@/components/notes/expanded-note-card"
 import { NoteEditorModal } from "@/components/notes/note-editor-modal"
 import { useSOPContext } from "@/lib/sop-context"
-import { CATEGORY_STYLES, type Note, type NoteCategory } from "@/lib/types"
+import { CATEGORY_STYLES, type Note, type NoteCategory, type SOP } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
 const categoryColors = CATEGORY_STYLES
@@ -33,16 +33,23 @@ const missingCritical = [
 export default function ReviewNotesPage() {
   const router = useRouter()
   const params = useParams()
-  const { sops, updateSOP } = useSOPContext()
+  const { sops, updateSOP, session, addSessionNotes, addSOP } = useSOPContext()
 
-  const sop = sops.find((s) => s.id === params.id) || sops[0]
-  const [notes, setNotes] = useState<Note[]>(sop?.notes || [])
+  // Try to find existing SOP, or use session notes for improvement mode
+  const sop = sops.find((s) => s.id === params.id)
+  const isImprovementMode = session?.metadata?.mode === 'improve'
+
+  // Use session notes if in improvement mode and no SOP exists yet
+  const initialNotes = sop?.notes || session?.notes || []
+
+  const [notes, setNotes] = useState<Note[]>(initialNotes)
   const [searchQuery, setSearchQuery] = useState("")
   const [activeFilter, setActiveFilter] = useState("All")
   const [sortBy, setSortBy] = useState("Chronological")
   const [editingNote, setEditingNote] = useState<Note | null>(null)
   const [isAddingNote, setIsAddingNote] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null)
+  const [isGenerating, setIsGenerating] = useState(false)
 
   const filteredNotes = useMemo(() => {
     let result = [...notes]
@@ -97,11 +104,98 @@ export default function ReviewNotesPage() {
     setShowDeleteConfirm(null)
   }
 
-  const handleGenerate = () => {
-    if (sop) {
-      updateSOP(sop.id, { notes })
+  const handleGenerate = async () => {
+    if (isGenerating) return // Prevent double clicks
+
+    setIsGenerating(true)
+    try {
+      const sessionId = params.id as string
+
+      // For improvement mode, update session notes first
+      if (isImprovementMode && session) {
+        addSessionNotes(notes)
+      }
+      // For regular mode, update SOP notes
+      else if (sop) {
+        updateSOP(sop.id, { notes })
+      }
+
+      // Build the request body with COMPLETE context for improvement mode
+      const requestBody = isImprovementMode && session?.metadata
+        ? {
+          mode: 'improve',
+          notes,
+          title: session?.title || 'Standard Operating Procedure',
+          // Pass the original SOP content
+          originalContent: session.metadata.originalContent || '',
+          // Pass the analysis results
+          analysis: session.metadata.analysisResult || null,
+          // Pass the conversation history
+          conversationHistory: session.messages || [],
+        }
+        : {
+          mode: 'create',
+          notes,
+          title: sop?.title || session?.title || 'Standard Operating Procedure',
+        }
+
+      // Call the generation API with full context
+      const response = await fetch('/api/chat/generate-sop', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to generate SOP')
+      }
+
+      // Stream the response
+      const reader = response.body?.getReader()
+      const decoder = new TextDecoder()
+      let generatedContent = ''
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+          generatedContent += decoder.decode(value, { stream: true })
+        }
+      }
+
+      // Update the SOP/session with the generated content
+      if (!sop) {
+        // SOP doesn't exist, create it (common in improvement mode)
+        const newSOP: SOP = {
+          id: sessionId,
+          title: session?.title || 'Standard Operating Procedure',
+          status: 'draft',
+          content: generatedContent,
+          notes,
+          chatHistory: session?.messages || [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        }
+        addSOP(newSOP)
+      } else {
+        // SOP exists, update it
+        updateSOP(sop.id, {
+          content: generatedContent,
+          notes,
+          status: 'draft'
+        })
+      }
+
+      // Navigate to preview
+      router.push(`/preview/${sessionId}`)
+    } catch (error) {
+      console.error('Generation error:', error)
+      alert('Failed to generate SOP. Please try again.')
+    } finally {
+      setIsGenerating(false)
     }
-    router.push(`/preview/${params.id}`)
   }
 
   return (
@@ -113,9 +207,22 @@ export default function ReviewNotesPage() {
           <span className="hidden sm:inline">Back to Chat</span>
         </Link>
         <h1 className="text-lg font-semibold text-gray-900">Review & Edit Notes</h1>
-        <Button onClick={handleGenerate} className="bg-blue-600 hover:bg-blue-700 text-white gap-2">
-          Generate SOP
-          <ArrowRight className="w-4 h-4" />
+        <Button
+          onClick={handleGenerate}
+          disabled={isGenerating}
+          className="bg-blue-600 hover:bg-blue-700 text-white gap-2 disabled:opacity-70"
+        >
+          {isGenerating ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Generating...
+            </>
+          ) : (
+            <>
+              Generate SOP
+              <ArrowRight className="w-4 h-4" />
+            </>
+          )}
         </Button>
       </header>
 
@@ -232,8 +339,19 @@ export default function ReviewNotesPage() {
                       Back to Chat to Address
                     </Button>
                   </Link>
-                  <Button onClick={handleGenerate} className="bg-yellow-600 hover:bg-yellow-700 text-white">
-                    Generate Anyway
+                  <Button
+                    onClick={handleGenerate}
+                    disabled={isGenerating}
+                    className="bg-yellow-600 hover:bg-yellow-700 text-white disabled:opacity-70"
+                  >
+                    {isGenerating ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        Generating...
+                      </>
+                    ) : (
+                      'Generate Anyway'
+                    )}
                   </Button>
                 </div>
               </div>
@@ -243,9 +361,23 @@ export default function ReviewNotesPage() {
 
         {/* Generate CTA */}
         <div className="flex justify-end">
-          <Button onClick={handleGenerate} size="lg" className="bg-blue-600 hover:bg-blue-700 text-white gap-2 px-8">
-            Generate Complete SOP
-            <ArrowRight className="w-5 h-5" />
+          <Button
+            onClick={handleGenerate}
+            size="lg"
+            disabled={isGenerating}
+            className="bg-blue-600 hover:bg-blue-700 text-white gap-2 px-8 disabled:opacity-70"
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Generating SOP...
+              </>
+            ) : (
+              <>
+                Generate Complete SOP
+                <ArrowRight className="w-5 h-5" />
+              </>
+            )}
           </Button>
         </div>
       </main>

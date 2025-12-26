@@ -499,7 +499,7 @@ function NoteCard({ note, onDelete, onEdit }) {
                                 children: categoryStyle.label
                             }, void 0, false, {
                                 fileName: "[project]/components/notes/notes-panel.tsx",
-                                lineNumber: 57,
+                                lineNumber: 63,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -507,13 +507,13 @@ function NoteCard({ note, onDelete, onEdit }) {
                                 children: priorityStyle.icon
                             }, void 0, false, {
                                 fileName: "[project]/components/notes/notes-panel.tsx",
-                                lineNumber: 66,
+                                lineNumber: 72,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/notes/notes-panel.tsx",
-                        lineNumber: 56,
+                        lineNumber: 62,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -521,13 +521,13 @@ function NoteCard({ note, onDelete, onEdit }) {
                         children: note.timestamp
                     }, void 0, false, {
                         fileName: "[project]/components/notes/notes-panel.tsx",
-                        lineNumber: 70,
+                        lineNumber: 76,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/notes/notes-panel.tsx",
-                lineNumber: 55,
+                lineNumber: 61,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -535,7 +535,7 @@ function NoteCard({ note, onDelete, onEdit }) {
                 children: note.content
             }, void 0, false, {
                 fileName: "[project]/components/notes/notes-panel.tsx",
-                lineNumber: 76,
+                lineNumber: 82,
                 columnNumber: 7
             }, this),
             note.relatedTo && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -546,7 +546,7 @@ function NoteCard({ note, onDelete, onEdit }) {
                         children: "→"
                     }, void 0, false, {
                         fileName: "[project]/components/notes/notes-panel.tsx",
-                        lineNumber: 81,
+                        lineNumber: 87,
                         columnNumber: 11
                     }, this),
                     " ",
@@ -554,7 +554,7 @@ function NoteCard({ note, onDelete, onEdit }) {
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/notes/notes-panel.tsx",
-                lineNumber: 80,
+                lineNumber: 86,
                 columnNumber: 9
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -565,7 +565,7 @@ function NoteCard({ note, onDelete, onEdit }) {
                         children: note.source
                     }, void 0, false, {
                         fileName: "[project]/components/notes/notes-panel.tsx",
-                        lineNumber: 87,
+                        lineNumber: 93,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -579,12 +579,12 @@ function NoteCard({ note, onDelete, onEdit }) {
                                     className: "w-3.5 h-3.5"
                                 }, void 0, false, {
                                     fileName: "[project]/components/notes/notes-panel.tsx",
-                                    lineNumber: 95,
+                                    lineNumber: 101,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/notes/notes-panel.tsx",
-                                lineNumber: 90,
+                                lineNumber: 96,
                                 columnNumber: 13
                             }, this),
                             onDelete && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -595,30 +595,30 @@ function NoteCard({ note, onDelete, onEdit }) {
                                     className: "w-3.5 h-3.5"
                                 }, void 0, false, {
                                     fileName: "[project]/components/notes/notes-panel.tsx",
-                                    lineNumber: 104,
+                                    lineNumber: 110,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/notes/notes-panel.tsx",
-                                lineNumber: 99,
+                                lineNumber: 105,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/notes/notes-panel.tsx",
-                        lineNumber: 88,
+                        lineNumber: 94,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/notes/notes-panel.tsx",
-                lineNumber: 86,
+                lineNumber: 92,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/notes/notes-panel.tsx",
-        lineNumber: 53,
+        lineNumber: 59,
         columnNumber: 5
     }, this);
 }
@@ -644,13 +644,13 @@ function CategoryGroup({ category, notes, onDeleteNote, onEditNote, defaultExpan
                                 className: "w-4 h-4 text-slate-400"
                             }, void 0, false, {
                                 fileName: "[project]/components/notes/notes-panel.tsx",
-                                lineNumber: 142,
+                                lineNumber: 148,
                                 columnNumber: 13
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$right$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronRight$3e$__["ChevronRight"], {
                                 className: "w-4 h-4 text-slate-400"
                             }, void 0, false, {
                                 fileName: "[project]/components/notes/notes-panel.tsx",
-                                lineNumber: 144,
+                                lineNumber: 150,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -658,13 +658,13 @@ function CategoryGroup({ category, notes, onDeleteNote, onEditNote, defaultExpan
                                 children: categoryStyle.label
                             }, void 0, false, {
                                 fileName: "[project]/components/notes/notes-panel.tsx",
-                                lineNumber: 146,
+                                lineNumber: 152,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/notes/notes-panel.tsx",
-                        lineNumber: 140,
+                        lineNumber: 146,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -672,13 +672,13 @@ function CategoryGroup({ category, notes, onDeleteNote, onEditNote, defaultExpan
                         children: notes.length
                     }, void 0, false, {
                         fileName: "[project]/components/notes/notes-panel.tsx",
-                        lineNumber: 156,
+                        lineNumber: 162,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/notes/notes-panel.tsx",
-                lineNumber: 136,
+                lineNumber: 142,
                 columnNumber: 7
             }, this),
             isExpanded && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -689,24 +689,282 @@ function CategoryGroup({ category, notes, onDeleteNote, onEditNote, defaultExpan
                         onEdit: onEditNote ? ()=>onEditNote(note) : undefined
                     }, note.id, false, {
                         fileName: "[project]/components/notes/notes-panel.tsx",
-                        lineNumber: 163,
+                        lineNumber: 169,
                         columnNumber: 13
                     }, this))
             }, void 0, false, {
                 fileName: "[project]/components/notes/notes-panel.tsx",
-                lineNumber: 161,
+                lineNumber: 167,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/notes/notes-panel.tsx",
-        lineNumber: 134,
+        lineNumber: 140,
         columnNumber: 5
     }, this);
 }
 _s(CategoryGroup, "hXm97mhk9SycwrMiz/XacDFEqLM=");
 _c1 = CategoryGroup;
-function NotesPanel({ notes, onDeleteNote, onEditNote, onReview, progress, phase }) {
+// -----------------------------------------------------------------------------
+// Analysis Summary Component (for Improvement Mode)
+// -----------------------------------------------------------------------------
+function AnalysisSummary({ analysisResult, improvementStatus }) {
+    const totalImprovements = analysisResult.improvements.length;
+    const addressedCount = Object.values(improvementStatus).filter((s)=>s === 'addressed').length;
+    const progressPercent = totalImprovements > 0 ? Math.round(addressedCount / totalImprovements * 100) : 0;
+    const highPriority = analysisResult.improvements.filter((i)=>i.priority === 'High');
+    const mediumPriority = analysisResult.improvements.filter((i)=>i.priority === 'Medium');
+    const lowPriority = analysisResult.improvements.filter((i)=>i.priority === 'Low');
+    const getStatusIcon = (idx)=>{
+        const status = improvementStatus[`improvement-${idx}`];
+        return status === 'addressed' ? '✅' : '⏳';
+    };
+    const getImprovementIndex = (improvement)=>{
+        return analysisResult.improvements.indexOf(improvement);
+    };
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        className: "bg-gradient-to-br from-slate-50 to-blue-50 rounded-lg p-4 border border-slate-200",
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
+                className: "font-semibold text-slate-800 mb-3 flex items-center gap-2",
+                children: "📊 Analysis Summary"
+            }, void 0, false, {
+                fileName: "[project]/components/notes/notes-panel.tsx",
+                lineNumber: 214,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "flex gap-3 text-sm mb-3",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                        className: "px-2 py-1 bg-blue-100 text-blue-700 rounded font-medium",
+                        children: [
+                            "Quality: ",
+                            analysisResult.quality.overall,
+                            "/100"
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/components/notes/notes-panel.tsx",
+                        lineNumber: 220,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                        className: "px-2 py-1 bg-green-100 text-green-700 rounded font-medium",
+                        children: [
+                            "Progress: ",
+                            addressedCount,
+                            "/",
+                            totalImprovements
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/components/notes/notes-panel.tsx",
+                        lineNumber: 223,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/components/notes/notes-panel.tsx",
+                lineNumber: 219,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "w-full bg-slate-200 rounded-full h-2 mb-4",
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "bg-green-500 h-2 rounded-full transition-all duration-500",
+                    style: {
+                        width: `${progressPercent}%`
+                    }
+                }, void 0, false, {
+                    fileName: "[project]/components/notes/notes-panel.tsx",
+                    lineNumber: 230,
+                    columnNumber: 9
+                }, this)
+            }, void 0, false, {
+                fileName: "[project]/components/notes/notes-panel.tsx",
+                lineNumber: 229,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "space-y-3",
+                children: [
+                    highPriority.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                className: "text-xs font-semibold text-red-600 flex items-center gap-1",
+                                children: [
+                                    "🔴 HIGH PRIORITY (",
+                                    highPriority.length,
+                                    ")"
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/components/notes/notes-panel.tsx",
+                                lineNumber: 240,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
+                                className: "mt-1 space-y-1",
+                                children: highPriority.map((imp)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
+                                        className: "text-xs text-slate-600 flex items-center gap-2",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                children: getStatusIcon(getImprovementIndex(imp))
+                                            }, void 0, false, {
+                                                fileName: "[project]/components/notes/notes-panel.tsx",
+                                                lineNumber: 246,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "truncate",
+                                                children: [
+                                                    imp.description.slice(0, 45),
+                                                    "..."
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/components/notes/notes-panel.tsx",
+                                                lineNumber: 247,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, getImprovementIndex(imp), true, {
+                                        fileName: "[project]/components/notes/notes-panel.tsx",
+                                        lineNumber: 245,
+                                        columnNumber: 17
+                                    }, this))
+                            }, void 0, false, {
+                                fileName: "[project]/components/notes/notes-panel.tsx",
+                                lineNumber: 243,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/components/notes/notes-panel.tsx",
+                        lineNumber: 239,
+                        columnNumber: 11
+                    }, this),
+                    mediumPriority.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                className: "text-xs font-semibold text-yellow-600 flex items-center gap-1",
+                                children: [
+                                    "🟡 MEDIUM PRIORITY (",
+                                    mediumPriority.length,
+                                    ")"
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/components/notes/notes-panel.tsx",
+                                lineNumber: 256,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
+                                className: "mt-1 space-y-1",
+                                children: mediumPriority.map((imp)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
+                                        className: "text-xs text-slate-600 flex items-center gap-2",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                children: getStatusIcon(getImprovementIndex(imp))
+                                            }, void 0, false, {
+                                                fileName: "[project]/components/notes/notes-panel.tsx",
+                                                lineNumber: 262,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "truncate",
+                                                children: [
+                                                    imp.description.slice(0, 45),
+                                                    "..."
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/components/notes/notes-panel.tsx",
+                                                lineNumber: 263,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, getImprovementIndex(imp), true, {
+                                        fileName: "[project]/components/notes/notes-panel.tsx",
+                                        lineNumber: 261,
+                                        columnNumber: 17
+                                    }, this))
+                            }, void 0, false, {
+                                fileName: "[project]/components/notes/notes-panel.tsx",
+                                lineNumber: 259,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/components/notes/notes-panel.tsx",
+                        lineNumber: 255,
+                        columnNumber: 11
+                    }, this),
+                    lowPriority.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                className: "text-xs font-semibold text-blue-600 flex items-center gap-1",
+                                children: [
+                                    "🔵 LOW PRIORITY (",
+                                    lowPriority.length,
+                                    ")"
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/components/notes/notes-panel.tsx",
+                                lineNumber: 272,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
+                                className: "mt-1 space-y-1",
+                                children: lowPriority.map((imp)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
+                                        className: "text-xs text-slate-600 flex items-center gap-2",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                children: getStatusIcon(getImprovementIndex(imp))
+                                            }, void 0, false, {
+                                                fileName: "[project]/components/notes/notes-panel.tsx",
+                                                lineNumber: 278,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "truncate",
+                                                children: [
+                                                    imp.description.slice(0, 45),
+                                                    "..."
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/components/notes/notes-panel.tsx",
+                                                lineNumber: 279,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, getImprovementIndex(imp), true, {
+                                        fileName: "[project]/components/notes/notes-panel.tsx",
+                                        lineNumber: 277,
+                                        columnNumber: 17
+                                    }, this))
+                            }, void 0, false, {
+                                fileName: "[project]/components/notes/notes-panel.tsx",
+                                lineNumber: 275,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/components/notes/notes-panel.tsx",
+                        lineNumber: 271,
+                        columnNumber: 11
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/components/notes/notes-panel.tsx",
+                lineNumber: 237,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/components/notes/notes-panel.tsx",
+        lineNumber: 213,
+        columnNumber: 5
+    }, this);
+}
+_c2 = AnalysisSummary;
+function NotesPanel({ notes, onDeleteNote, onEditNote, onReview, progress, phase, isImprovementMode = false, analysisResult, improvementStatus = {} }) {
     _s1();
     const [viewMode, setViewMode] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("grouped");
     // Group notes by category
@@ -756,7 +1014,7 @@ function NotesPanel({ notes, onDeleteNote, onEditNote, onReview, progress, phase
                                 children: "Extracted Notes"
                             }, void 0, false, {
                                 fileName: "[project]/components/notes/notes-panel.tsx",
-                                lineNumber: 232,
+                                lineNumber: 349,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -767,13 +1025,13 @@ function NotesPanel({ notes, onDeleteNote, onEditNote, onReview, progress, phase
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/components/notes/notes-panel.tsx",
-                                lineNumber: 233,
+                                lineNumber: 350,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/notes/notes-panel.tsx",
-                        lineNumber: 231,
+                        lineNumber: 348,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$chat$2f$phase$2d$indicator$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["PhaseIndicator"], {
@@ -782,14 +1040,29 @@ function NotesPanel({ notes, onDeleteNote, onEditNote, onReview, progress, phase
                         variant: "compact"
                     }, void 0, false, {
                         fileName: "[project]/components/notes/notes-panel.tsx",
-                        lineNumber: 237,
+                        lineNumber: 354,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/notes/notes-panel.tsx",
-                lineNumber: 230,
+                lineNumber: 347,
                 columnNumber: 7
+            }, this),
+            isImprovementMode && analysisResult && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "p-4 border-b border-slate-200",
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(AnalysisSummary, {
+                    analysisResult: analysisResult,
+                    improvementStatus: improvementStatus
+                }, void 0, false, {
+                    fileName: "[project]/components/notes/notes-panel.tsx",
+                    lineNumber: 364,
+                    columnNumber: 11
+                }, this)
+            }, void 0, false, {
+                fileName: "[project]/components/notes/notes-panel.tsx",
+                lineNumber: 363,
+                columnNumber: 9
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$scroll$2d$area$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ScrollArea"], {
                 className: "flex-1 p-4",
@@ -802,12 +1075,12 @@ function NotesPanel({ notes, onDeleteNote, onEditNote, onReview, progress, phase
                                 className: "w-6 h-6 text-slate-400"
                             }, void 0, false, {
                                 fileName: "[project]/components/notes/notes-panel.tsx",
-                                lineNumber: 249,
+                                lineNumber: 376,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/notes/notes-panel.tsx",
-                            lineNumber: 248,
+                            lineNumber: 375,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -815,7 +1088,7 @@ function NotesPanel({ notes, onDeleteNote, onEditNote, onReview, progress, phase
                             children: "No notes yet"
                         }, void 0, false, {
                             fileName: "[project]/components/notes/notes-panel.tsx",
-                            lineNumber: 251,
+                            lineNumber: 378,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -823,13 +1096,13 @@ function NotesPanel({ notes, onDeleteNote, onEditNote, onReview, progress, phase
                             children: "Notes will appear here as you chat with the AI"
                         }, void 0, false, {
                             fileName: "[project]/components/notes/notes-panel.tsx",
-                            lineNumber: 252,
+                            lineNumber: 379,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/notes/notes-panel.tsx",
-                    lineNumber: 247,
+                    lineNumber: 374,
                     columnNumber: 11
                 }, this) : viewMode === "grouped" ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "space-y-4",
@@ -841,12 +1114,12 @@ function NotesPanel({ notes, onDeleteNote, onEditNote, onReview, progress, phase
                             defaultExpanded: true
                         }, category, false, {
                             fileName: "[project]/components/notes/notes-panel.tsx",
-                            lineNumber: 259,
+                            lineNumber: 386,
                             columnNumber: 15
                         }, this))
                 }, void 0, false, {
                     fileName: "[project]/components/notes/notes-panel.tsx",
-                    lineNumber: 257,
+                    lineNumber: 384,
                     columnNumber: 11
                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "space-y-2",
@@ -856,17 +1129,17 @@ function NotesPanel({ notes, onDeleteNote, onEditNote, onReview, progress, phase
                             onEdit: onEditNote ? ()=>onEditNote(note) : undefined
                         }, note.id, false, {
                             fileName: "[project]/components/notes/notes-panel.tsx",
-                            lineNumber: 272,
+                            lineNumber: 399,
                             columnNumber: 15
                         }, this))
                 }, void 0, false, {
                     fileName: "[project]/components/notes/notes-panel.tsx",
-                    lineNumber: 270,
+                    lineNumber: 397,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/components/notes/notes-panel.tsx",
-                lineNumber: 245,
+                lineNumber: 372,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -881,7 +1154,7 @@ function NotesPanel({ notes, onDeleteNote, onEditNote, onReview, progress, phase
                                 children: "By Category"
                             }, void 0, false, {
                                 fileName: "[project]/components/notes/notes-panel.tsx",
-                                lineNumber: 286,
+                                lineNumber: 413,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -890,13 +1163,13 @@ function NotesPanel({ notes, onDeleteNote, onEditNote, onReview, progress, phase
                                 children: "All Notes"
                             }, void 0, false, {
                                 fileName: "[project]/components/notes/notes-panel.tsx",
-                                lineNumber: 297,
+                                lineNumber: 424,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/notes/notes-panel.tsx",
-                        lineNumber: 285,
+                        lineNumber: 412,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -908,35 +1181,36 @@ function NotesPanel({ notes, onDeleteNote, onEditNote, onReview, progress, phase
                                 className: "w-4 h-4"
                             }, void 0, false, {
                                 fileName: "[project]/components/notes/notes-panel.tsx",
-                                lineNumber: 315,
+                                lineNumber: 442,
                                 columnNumber: 11
                             }, this),
                             "Review & Generate SOP"
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/notes/notes-panel.tsx",
-                        lineNumber: 310,
+                        lineNumber: 437,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/notes/notes-panel.tsx",
-                lineNumber: 284,
+                lineNumber: 411,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/notes/notes-panel.tsx",
-        lineNumber: 228,
+        lineNumber: 345,
         columnNumber: 5
     }, this);
 }
 _s1(NotesPanel, "T5VDFIQg40mFWWch9G6MVP+5H2U=");
-_c2 = NotesPanel;
-var _c, _c1, _c2;
+_c3 = NotesPanel;
+var _c, _c1, _c2, _c3;
 __turbopack_context__.k.register(_c, "NoteCard");
 __turbopack_context__.k.register(_c1, "CategoryGroup");
-__turbopack_context__.k.register(_c2, "NotesPanel");
+__turbopack_context__.k.register(_c2, "AnalysisSummary");
+__turbopack_context__.k.register(_c3, "NotesPanel");
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
 }

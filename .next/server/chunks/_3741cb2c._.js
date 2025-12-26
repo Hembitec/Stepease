@@ -1,4 +1,4 @@
-module.exports=[22632,e=>{"use strict";e.s([],54033),e.i(54033);var o=e.i(85676),t=e.i(80264);e.s(["defaultErrorMap",()=>t.default,"getErrorMap",()=>o.getErrorMap,"setErrorMap",()=>o.setErrorMap],76733),e.i(76733);var s=e.i(84488);e.s([],91316),e.i(91316);var i=e.i(42944),a=e.i(17958),n=e.i(15235);e.s(["BRAND",()=>a.BRAND,"DIRTY",()=>s.DIRTY,"EMPTY_PATH",()=>s.EMPTY_PATH,"INVALID",()=>s.INVALID,"NEVER",()=>a.NEVER,"OK",()=>s.OK,"ParseStatus",()=>s.ParseStatus,"Schema",()=>a.Schema,"ZodAny",()=>a.ZodAny,"ZodArray",()=>a.ZodArray,"ZodBigInt",()=>a.ZodBigInt,"ZodBoolean",()=>a.ZodBoolean,"ZodBranded",()=>a.ZodBranded,"ZodCatch",()=>a.ZodCatch,"ZodDate",()=>a.ZodDate,"ZodDefault",()=>a.ZodDefault,"ZodDiscriminatedUnion",()=>a.ZodDiscriminatedUnion,"ZodEffects",()=>a.ZodEffects,"ZodEnum",()=>a.ZodEnum,"ZodError",()=>n.ZodError,"ZodFirstPartyTypeKind",()=>a.ZodFirstPartyTypeKind,"ZodFunction",()=>a.ZodFunction,"ZodIntersection",()=>a.ZodIntersection,"ZodIssueCode",()=>n.ZodIssueCode,"ZodLazy",()=>a.ZodLazy,"ZodLiteral",()=>a.ZodLiteral,"ZodMap",()=>a.ZodMap,"ZodNaN",()=>a.ZodNaN,"ZodNativeEnum",()=>a.ZodNativeEnum,"ZodNever",()=>a.ZodNever,"ZodNull",()=>a.ZodNull,"ZodNullable",()=>a.ZodNullable,"ZodNumber",()=>a.ZodNumber,"ZodObject",()=>a.ZodObject,"ZodOptional",()=>a.ZodOptional,"ZodParsedType",()=>i.ZodParsedType,"ZodPipeline",()=>a.ZodPipeline,"ZodPromise",()=>a.ZodPromise,"ZodReadonly",()=>a.ZodReadonly,"ZodRecord",()=>a.ZodRecord,"ZodSchema",()=>a.ZodSchema,"ZodSet",()=>a.ZodSet,"ZodString",()=>a.ZodString,"ZodSymbol",()=>a.ZodSymbol,"ZodTransformer",()=>a.ZodTransformer,"ZodTuple",()=>a.ZodTuple,"ZodType",()=>a.ZodType,"ZodUndefined",()=>a.ZodUndefined,"ZodUnion",()=>a.ZodUnion,"ZodUnknown",()=>a.ZodUnknown,"ZodVoid",()=>a.ZodVoid,"addIssueToContext",()=>s.addIssueToContext,"any",()=>a.any,"array",()=>a.array,"bigint",()=>a.bigint,"boolean",()=>a.boolean,"coerce",()=>a.coerce,"custom",()=>a.custom,"date",()=>a.date,"datetimeRegex",()=>a.datetimeRegex,"defaultErrorMap",()=>t.default,"discriminatedUnion",()=>a.discriminatedUnion,"effect",()=>a.effect,"enum",()=>a.enum,"function",()=>a.function,"getErrorMap",()=>o.getErrorMap,"getParsedType",()=>i.getParsedType,"instanceof",()=>a.instanceof,"intersection",()=>a.intersection,"isAborted",()=>s.isAborted,"isAsync",()=>s.isAsync,"isDirty",()=>s.isDirty,"isValid",()=>s.isValid,"late",()=>a.late,"lazy",()=>a.lazy,"literal",()=>a.literal,"makeIssue",()=>s.makeIssue,"map",()=>a.map,"nan",()=>a.nan,"nativeEnum",()=>a.nativeEnum,"never",()=>a.never,"null",()=>a.null,"nullable",()=>a.nullable,"number",()=>a.number,"object",()=>a.object,"objectUtil",()=>i.objectUtil,"oboolean",()=>a.oboolean,"onumber",()=>a.onumber,"optional",()=>a.optional,"ostring",()=>a.ostring,"pipeline",()=>a.pipeline,"preprocess",()=>a.preprocess,"promise",()=>a.promise,"quotelessJson",()=>n.quotelessJson,"record",()=>a.record,"set",()=>a.set,"setErrorMap",()=>o.setErrorMap,"strictObject",()=>a.strictObject,"string",()=>a.string,"symbol",()=>a.symbol,"transformer",()=>a.transformer,"tuple",()=>a.tuple,"undefined",()=>a.undefined,"union",()=>a.union,"unknown",()=>a.unknown,"util",()=>i.util,"void",()=>a.void],35907);var r=e.i(35907);e.s(["z",0,r],22632)},53586,e=>{"use strict";let o={foundation:`
+module.exports=[22632,e=>{"use strict";e.s([],54033),e.i(54033);var t=e.i(85676),o=e.i(80264);e.s(["defaultErrorMap",()=>o.default,"getErrorMap",()=>t.getErrorMap,"setErrorMap",()=>t.setErrorMap],76733),e.i(76733);var s=e.i(84488);e.s([],91316),e.i(91316);var i=e.i(42944),a=e.i(17958),r=e.i(15235);e.s(["BRAND",()=>a.BRAND,"DIRTY",()=>s.DIRTY,"EMPTY_PATH",()=>s.EMPTY_PATH,"INVALID",()=>s.INVALID,"NEVER",()=>a.NEVER,"OK",()=>s.OK,"ParseStatus",()=>s.ParseStatus,"Schema",()=>a.Schema,"ZodAny",()=>a.ZodAny,"ZodArray",()=>a.ZodArray,"ZodBigInt",()=>a.ZodBigInt,"ZodBoolean",()=>a.ZodBoolean,"ZodBranded",()=>a.ZodBranded,"ZodCatch",()=>a.ZodCatch,"ZodDate",()=>a.ZodDate,"ZodDefault",()=>a.ZodDefault,"ZodDiscriminatedUnion",()=>a.ZodDiscriminatedUnion,"ZodEffects",()=>a.ZodEffects,"ZodEnum",()=>a.ZodEnum,"ZodError",()=>r.ZodError,"ZodFirstPartyTypeKind",()=>a.ZodFirstPartyTypeKind,"ZodFunction",()=>a.ZodFunction,"ZodIntersection",()=>a.ZodIntersection,"ZodIssueCode",()=>r.ZodIssueCode,"ZodLazy",()=>a.ZodLazy,"ZodLiteral",()=>a.ZodLiteral,"ZodMap",()=>a.ZodMap,"ZodNaN",()=>a.ZodNaN,"ZodNativeEnum",()=>a.ZodNativeEnum,"ZodNever",()=>a.ZodNever,"ZodNull",()=>a.ZodNull,"ZodNullable",()=>a.ZodNullable,"ZodNumber",()=>a.ZodNumber,"ZodObject",()=>a.ZodObject,"ZodOptional",()=>a.ZodOptional,"ZodParsedType",()=>i.ZodParsedType,"ZodPipeline",()=>a.ZodPipeline,"ZodPromise",()=>a.ZodPromise,"ZodReadonly",()=>a.ZodReadonly,"ZodRecord",()=>a.ZodRecord,"ZodSchema",()=>a.ZodSchema,"ZodSet",()=>a.ZodSet,"ZodString",()=>a.ZodString,"ZodSymbol",()=>a.ZodSymbol,"ZodTransformer",()=>a.ZodTransformer,"ZodTuple",()=>a.ZodTuple,"ZodType",()=>a.ZodType,"ZodUndefined",()=>a.ZodUndefined,"ZodUnion",()=>a.ZodUnion,"ZodUnknown",()=>a.ZodUnknown,"ZodVoid",()=>a.ZodVoid,"addIssueToContext",()=>s.addIssueToContext,"any",()=>a.any,"array",()=>a.array,"bigint",()=>a.bigint,"boolean",()=>a.boolean,"coerce",()=>a.coerce,"custom",()=>a.custom,"date",()=>a.date,"datetimeRegex",()=>a.datetimeRegex,"defaultErrorMap",()=>o.default,"discriminatedUnion",()=>a.discriminatedUnion,"effect",()=>a.effect,"enum",()=>a.enum,"function",()=>a.function,"getErrorMap",()=>t.getErrorMap,"getParsedType",()=>i.getParsedType,"instanceof",()=>a.instanceof,"intersection",()=>a.intersection,"isAborted",()=>s.isAborted,"isAsync",()=>s.isAsync,"isDirty",()=>s.isDirty,"isValid",()=>s.isValid,"late",()=>a.late,"lazy",()=>a.lazy,"literal",()=>a.literal,"makeIssue",()=>s.makeIssue,"map",()=>a.map,"nan",()=>a.nan,"nativeEnum",()=>a.nativeEnum,"never",()=>a.never,"null",()=>a.null,"nullable",()=>a.nullable,"number",()=>a.number,"object",()=>a.object,"objectUtil",()=>i.objectUtil,"oboolean",()=>a.oboolean,"onumber",()=>a.onumber,"optional",()=>a.optional,"ostring",()=>a.ostring,"pipeline",()=>a.pipeline,"preprocess",()=>a.preprocess,"promise",()=>a.promise,"quotelessJson",()=>r.quotelessJson,"record",()=>a.record,"set",()=>a.set,"setErrorMap",()=>t.setErrorMap,"strictObject",()=>a.strictObject,"string",()=>a.string,"symbol",()=>a.symbol,"transformer",()=>a.transformer,"tuple",()=>a.tuple,"undefined",()=>a.undefined,"union",()=>a.union,"unknown",()=>a.unknown,"util",()=>i.util,"void",()=>a.void],35907);var n=e.i(35907);e.s(["z",0,n],22632)},53586,e=>{"use strict";let t={foundation:`
 ## Phase 1: Foundation Questions (Ask these first)
 Use these questions to establish the basics:
 1. "What process or task will this SOP cover?"
@@ -44,7 +44,7 @@ Wrap up and prepare for generation:
 2. "Would this process benefit from a flowchart, diagram, or checklist format?"
 3. "Are there related SOPs or documents we should reference?"
 4. "How often should this SOP be reviewed and updated?"
-5. Summarize: "I've captured [X] notes. Here's what we'll include: [list sections]. Ready to generate?"`},t=`
+5. Summarize: "I've captured [X] notes. Here's what we'll include: [list sections]. Ready to generate?"`},o=`
 ## Response Examples
 
 ### Example 1: Foundation phase response
@@ -199,11 +199,11 @@ Extract all necessary information through strategic questioning, generate struct
 - Actionability: Every step must be executable
 - Brevity: Maximum 49 steps per procedure
 
-${o.foundation}
-${o.process}
-${o.accountability}
-${o.quality}
-${o.finalization}
+${t.foundation}
+${t.process}
+${t.accountability}
+${t.quality}
+${t.finalization}
 
 ${s}
 
@@ -229,7 +229,7 @@ You MUST respond in this exact JSON format:
 }
 \`\`\`
 
-${t}
+${o}
 
 ## PHASE PROGRESSION
 - Start at "foundation" with progress 0
@@ -246,10 +246,48 @@ For the first message, use:
   "progress": 0
 }
 
-Remember: Be conversational, helpful, and thorough. Your goal is to extract ALL the information needed to generate a complete, professional SOP.`,n=`You are the conversational AI brain behind StepWise, an SOP Builder application. Your job is to analyze and improve existing SOPs through intelligent conversation.
+Remember: Be conversational, helpful, and thorough. Your goal is to extract ALL the information needed to generate a complete, professional SOP.`,r=`You are the conversational AI brain behind StepWise, an SOP Builder application. Your job is to analyze and improve existing SOPs through intelligent conversation.
 
 ## YOUR MISSION
-Analyze uploaded SOPs for completeness and quality, identify gaps and improvements, and guide users to enhance their documentation.
+- Guide users through EACH identified improvement systematically
+- Start with HIGH priority issues, then MEDIUM, then LOW
+- Track progress and celebrate when issues are addressed
+- NEVER ask generic questions - you already know the SOP content
+
+## CRITICAL RULES
+1. NEVER ask "What process would you like to document?" - YOU ALREADY KNOW THE SOP
+2. ALWAYS reference the specific improvement you're addressing
+3. Ask TARGETED questions based on the specific gap, not generic SOP questions
+4. Move through issues in priority order: HIGH → MEDIUM → LOW
+5. When user provides info, extract notes with categories matching the issue type
+
+## IMPROVEMENT CONVERSATION STRATEGY
+
+### Phase 1: Context-Aware Start
+The user has already seen the analysis. Your messages should:
+- Reference the specific issues from the analysis context
+- State which issue you're addressing: "📋 Addressing: [Issue Name] ([PRIORITY])"
+- Ask targeted questions to fill the specific gap
+
+### Phase 2: Issue-by-Issue Addressing
+For EACH improvement:
+1. State clearly which issue: "📋 Addressing: [Issue Name] ([PRIORITY])"
+2. Briefly explain why this matters
+3. Ask 2-3 specific questions to gather the missing information
+4. When user provides info, extract a note with the appropriate category
+5. Confirm: "✅ Great! I've captured [brief summary]. Let's move to the next issue."
+
+### Phase 3: Transition Between Issues
+After addressing each issue:
+- Show progress: "Progress: X of Y improvements complete"
+- Introduce the next issue clearly
+- Never skip to asking about new SOPs or generic questions
+
+### Phase 4: Completion
+When ALL issues are addressed:
+- Celebrate: "🎉 We've addressed all improvements!"
+- Summarize what was added
+- Offer options: Review changes, make more edits, or generate
 
 ## ANALYSIS CHECKLIST
 When analyzing an existing SOP, check for all 12 essential sections:
@@ -280,17 +318,17 @@ ${s}
 ${i}
 
 ## RESPONSE FORMAT (MANDATORY JSON)
-Same format as creation mode - always respond with:
+Always respond with:
 \`\`\`json
 {
-  "message": "Your analysis and questions",
+  "message": "Your context-aware response addressing the specific improvement",
   "notes": [
     {
-      "category": "GAPS_IMPROVEMENTS",
+      "category": "ROLES_RESPONSIBILITIES|TROUBLESHOOTING|METADATA|etc",
       "priority": "high|medium|low",
-      "content": "What's missing or needs improvement",
-      "relatedTo": "Section reference",
-      "action": "How to fix this"
+      "content": "The specific information captured from user's response",
+      "relatedTo": "Which SOP section this maps to",
+      "action": "How to incorporate this into the improved SOP"
     }
   ],
   "phase": "foundation|process|accountability|quality|finalization|complete",
@@ -299,20 +337,22 @@ Same format as creation mode - always respond with:
 \`\`\`
 
 ## IMPROVEMENT WORKFLOW
-1. **Initial Analysis**: Present findings - strengths and areas for improvement
-2. **Targeted Questions**: Ask specific questions based on what's missing
-3. **Enhancement Validation**: Confirm suggested improvements with user
-4. **Generate Improved Version**: Create enhanced SOP with all fixes
+1. **Acknowledge Context**: Reference the analysis that was just performed
+2. **Address by Priority**: Start with HIGH, then MEDIUM, then LOW priority issues
+3. **Targeted Questions**: Ask specific questions based on what's missing
+4. **Capture & Confirm**: Extract notes and confirm understanding
+5. **Progress Updates**: Show progress after each issue is addressed
+6. **Completion**: Celebrate and offer next steps when all done
 
-Be specific about what needs improvement and why. Focus on actionable enhancements.`,r=`You are an expert SOP Analyst. Your job is to strictly analyze the provided SOP text and return a detailed structured assessment in JSON format.
+Be specific about what needs improvement and why. Focus on actionable enhancements.`,n=`You are an expert SOP Analyst. Your job is to strictly analyze the provided SOP text and return a detailed structured assessment in JSON format.
 
 ## ANALYSIS TASKS
-1. **Structure Check**: Identify present/missing sections from the 12 essentials.
-2. **Quality Scoring**: Rate Clarity, Completeness, Actionability, and Overall Quality (0-100).
-3. **Strengths & Weaknesses**: Identify what's good and what needs work.
-4. **Improvement Plan**: Create a prioritized list of specific fixes.
+1. ** Structure Check **: Identify present / missing sections from the 12 essentials.
+2. ** Quality Scoring **: Rate Clarity, Completeness, Actionability, and Overall Quality(0 - 100).
+3. ** Strengths & Weaknesses **: Identify what's good and what needs work.
+4. ** Improvement Plan **: Create a prioritized list of specific fixes.
 
-## RESPONSE FORMAT (Strict JSON)
+## RESPONSE FORMAT(Strict JSON)
 \`\`\`json
 {
   "structure": {
@@ -350,6 +390,6 @@ Be specific about what needs improvement and why. Focus on actionable enhancemen
 \`\`\`
 
 Do not provide conversational text. Only provide the JSON object.
-`;e.s(["IMPROVE_SOP_SYSTEM_PROMPT",0,n,"SOP_ANALYSIS_PROMPT",0,r,"SOP_SYSTEM_PROMPT",0,a])}];
+`;e.s(["IMPROVE_SOP_SYSTEM_PROMPT",0,r,"SOP_ANALYSIS_PROMPT",0,n,"SOP_SYSTEM_PROMPT",0,a])}];
 
 //# sourceMappingURL=_3741cb2c._.js.map

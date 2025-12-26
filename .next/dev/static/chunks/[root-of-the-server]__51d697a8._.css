@@ -2606,6 +2606,10 @@
     background-color: var(--color-green-100);
   }
 
+  .bg-green-500 {
+    background-color: var(--color-green-500);
+  }
+
   .bg-green-600 {
     background-color: var(--color-green-600);
   }
@@ -2933,6 +2937,11 @@
 
   .to-amber-500 {
     --tw-gradient-to: var(--color-amber-500);
+    --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
+  }
+
+  .to-blue-50 {
+    --tw-gradient-to: var(--color-blue-50);
     --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
   }
 
@@ -5291,6 +5300,10 @@
 
   .disabled\:opacity-50:disabled {
     opacity: .5;
+  }
+
+  .disabled\:opacity-70:disabled {
+    opacity: .7;
   }
 
   :where([data-side="left"]) .in-data-\[side\=left\]\:cursor-w-resize {

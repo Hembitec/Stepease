@@ -458,7 +458,7 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
-function DashboardLayout({ children }) {
+function DashboardLayout({ children, fullHeight = false }) {
     _s();
     const [isCollapsed, setIsCollapsed] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [isMobile, setIsMobile] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
@@ -498,7 +498,7 @@ function DashboardLayout({ children }) {
         setIsMobileMenuOpen(false);
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-blue-50/30",
+        className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("bg-gradient-to-br from-slate-50 via-slate-100 to-blue-50/30", fullHeight ? "h-screen overflow-hidden" : "min-h-screen"),
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("header", {
                 className: "fixed top-0 left-0 right-0 h-16 bg-slate-900 text-white flex items-center justify-between px-4 z-30 md:hidden",
@@ -511,12 +511,12 @@ function DashboardLayout({ children }) {
                             className: "w-6 h-6"
                         }, void 0, false, {
                             fileName: "[project]/components/layout/dashboard-layout.tsx",
-                            lineNumber: 63,
+                            lineNumber: 67,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/components/layout/dashboard-layout.tsx",
-                        lineNumber: 58,
+                        lineNumber: 62,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -528,12 +528,12 @@ function DashboardLayout({ children }) {
                                     className: "w-4 h-4 text-white"
                                 }, void 0, false, {
                                     fileName: "[project]/components/layout/dashboard-layout.tsx",
-                                    lineNumber: 68,
+                                    lineNumber: 72,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/components/layout/dashboard-layout.tsx",
-                                lineNumber: 67,
+                                lineNumber: 71,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -541,26 +541,26 @@ function DashboardLayout({ children }) {
                                 children: "StepWise"
                             }, void 0, false, {
                                 fileName: "[project]/components/layout/dashboard-layout.tsx",
-                                lineNumber: 70,
+                                lineNumber: 74,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/components/layout/dashboard-layout.tsx",
-                        lineNumber: 66,
+                        lineNumber: 70,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "w-10"
                     }, void 0, false, {
                         fileName: "[project]/components/layout/dashboard-layout.tsx",
-                        lineNumber: 74,
+                        lineNumber: 78,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/components/layout/dashboard-layout.tsx",
-                lineNumber: 57,
+                lineNumber: 61,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$layout$2f$sidebar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Sidebar"], {
@@ -570,22 +570,22 @@ function DashboardLayout({ children }) {
                 onMobileClose: closeMobileMenu
             }, void 0, false, {
                 fileName: "[project]/components/layout/dashboard-layout.tsx",
-                lineNumber: 77,
+                lineNumber: 81,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
-                className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("min-h-screen transition-all duration-300 ease-in-out", // Mobile: add top padding for navbar, no side margin
+                className: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["cn"])("transition-all duration-300 ease-in-out", fullHeight ? "h-screen overflow-hidden" : "min-h-screen", // Mobile: add top padding for navbar, no side margin
                 isMobile ? "pt-16 ml-0" : isCollapsed ? "ml-20" : "ml-64"),
                 children: children
             }, void 0, false, {
                 fileName: "[project]/components/layout/dashboard-layout.tsx",
-                lineNumber: 84,
+                lineNumber: 88,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/components/layout/dashboard-layout.tsx",
-        lineNumber: 55,
+        lineNumber: 56,
         columnNumber: 5
     }, this);
 }

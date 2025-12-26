@@ -1,6 +1,7 @@
 "use client"
 
 import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 
 interface MarkdownRendererProps {
   content: string
@@ -10,6 +11,7 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
   return (
     <div className="prose prose-gray max-w-none">
       <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
         components={{
           h1: ({ children }) => <h1 className="text-3xl font-bold text-gray-900 mb-4 pb-2 border-b">{children}</h1>,
           h2: ({ children }) => <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">{children}</h2>,

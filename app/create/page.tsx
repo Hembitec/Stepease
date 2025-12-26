@@ -5,9 +5,9 @@
 // Main interface for AI-powered SOP creation with 5-phase conversation flow
 // =============================================================================
 
-import { useState, useRef, useEffect, useCallback } from "react"
+import { useState, useRef, useEffect, useCallback, useMemo, Suspense } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { experimental_useObject as useObject } from "@ai-sdk/react"
 import { ArrowLeft, Save, FileEdit, MessageSquare, Bot, User, Send, PanelRightClose, PanelRightOpen } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -19,6 +19,12 @@ import { aiResponseSchema } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import type { Note, ConversationPhase, SOP, ChatMessage, AIResponse } from "@/lib/types"
 import { generateId } from "@/lib/types"
+import {
+  generateImprovementGreeting,
+  initializeImprovementStatus,
+  type ImprovementStatus
+} from "@/lib/improvement-helpers"
+import type { AnalysisResult } from "@/lib/sop-analyzer"
 
 // -----------------------------------------------------------------------------
 // Initial Greeting Message
@@ -88,8 +94,12 @@ function TypingIndicator() {
 // Main Component
 // -----------------------------------------------------------------------------
 
-export default function CreateSOPPage() {
+function CreateSOPPageContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const mode = searchParams.get('mode') ?? 'create'
+  const isImprovementMode = mode === 'improve'
+
   const { addSOP, session, startNewSession, addSessionNotes, setSessionPhase } = useSOPContext()
 
   // Local state
@@ -100,15 +110,34 @@ export default function CreateSOPPage() {
   const [activeTab, setActiveTab] = useState<"chat" | "notes">("chat")
   const [inputValue, setInputValue] = useState("")
   const [isNotesCollapsed, setIsNotesCollapsed] = useState(false)
+  const [improvementStatus, setImprovementStatus] = useState<Record<string, ImprovementStatus>>({})
+  const [initialMessageShown, setInitialMessageShown] = useState(false)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // Initialize session on mount
   useEffect(() => {
-    if (!session) {
+    if (!session && !isImprovementMode) {
       startNewSession()
     }
-  }, [session, startNewSession])
+
+    // For improvement mode, load session data
+    if (session && isImprovementMode && !initialMessageShown) {
+      setNotes(session.notes)
+      if (session.messages.length > 0) {
+        setChatHistory(session.messages)
+      }
+      setCurrentPhase(session.phase)
+
+      // Initialize improvement status tracking
+      if (session.metadata?.analysisResult) {
+        const status = initializeImprovementStatus(session.metadata.analysisResult)
+        setImprovementStatus(status)
+      }
+
+      setInitialMessageShown(true)
+    }
+  }, [session, isImprovementMode, startNewSession, initialMessageShown])
 
   // -------------------------------------------------------------------------
   // Object Streaming Hook
@@ -173,6 +202,14 @@ export default function CreateSOPPage() {
   // Message Sending
   // -------------------------------------------------------------------------
 
+  // Dynamic initial greeting based on mode
+  const initialGreeting = useMemo(() => {
+    if (isImprovementMode && session?.metadata?.analysisResult) {
+      return generateImprovementGreeting(session.metadata.analysisResult)
+    }
+    return INITIAL_GREETING
+  }, [isImprovementMode, session])
+
   const handleSendMessage = useCallback(() => {
     if (!inputValue.trim() || isLoading) return
 
@@ -190,9 +227,13 @@ export default function CreateSOPPage() {
     // Use current mode and messages for the request
     submit({
       messages: newHistory,
-      mode: "create"
+      mode: mode,
+      // Pass analysis context for improvement mode
+      ...(isImprovementMode && session?.metadata?.analysisResult && {
+        analysisContext: session.metadata.analysisResult
+      })
     })
-  }, [inputValue, isLoading, chatHistory, submit])
+  }, [inputValue, isLoading, chatHistory, submit, mode, isImprovementMode, session])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -244,6 +285,35 @@ export default function CreateSOPPage() {
   const handleDeleteNote = useCallback((id: string) => {
     setNotes((prev) => prev.filter((n) => n.id !== id))
   }, [])
+
+  // Track improvement status when notes are added
+  useEffect(() => {
+    if (isImprovementMode && session?.metadata?.analysisResult) {
+      const analysis = session.metadata.analysisResult
+      const newStatus = { ...improvementStatus }
+
+      analysis.improvements.forEach((imp: AnalysisResult['improvements'][0], idx: number) => {
+        // Check if notes relate to this improvement
+        const isAddressed = notes.some(note => {
+          const noteContent = note.content.toLowerCase()
+          const impDesc = imp.description.toLowerCase()
+          const impCategory = imp.category.toLowerCase()
+
+          return (
+            noteContent.includes(impDesc.slice(0, 30)) ||
+            note.relatedTo?.toLowerCase().includes(impCategory) ||
+            (note.category === 'GAPS_IMPROVEMENTS' && noteContent.includes(impDesc.slice(0, 20)))
+          )
+        })
+
+        if (isAddressed && newStatus[`improvement-${idx}`] !== 'addressed') {
+          newStatus[`improvement-${idx}`] = 'addressed'
+        }
+      })
+
+      setImprovementStatus(newStatus)
+    }
+  }, [notes, isImprovementMode, session])
 
   // -------------------------------------------------------------------------
   // Render
@@ -332,7 +402,7 @@ export default function CreateSOPPage() {
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 lg:p-6">
               {/* Initial greeting */}
-              <MessageBubble role="assistant" content={INITIAL_GREETING} />
+              <MessageBubble role="assistant" content={initialGreeting} />
 
               {/* Chat history */}
               {chatHistory.map((message) => (
@@ -390,6 +460,9 @@ export default function CreateSOPPage() {
               onReview={handleReview}
               progress={progress}
               phase={currentPhase}
+              isImprovementMode={isImprovementMode}
+              analysisResult={session?.metadata?.analysisResult}
+              improvementStatus={improvementStatus}
             />
           </div>
 
@@ -401,10 +474,27 @@ export default function CreateSOPPage() {
               onReview={handleReview}
               progress={progress}
               phase={currentPhase}
+              isImprovementMode={isImprovementMode}
+              analysisResult={session?.metadata?.analysisResult}
+              improvementStatus={improvementStatus}
             />
           </div>
         </div>
       </div>
     </DashboardLayout>
+  )
+}
+
+export default function CreateSOPPage() {
+  return (
+    <Suspense fallback={
+      <DashboardLayout fullHeight>
+        <div className="h-full flex items-center justify-center">
+          <div className="text-slate-500">Loading...</div>
+        </div>
+      </DashboardLayout>
+    }>
+      <CreateSOPPageContent />
+    </Suspense>
   )
 }

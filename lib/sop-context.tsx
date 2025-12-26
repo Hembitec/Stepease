@@ -231,29 +231,10 @@ export function SOPProvider({ children }: { children: ReactNode }) {
       action: "Needs addressing",
     }))
 
-    // Detailed context message for the AI
-    const contextMessage = `I need you to help me improve this SOP.
-    
-ANALYSIS SUMMARY:
-${analysis.summary}
-
-STRENGTHS:
-${analysis.strengths.map(s => `- ${s}`).join("\n")}
-
-CONTENT TO IMPROVE:
-${content}`
-
     const newSession: SessionState = {
       id: newId,
       title: "SOP Improvement",
-      messages: [
-        {
-          id: "context-chk",
-          role: "user",
-          content: contextMessage,
-          timestamp: new Date().toISOString()
-        }
-      ],
+      messages: [], // Start with empty messages - AI greeting will be shown separately
       notes: improvementNotes,
       phase: "foundation", // Start at foundation to re-verify basics
       phaseProgress: 0,
@@ -261,7 +242,7 @@ ${content}`
       createdAt: new Date().toISOString(),
       metadata: {
         mode: "improve",
-        originalContent: content,
+        originalContent: content, // Store original SOP for AI context
         analysisResult: analysis
       }
     }

@@ -1,9 +1,26 @@
-[00:00:01.358] Server  LOG      ✓ Ready in 887ms
-[00:00:04.412] Server  LOG      ○ Compiling /improve ...
-[00:00:09.710] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:00:10.381] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:00:10.381] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/improve","route":"/improve"}
-[00:00:10.381] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/improve color: rgb(120, 120, 120) color: inherit {"dp":"/improve","o":"http://localhost:3000/improve","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766510655984}
-[00:07:31.204] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/create?mode=improve color: rgb(120, 120, 120) color: inherit {"dp":"/create","o":"http://localhost:3000/create?mode=improve","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766511096817}
-[00:27:41.486] Server  ERROR   AI_APICallError: models/gemini-3-flash-preview is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
-[00:30:16.491] Server  ERROR   AI_APICallError: models/gemini-3-flash-preview is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+[00:00:01.794] Server  LOG      ✓ Ready in 1189ms
+[00:04:41.285] Server  LOG      ○ Compiling / ...
+[00:04:46.044] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:04:46.645] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:04:46.645] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[00:04:46.645] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766754062444}
+[00:04:50.032] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766754065879}
+[00:29:20.573] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/create color: rgb(120, 120, 120) color: inherit {"dp":"/create","o":"http://localhost:3000/create","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766755536332}
+[00:47:51.719] Server  ERROR   AI_RetryError: Failed after 3 attempts. Last error: Cannot connect to API: Connect Timeout Error (attempted address: generativelanguage.googleapis.com:443, timeout: 10000ms)
+[00:58:28.726] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/review/sop-1766770564590 color: rgb(120, 120, 120) color: inherit {"dp":"/review/[id]","o":"http://localhost:3000/review/sop-1766770564590","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766770566102}
+[00:58:36.323] Server  LOG     Generating new SOP from notes...
+[00:58:36.325] Server  LOG     - Notes collected: 53
+[00:58:44.586] Server  ERROR   AI_RetryError: Failed after 3 attempts. Last error: You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/usage?tab=rate-limit. 
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-3-flash-preview
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-3-flash-preview
+* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-3-flash-preview
+Please retry in 38.089822036s.
+[00:58:47.649] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/preview/sop-1766770564590 color: rgb(120, 120, 120) color: inherit {"dp":"/preview/[id]","o":"http://localhost:3000/preview/sop-1766770564590","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766770585011}
+[00:59:07.226] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/review/sop-1766770564590 color: rgb(120, 120, 120) color: inherit {"dp":"/review/[id]","o":"http://localhost:3000/review/sop-1766770564590","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766770604609}
+[01:00:09.133] Server  LOG     Generating new SOP from notes...
+[01:00:09.133] Server  LOG     - Notes collected: 53
+[01:00:38.526] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/preview/sop-1766770564590 color: rgb(120, 120, 120) color: inherit {"dp":"/preview/[id]","o":"http://localhost:3000/preview/sop-1766770564590","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766770695913}
+[01:03:56.993] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/library color: rgb(120, 120, 120) color: inherit {"dp":"/library","o":"http://localhost:3000/library","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766770894369}
+[01:04:06.026] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/preview/sop-1766770564590 color: rgb(120, 120, 120) color: inherit {"dp":"/preview/[id]","o":"http://localhost:3000/preview/sop-1766770564590","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766770903412}
+[01:04:09.073] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/review/sop-1766770564590 color: rgb(120, 120, 120) color: inherit {"dp":"/review/[id]","o":"http://localhost:3000/review/sop-1766770564590","sdkn":"@vercel/analytics/next","sdkv":"1.3.1","sv":"0.1.3","ts":1766770906454}
+[01:19:29.433] Server  LOG      ✓ Compiled in 900ms
