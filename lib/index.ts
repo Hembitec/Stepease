@@ -1,5 +1,5 @@
 // =============================================================================
-// STEPWISE - LIBRARY INDEX
+// Stepease - LIBRARY INDEX
 // Central export point for all library modules
 // =============================================================================
 

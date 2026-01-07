@@ -1,5 +1,5 @@
 // =============================================================================
-// STEPWISE - IMPROVEMENT MODE HELPERS
+// Stepease - IMPROVEMENT MODE HELPERS
 // Utilities for context-aware SOP improvement conversations
 // =============================================================================
 

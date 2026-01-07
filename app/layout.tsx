@@ -1,33 +1,28 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import { Familjen_Grotesk, Inter } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
+import { ClerkProvider } from "@clerk/nextjs"
 import { SOPProvider } from "@/lib/sop-context"
 import "./globals.css"
 
-const _geist = Geist({ subsets: ["latin"] })
-const _geistMono = Geist_Mono({ subsets: ["latin"] })
+const familjenGrotesk = Familjen_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-sans",
+})
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+})
 
 export const metadata: Metadata = {
-  title: "StepWise - AI-Powered Standard Operating Procedures",
+  title: "Stepease - AI-Powered Standard Operating Procedures",
   description:
     "Create, improve, and manage Standard Operating Procedures in minutes with AI. Transform your business processes into professional documentation.",
   icons: {
-    icon: [
-      {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
-        type: "image/svg+xml",
-      },
-    ],
-    apple: "/apple-icon.png",
+    icon: "/icon-bg.png",
+    apple: "/icon-bg.png",
   },
 }
 
@@ -37,11 +32,20 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className="font-sans antialiased">
-        <SOPProvider>{children}</SOPProvider>
-        <Analytics />
-      </body>
-    </html>
+    <ClerkProvider
+      appearance={{
+        variables: {
+          colorPrimary: '#2563eb',
+          fontFamily: 'var(--font-sans)',
+        },
+      }}
+    >
+      <html lang="en" className={`${familjenGrotesk.variable} ${inter.variable}`}>
+        <body className="font-sans antialiased" suppressHydrationWarning>
+          <SOPProvider>{children}</SOPProvider>
+          <Analytics />
+        </body>
+      </html>
+    </ClerkProvider>
   )
 }

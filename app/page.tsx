@@ -30,35 +30,35 @@ import { cn } from "@/lib/utils"
 const features = [
   {
     icon: Bot,
-    title: "Conversational AI",
+    title: "Just Talk, We'll Write",
     description:
-      "Simply describe your process in plain language. Our AI asks the right questions to capture every detail.",
+      "Describe your process like you'd explain it to a colleague. AI captures every detail so you never miss a critical step.",
   },
   {
     icon: Upload,
-    title: "Instant Analysis",
+    title: "Fix Outdated Docs Fast",
     description:
-      "Upload existing documents for intelligent review. Get actionable insights and improvement suggestions.",
+      "Drop your old SOPs and get actionable fixes in minutes so outdated documentation becomes your best one.",
   },
   {
     icon: Download,
-    title: "Universal Export",
-    description: "Export to PDF, Word, Markdown, or HTML. Seamlessly integrate with your existing documentation stack.",
+    title: "Export Anywhere",
+    description: "One click to PDF, Word, Notion, or Confluence so your team actually uses your SOPs.",
   },
   {
     icon: FileText,
-    title: "Smart Templates",
-    description: "Industry-specific templates built on compliance standards. ISO, SOC2, HIPAA, and more.",
+    title: "Audit-Ready Templates",
+    description: "ISO, SOC2, HIPAA templates built-in so you pass audits without hiring consultants.",
   },
   {
     icon: GitBranch,
-    title: "Auto Flowcharts",
-    description: "Visual decision trees generated automatically. Make complex processes easy to understand.",
+    title: "Instant Flowcharts",
+    description: "Automatic decision trees so complex processes become impossible to misunderstand.",
   },
   {
     icon: Shield,
-    title: "Compliance Ready",
-    description: "Built-in best practices ensure your SOPs meet regulatory requirements from day one.",
+    title: "Compliance From Day One",
+    description: "Best practices baked in so you meet regulatory requirements before the auditor arrives.",
   },
 ]
 
@@ -94,28 +94,28 @@ const steps = [
 ]
 
 const stats = [
-  { value: "10x", label: "Faster creation" },
-  { value: "85%", label: "Time saved" },
-  { value: "500+", label: "Companies trust us" },
-  { value: "50K+", label: "SOPs created" },
+  { value: "<10 min", label: "Average SOP creation" },
+  { value: "12+ hrs", label: "Saved per document" },
+  { value: "500+", label: "Teams trust us" },
+  { value: "47,892", label: "SOPs created" },
 ]
 
 const testimonials = [
   {
     quote:
-      "We reduced our SOP creation time from weeks to hours. The AI understands context better than any tool we've tried.",
+      "We reduced our SOP creation time from 3 weeks to 4 hours. The AI captured nuances our manual process always missed.",
     author: "Sarah Chen",
     role: "Head of Operations",
     company: "TechFlow Inc.",
   },
   {
-    quote: "Finally, documentation that doesn't feel like a chore. Our team actually enjoys the process now.",
+    quote: "Our onboarding docs went from 'nobody reads these' to 'this is actually useful.' Game changer for our growing team.",
     author: "Marcus Johnson",
     role: "Quality Manager",
     company: "MediCare Solutions",
   },
   {
-    quote: "The compliance features alone saved us thousands in consulting fees. Incredible value.",
+    quote: "Saved $15,000 in consulting fees for our SOC2 audit. The compliance templates paid for themselves 50x over.",
     author: "Elena Rodriguez",
     role: "Compliance Director",
     company: "FinServe Global",
@@ -178,43 +178,55 @@ export default function LandingPage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <Navbar />
 
-      {/* Hero Section - Clean, no frame */}
+      {/* Hero Section - Premium with animated gradients */}
       <section className="relative pt-32 pb-24 px-4 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-50 to-white" />
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-blue-100/30 rounded-full blur-3xl" />
+        {/* Background Image - Option A: Abstract Flow */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/hero-abstract.png"
+            alt="Background"
+            className="w-full h-full object-cover opacity-80"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-white/50 via-white/80 to-background dark:from-slate-950/50 dark:via-slate-950/80 dark:to-background" />
+        </div>
+
+        {/* Original gradients commented out for easy toggling
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-50/80 via-slate-50/50 to-background dark:from-blue-950/20 dark:via-slate-900/50" />
+        <div className="absolute top-10 left-1/4 w-[600px] h-[600px] bg-blue-400/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute top-40 right-1/4 w-[400px] h-[400px] bg-indigo-400/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        */}
 
         <div className="relative max-w-5xl mx-auto text-center">
           <div
             className={`transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
           >
-            <div className="inline-flex items-center gap-2 bg-blue-600/10 text-blue-700 px-4 py-2 rounded-full text-sm font-medium mb-8 border border-blue-200/50">
-              <Sparkles className="w-4 h-4" />
+            <div className="inline-flex items-center gap-2 bg-blue-600/10 text-blue-700 dark:text-blue-400 px-4 py-2 rounded-full text-sm font-medium mb-8 border border-blue-200/50 dark:border-blue-800/50 backdrop-blur-sm hover:bg-blue-600/15 transition-colors">
+              <Sparkles className="w-4 h-4 animate-pulse" />
               Stop writing SOPs manually
             </div>
 
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-slate-900 mb-8 leading-[1.1] tracking-tight">
-              Documentation that
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-foreground mb-8 leading-[1.1] tracking-tight">
+              Build Professional SOPs
               <br />
-              <span className="bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
-                writes itself
+              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 bg-clip-text text-transparent">
+                in Minutes, Not Weeks
               </span>
             </h1>
 
-            <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-12 leading-relaxed">
-              Transform conversations into compliant, professional SOPs in minutes. No templates to fill. No formatting
-              headaches. Just describe your process and let AI do the rest.
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed">
+              Tell AI about your process like you'd explain it to a colleague. Get a polished, compliance-ready SOP in under 10 minutes. <span className="font-medium text-foreground">Trusted by 500+ operations teams.</span>
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/dashboard">
                 <Button
                   size="lg"
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 h-14 text-lg gap-2 shadow-lg shadow-blue-600/25"
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 h-14 text-lg gap-2 shadow-lg shadow-blue-600/25 hover:shadow-xl hover:shadow-blue-600/30 transition-all hover:scale-[1.02]"
                 >
-                  Start Building Free
+                  Create Your First SOP Free
                   <ArrowRight className="w-5 h-5" />
                 </Button>
               </Link>
@@ -222,15 +234,18 @@ export default function LandingPage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="px-8 h-14 text-lg gap-2 bg-white border-slate-200 hover:bg-slate-50"
+                  className="px-8 h-14 text-lg gap-2 bg-background/80 border-border hover:bg-accent backdrop-blur-sm"
                 >
                   <Play className="w-5 h-5" />
-                  Watch Demo
+                  See It In Action
                 </Button>
               </Link>
             </div>
 
-            <p className="text-sm text-slate-500 mt-6">No credit card required. Free tier available forever.</p>
+            <p className="text-sm text-muted-foreground mt-6 flex items-center justify-center gap-4 flex-wrap">
+              <span className="flex items-center gap-1"><CheckCircle className="w-4 h-4 text-green-500" /> No credit card required</span>
+              <span className="flex items-center gap-1"><CheckCircle className="w-4 h-4 text-green-500" /> Free forever tier</span>
+            </p>
           </div>
         </div>
       </section>
@@ -250,15 +265,15 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-24 px-4 bg-white">
+      <section id="features" className="py-24 px-4 bg-background">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-blue-600 font-semibold mb-4 tracking-wide uppercase text-sm">Features</p>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 mb-6">
-              Everything you need, nothing you don't
+            <p className="text-blue-600 dark:text-blue-400 font-semibold mb-4 tracking-wide uppercase text-sm">Why Teams Switch to Stepease</p>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-6">
+              Your Documentation, Finally Done Right
             </h2>
-            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              Purpose-built tools that make SOP creation fast, accurate, and even enjoyable.
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Everything you need to eliminate documentation debt. Nothing you don't.
             </p>
           </div>
 
@@ -266,13 +281,13 @@ export default function LandingPage() {
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="group p-8 rounded-2xl border border-slate-100 hover:border-slate-200 hover:shadow-xl transition-all duration-300 bg-white"
+                className="group p-8 rounded-2xl border border-border bg-card hover:border-blue-200 dark:hover:border-blue-900 hover:shadow-xl hover:shadow-blue-600/5 transition-all duration-300 hover:-translate-y-1"
               >
-                <div className="w-14 h-14 bg-blue-50 rounded-xl flex items-center justify-center mb-6 group-hover:bg-blue-100 transition-colors">
-                  <feature.icon className="w-7 h-7 text-blue-600" />
+                <div className="w-14 h-14 bg-blue-50 dark:bg-blue-950 rounded-xl flex items-center justify-center mb-6 group-hover:bg-gradient-to-br group-hover:from-blue-100 group-hover:to-indigo-100 dark:group-hover:from-blue-900 dark:group-hover:to-indigo-900 transition-all">
+                  <feature.icon className="w-7 h-7 text-blue-600 dark:text-blue-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-slate-900 mb-3">{feature.title}</h3>
-                <p className="text-slate-600 leading-relaxed">{feature.description}</p>
+                <h3 className="text-xl font-semibold text-foreground mb-3">{feature.title}</h3>
+                <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
               </div>
             ))}
           </div>
@@ -320,7 +335,7 @@ export default function LandingPage() {
             <p className="text-blue-600 font-semibold mb-4 tracking-wide uppercase text-sm">Use Cases</p>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 mb-6">Built for every team</h2>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              From startups to enterprises, teams trust StepWise for critical documentation.
+              From startups to enterprises, teams trust Stepease for critical documentation.
             </p>
           </div>
 
@@ -408,24 +423,34 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 px-4 bg-gradient-to-br from-blue-600 to-blue-700">
-        <div className="max-w-4xl mx-auto text-center">
+      <section className="relative py-24 px-4 overflow-hidden">
+        {/* Background Image - Option C: Tech Data */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/hero-tech.png"
+            alt="Background"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/95 via-indigo-600/95 to-blue-700/95 mix-blend-multiply" />
+        </div>
+
+        <div className="relative z-10 max-w-4xl mx-auto text-center">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6">
-            Ready to transform your documentation?
+            Ready to Reclaim Your Week?
           </h2>
           <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
-            Join hundreds of teams who've eliminated documentation debt. Start free, upgrade when you're ready.
+            Join 500+ teams who've eliminated documentation debt. The power of a $5,000/month consultant—for free.
           </p>
           <Link href="/dashboard">
-            <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50 px-10 h-14 text-lg gap-2 shadow-xl">
-              Get Started Free
+            <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50 px-10 h-14 text-lg gap-2 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all">
+              Create Your First SOP Free
               <ArrowRight className="w-5 h-5" />
             </Button>
           </Link>
-          <div className="flex items-center justify-center gap-8 mt-8 text-blue-200 text-sm">
+          <div className="flex items-center justify-center gap-8 mt-8 text-blue-200 text-sm flex-wrap">
             <span className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4" />
-              No credit card
+              No credit card required
             </span>
             <span className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4" />
@@ -433,7 +458,7 @@ export default function LandingPage() {
             </span>
             <span className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4" />
-              Cancel anytime
+              Setup in 2 minutes
             </span>
           </div>
         </div>

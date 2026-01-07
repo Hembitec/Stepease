@@ -1,7 +1,7 @@
 "use client"
 
 // =============================================================================
-// STEPWISE - PHASE INDICATOR
+// Stepease - PHASE INDICATOR
 // Visual progress indicator for the 5-phase conversation flow
 // =============================================================================
 

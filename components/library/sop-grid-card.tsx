@@ -26,7 +26,12 @@ export function SOPGridCard({ sop }: SOPGridCardProps) {
     if (diffDays === 0) return "Today"
     if (diffDays === 1) return "Yesterday"
     if (diffDays < 7) return `${diffDays}d ago`
-    return date.toLocaleDateString()
+    // Use explicit locale to prevent hydration mismatch
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }).format(date)
   }
 
   return (

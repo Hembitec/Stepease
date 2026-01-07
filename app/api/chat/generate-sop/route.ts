@@ -1,5 +1,5 @@
 // =============================================================================
-// STEPWISE - GENERATE SOP API ROUTE
+// Stepease - GENERATE SOP API ROUTE
 // Transforms collected notes into a complete SOP document
 // Supports both CREATE (new SOP) and IMPROVE (existing SOP) modes
 // =============================================================================

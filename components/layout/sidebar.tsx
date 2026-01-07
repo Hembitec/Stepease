@@ -1,20 +1,34 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import {
   LayoutDashboard,
   FolderOpen,
   Settings,
-  FileText,
   LogOut,
   Plus,
   ChevronRight,
   ChevronLeft,
   X,
+  SidebarClose,
+  SidebarOpen,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { useUser, useClerk } from "@clerk/nextjs"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
@@ -31,6 +45,8 @@ interface SidebarProps {
 
 export function Sidebar({ isCollapsed, onToggle, isMobileOpen, onMobileClose }: SidebarProps) {
   const pathname = usePathname()
+  const { user } = useUser()
+  const { signOut } = useClerk()
 
   return (
     <>
@@ -53,70 +69,78 @@ export function Sidebar({ isCollapsed, onToggle, isMobileOpen, onMobileClose }: 
           isMobileOpen && "!flex w-72"
         )}
       >
-        {/* Header Row: Logo + Name + Toggle */}
+        {/* Header Row: Logo + Name + Toggle (or just Expand button when collapsed) */}
         <div
           className={cn(
             "flex items-center gap-3 py-5 border-b border-slate-800",
             isCollapsed && !isMobileOpen ? "px-4 justify-center" : "px-5"
           )}
         >
-          {/* Logo */}
-          <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/25 flex-shrink-0">
-            <FileText className="w-5 h-5 text-white" />
-          </div>
-
-          {/* Name - hidden when collapsed on desktop, always shown on mobile */}
-          {(!isCollapsed || isMobileOpen) && (
-            <span className="text-lg font-bold text-white whitespace-nowrap flex-1">
-              StepWise
-            </span>
-          )}
-
-          {/* Toggle Button (desktop) / Close Button (mobile) */}
-          {isMobileOpen ? (
-            <button
-              onClick={onMobileClose}
-              className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
-              title="Close sidebar"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          ) : (
+          {/* When collapsed on desktop: show only expand button */}
+          {isCollapsed && !isMobileOpen ? (
             <button
               onClick={onToggle}
-              className={cn(
-                "w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors",
-                isCollapsed && "hidden"
-              )}
-              title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              className="w-9 h-9 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+              title="Expand sidebar"
             >
-              <ChevronLeft className="w-5 h-5" />
+              <SidebarOpen className="w-5 h-5" />
             </button>
+          ) : (
+            <>
+              {/* Logo */}
+              <div className="relative w-10 h-10 flex-shrink-0">
+                <Image
+                  src="/icon.png"
+                  alt="Logo"
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </div>
+
+              {/* Name */}
+              {!isMobileOpen && (
+                <span className="text-lg font-bold text-white whitespace-nowrap flex-1">
+                  Stepease
+                </span>
+              )}
+              {isMobileOpen && (
+                <span className="text-lg font-bold text-white whitespace-nowrap flex-1">
+                  Stepease
+                </span>
+              )}
+
+              {/* Toggle Button (desktop) / Close Button (mobile) */}
+              {isMobileOpen ? (
+                <button
+                  onClick={onMobileClose}
+                  className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                  title="Close sidebar"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              ) : (
+                <button
+                  onClick={onToggle}
+                  className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                  title="Collapse sidebar"
+                >
+                  <SidebarClose className="w-5 h-5" />
+                </button>
+              )}
+            </>
           )}
         </div>
 
-        {/* Expand button when collapsed (desktop only) */}
-        {isCollapsed && !isMobileOpen && (
-          <div className="px-3 py-3 border-b border-slate-800">
-            <button
-              onClick={onToggle}
-              className="w-full h-10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
-              title="Expand sidebar"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </div>
-        )}
-
         {/* Quick Create Button */}
-        <div className={cn("py-4", isCollapsed && !isMobileOpen ? "px-3" : "px-4")}>
+        <div className={cn("transition-all duration-200", isCollapsed && !isMobileOpen ? "py-3 px-0 flex justify-center" : "py-4 px-4")}>
           <Link
             href="/create"
             onClick={onMobileClose}
             className={cn(
               "flex items-center justify-center bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white font-medium transition-all duration-200 shadow-lg shadow-blue-600/25 hover:shadow-blue-500/40",
               isCollapsed && !isMobileOpen
-                ? "w-10 h-10 rounded-lg"
+                ? "w-9 h-9 rounded-lg"
                 : "w-full px-4 py-3 rounded-xl gap-3"
             )}
             title="Create New SOP"
@@ -137,14 +161,14 @@ export function Sidebar({ isCollapsed, onToggle, isMobileOpen, onMobileClose }: 
             {menuItems.map((item) => {
               const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
               return (
-                <li key={item.href}>
+                <li key={item.href} className={cn(isCollapsed && !isMobileOpen && "flex justify-center")}>
                   <Link
                     href={item.href}
                     onClick={onMobileClose}
                     className={cn(
                       "flex items-center gap-3 rounded-xl transition-all duration-200 group",
                       isCollapsed && !isMobileOpen
-                        ? "justify-center p-2.5"
+                        ? "w-9 h-9 justify-center p-0"
                         : "px-4 py-2.5",
                       // Only show background when expanded OR on hover
                       isCollapsed && !isMobileOpen
@@ -183,30 +207,53 @@ export function Sidebar({ isCollapsed, onToggle, isMobileOpen, onMobileClose }: 
               "flex items-center gap-3 rounded-xl hover:bg-slate-800/50 transition-colors cursor-pointer",
               isCollapsed && !isMobileOpen ? "justify-center p-2" : "px-2 py-2"
             )}
-            title={isCollapsed && !isMobileOpen ? "John Doe" : undefined}
+            title={isCollapsed && !isMobileOpen ? user?.fullName || "User" : undefined}
           >
             <Avatar className="w-9 h-9 bg-gradient-to-br from-blue-500 to-indigo-600 flex-shrink-0 shadow-lg shadow-blue-500/25">
               <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-sm font-medium">
-                JD
+                {user?.firstName?.charAt(0) || user?.emailAddresses[0]?.emailAddress?.charAt(0) || "U"}
               </AvatarFallback>
             </Avatar>
             {(!isCollapsed || isMobileOpen) && (
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white truncate">John Doe</p>
-                <p className="text-xs text-slate-500 truncate">john@company.com</p>
+                <p className="text-sm font-medium text-white truncate">{user?.fullName || "User"}</p>
+                <p className="text-xs text-slate-500 truncate">{user?.primaryEmailAddress?.emailAddress || ""}</p>
               </div>
             )}
           </div>
-          <button
-            className={cn(
-              "flex items-center gap-3 w-full mt-2 text-sm text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-xl transition-colors",
-              isCollapsed && !isMobileOpen ? "justify-center p-3" : "px-4 py-2.5"
-            )}
-            title={isCollapsed && !isMobileOpen ? "Sign out" : undefined}
-          >
-            <LogOut className="w-4 h-4 flex-shrink-0" />
-            {(!isCollapsed || isMobileOpen) && <span>Sign out</span>}
-          </button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button
+                className={cn(
+                  "flex items-center gap-3 w-full mt-2 text-sm text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-xl transition-colors",
+                  isCollapsed && !isMobileOpen ? "justify-center p-3" : "px-4 py-2.5"
+                )}
+                title={isCollapsed && !isMobileOpen ? "Sign out" : undefined}
+              >
+                <LogOut className="w-4 h-4 flex-shrink-0" />
+                {(!isCollapsed || isMobileOpen) && <span>Sign out</span>}
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent className="bg-slate-900 border-slate-700">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="text-white">Sign out of Stepease?</AlertDialogTitle>
+                <AlertDialogDescription className="text-slate-400">
+                  You will be redirected to the landing page. Any unsaved changes may be lost.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className="bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white">
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => signOut({ redirectUrl: '/' })}
+                  className="bg-red-600 hover:bg-red-700 text-white border-0"
+                >
+                  Sign out
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </aside>
     </>

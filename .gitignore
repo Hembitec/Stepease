@@ -142,3 +142,6 @@ dist
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# clerk configuration (can include secrets)
+/.clerk/

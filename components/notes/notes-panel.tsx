@@ -1,7 +1,7 @@
 "use client"
 
 // =============================================================================
-// STEPWISE - ENHANCED NOTES PANEL
+// Stepease - ENHANCED NOTES PANEL
 // Displays categorized notes with priority indicators
 // =============================================================================
 

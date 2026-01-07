@@ -1,5 +1,5 @@
 // =============================================================================
-// STEPWISE - TYPE DEFINITIONS
+// Stepease - TYPE DEFINITIONS
 // Core types for the SOP Builder application
 // =============================================================================
 

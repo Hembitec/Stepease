@@ -54,7 +54,7 @@ export function DashboardLayout({ children, fullHeight = false }: DashboardLayou
 
   return (
     <div className={cn(
-      "bg-gradient-to-br from-slate-50 via-slate-100 to-blue-50/30",
+      "bg-gradient-to-br from-slate-50 via-slate-100 to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/30",
       fullHeight ? "h-screen overflow-hidden" : "min-h-screen"
     )}>
       {/* Mobile Top Navbar */}
@@ -71,7 +71,7 @@ export function DashboardLayout({ children, fullHeight = false }: DashboardLayou
           <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
             <FileText className="w-4 h-4 text-white" />
           </div>
-          <span className="text-lg font-bold">StepWise</span>
+          <span className="text-lg font-bold">Stepease</span>
         </div>
 
         {/* Spacer for symmetry */}

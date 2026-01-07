@@ -1,5 +1,5 @@
 // =============================================================================
-// STEPWISE - AI RESPONSE PARSER
+// Stepease - AI RESPONSE PARSER
 // Handles parsing and validation of AI responses
 // =============================================================================
 
@@ -119,7 +119,7 @@ export function parseAIResponse(
     try {
         const jsonStr = extractJSON(content)
         const rawParsed = JSON.parse(jsonStr)
-        
+
         // Use Zod for strict validation
         const result = aiResponseSchema.safeParse(rawParsed)
 

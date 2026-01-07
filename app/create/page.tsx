@@ -1,7 +1,7 @@
 "use client"
 
 // =============================================================================
-// STEPWISE - CREATE SOP PAGE
+// Stepease - CREATE SOP PAGE
 // Main interface for AI-powered SOP creation with 5-phase conversation flow
 // =============================================================================
 

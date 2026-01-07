@@ -1,6 +1,6 @@
 
 import mammoth from "mammoth"
-import { PDFParse } from "pdf-parse"
+import { extractTextFromPDF } from "./pdf-extraction-client"
 
 export interface ProcessedFile {
     content: string
@@ -24,34 +24,28 @@ function cleanText(text: string): string {
 }
 
 /**
- * Process a PDF file buffer to extract text
+ * Process a PDF file buffer to extract text using external API
  */
 export async function processPDF(buffer: Buffer): Promise<ProcessedFile> {
     try {
-        // Create PDFParse instance with the buffer data
-        const pdfParser = new PDFParse({ data: buffer })
-
-        // Extract text and info from the PDF
-        const textResult = await pdfParser.getText()
-        const infoResult = await pdfParser.getInfo()
-
-        const content = cleanText(textResult.text)
-
-        // Clean up resources
-        await pdfParser.destroy()
+        // Use external PDF extraction API
+        const result = await extractTextFromPDF(buffer)
+        const content = cleanText(result.text)
 
         return {
             content,
             metadata: {
-                pageCount: infoResult.total,
                 charCount: content.length,
-                wordCount: content.split(/\s+/).length,
-                title: infoResult.info?.Title as string | undefined
+                wordCount: content.split(/\s+/).filter(w => w.length > 0).length,
             }
         }
     } catch (error) {
         console.error("PDF Processing Error:", error)
-        throw new Error("Failed to process PDF file")
+        throw new Error(
+            error instanceof Error
+                ? error.message
+                : "Failed to process PDF file"
+        )
     }
 }
 

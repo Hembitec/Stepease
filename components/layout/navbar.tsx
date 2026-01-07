@@ -1,9 +1,17 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { useState, useEffect } from "react"
-import { FileText, Menu, X } from "lucide-react"
+import { Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import {
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton
+} from "@clerk/nextjs"
 import { cn } from "@/lib/utils"
 
 export function Navbar() {
@@ -28,11 +36,18 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <FileText className="w-5 h-5 text-white" />
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-1.5">
+            <div className="relative h-12 w-12 flex-shrink-0">
+              <Image
+                src="/icon.png"
+                alt="Stepease"
+                fill
+                className="object-contain"
+                priority
+              />
             </div>
-            <span className="text-xl font-bold text-gray-900">StepWise</span>
+            <span className="text-xl font-bold text-gray-900 font-inter">Stepease</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -48,14 +63,22 @@ export function Navbar() {
             </Link>
           </div>
 
-          {/* Desktop CTA */}
+          {/* Desktop CTA - Auth Buttons */}
           <div className="hidden md:flex items-center gap-4">
-            <Link href="/dashboard">
-              <Button variant="ghost">Log In</Button>
-            </Link>
-            <Link href="/dashboard">
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">Sign Up Free</Button>
-            </Link>
+            <SignedOut>
+              <SignInButton mode="modal" forceRedirectUrl="/dashboard">
+                <Button variant="ghost">Log In</Button>
+              </SignInButton>
+              <SignUpButton mode="modal" forceRedirectUrl="/dashboard">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white">Sign Up Free</Button>
+              </SignUpButton>
+            </SignedOut>
+            <SignedIn>
+              <Link href="/dashboard">
+                <Button variant="ghost">Dashboard</Button>
+              </Link>
+              <UserButton afterSignOutUrl="/" />
+            </SignedIn>
           </div>
 
           {/* Mobile Menu Button */}
@@ -79,14 +102,25 @@ export function Navbar() {
               Pricing
             </Link>
             <hr />
-            <Link href="/dashboard">
-              <Button variant="ghost" className="w-full justify-start">
-                Log In
-              </Button>
-            </Link>
-            <Link href="/dashboard">
-              <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">Sign Up Free</Button>
-            </Link>
+            <SignedOut>
+              <SignInButton mode="modal" forceRedirectUrl="/dashboard">
+                <Button variant="ghost" className="w-full justify-start">
+                  Log In
+                </Button>
+              </SignInButton>
+              <SignUpButton mode="modal" forceRedirectUrl="/dashboard">
+                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">Sign Up Free</Button>
+              </SignUpButton>
+            </SignedOut>
+            <SignedIn>
+              <Link href="/dashboard">
+                <Button variant="ghost" className="w-full justify-start">Dashboard</Button>
+              </Link>
+              <div className="flex items-center gap-2 px-3 py-2">
+                <UserButton afterSignOutUrl="/" />
+                <span className="text-gray-600">Account</span>
+              </div>
+            </SignedIn>
           </div>
         </div>
       )}

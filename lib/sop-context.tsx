@@ -1,7 +1,7 @@
 "use client"
 
 // =============================================================================
-// STEPWISE - SOP CONTEXT PROVIDER
+// Stepease - SOP CONTEXT PROVIDER
 // Global state management for SOP creation with 5-phase conversation flow
 // =============================================================================
 

@@ -31,8 +31,14 @@ export function SOPListItem({ sop, onDelete, onArchive }: SOPListItemProps) {
     if (diffHours < 24) return `${diffHours}h ago`
     if (diffDays === 1) return "Yesterday"
     if (diffDays < 7) return `${diffDays}d ago`
-    return date.toLocaleDateString()
+    // Use explicit locale to prevent hydration mismatch
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }).format(date)
   }
+
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md hover:border-gray-300 transition-all flex items-center gap-4">

@@ -1,5 +1,5 @@
 // =============================================================================
-// STEPWISE - SOP CHAT API ROUTE
+// Stepease - SOP CHAT API ROUTE
 // Handles conversational AI for SOP creation and improvement
 // =============================================================================
 
