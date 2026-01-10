@@ -1,6 +1,5 @@
 
 import mammoth from "mammoth"
-import { extractTextFromPDF } from "./pdf-extraction-client"
 
 export interface ProcessedFile {
     content: string
@@ -24,30 +23,36 @@ function cleanText(text: string): string {
 }
 
 /**
- * Process a PDF file buffer to extract text using external API
+ * Process a PDF file buffer to extract text using pdf-parse v1.x
+ * Note: We use dynamic require to avoid the test file loading bug in pdf-parse
  */
 export async function processPDF(buffer: Buffer): Promise<ProcessedFile> {
     try {
-        // Use external PDF extraction API
-        const result = await extractTextFromPDF(buffer)
-        const content = cleanText(result.text)
+        // Use the lib directly to avoid index.js which has the test file bug
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const pdfParse = require("pdf-parse/lib/pdf-parse.js")
+        const data = await pdfParse(buffer)
+        const content = cleanText(data.text)
 
         return {
             content,
             metadata: {
+                pageCount: data.numpages,
                 charCount: content.length,
-                wordCount: content.split(/\s+/).filter(w => w.length > 0).length,
+                wordCount: content.split(/\s+/).filter((w: string) => w.length > 0).length,
+                title: data.info?.Title || undefined
             }
         }
     } catch (error) {
         console.error("PDF Processing Error:", error)
         throw new Error(
             error instanceof Error
-                ? error.message
+                ? `Failed to process PDF: ${error.message}`
                 : "Failed to process PDF file"
         )
     }
 }
+
 
 /**
  * Process a Word document buffer to extract text

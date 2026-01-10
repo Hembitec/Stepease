@@ -1,19 +1,16 @@
 
 import { processPDF, processWord, processText, type ProcessedFile } from "@/lib/file-processors"
-import { analyzeSOPText } from "@/lib/sop-analyzer"
 
-export const maxDuration = 60 // Allow up to 60 seconds for processing
+export const maxDuration = 30
 
 export async function POST(req: Request) {
-    let stage: "extraction" | "analysis" = "extraction"
-
     try {
         const formData = await req.formData()
         const file = formData.get("file") as File
 
         if (!file) {
             return Response.json(
-                { error: "No file provided", stage: "extraction" },
+                { error: "No file provided" },
                 { status: 400 }
             )
         }
@@ -22,7 +19,7 @@ export async function POST(req: Request) {
         const arrayBuffer = await file.arrayBuffer()
         const buffer = Buffer.from(arrayBuffer)
 
-        // Process file based on type (EXTRACTION STAGE)
+        // Process file based on type
         let processedFile: ProcessedFile
 
         if (file.type === "application/pdf") {
@@ -36,39 +33,27 @@ export async function POST(req: Request) {
             processedFile = await processText(buffer)
         } else {
             return Response.json(
-                { error: "Unsupported file type", stage: "extraction" },
+                { error: "Unsupported file type" },
                 { status: 400 }
             )
         }
 
-        // Switch to analysis stage
-        stage = "analysis"
-
-        // Analyze content (ANALYSIS STAGE)
-        const analysis = await analyzeSOPText(processedFile.content)
-
         return Response.json({
             processedFile,
-            analysis,
-            stage: "complete"
+            success: true
         })
 
     } catch (error) {
-        console.error(`${stage.toUpperCase()} Error:`, error)
+        console.error("EXTRACTION Error:", error)
 
         const errorMessage = error instanceof Error ? error.message : "Unknown error"
-        const userMessage = stage === "extraction"
-            ? "Failed to extract text from your file. Please check the file format."
-            : "Failed to analyze the SOP content. Please try again."
 
         return Response.json(
             {
-                error: userMessage,
-                details: errorMessage,
-                stage
+                error: "Failed to extract text from your file. Please check the file format.",
+                details: errorMessage
             },
             { status: 500 }
         )
     }
 }
-

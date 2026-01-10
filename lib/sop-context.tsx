@@ -231,13 +231,17 @@ export function SOPProvider({ children }: { children: ReactNode }) {
       action: "Needs addressing",
     }))
 
+    // Calculate initial progress based on analysis - improvements already done partially
+    // Use the overall quality score as a baseline for progress
+    const baseProgress = Math.min(analysis.quality.overall, 75) // Cap at 75% since we're improving
+
     const newSession: SessionState = {
       id: newId,
       title: "SOP Improvement",
       messages: [], // Start with empty messages - AI greeting will be shown separately
       notes: improvementNotes,
-      phase: "foundation", // Start at foundation to re-verify basics
-      phaseProgress: 0,
+      phase: "process", // Start at process phase since we already have the foundation from the analyzed SOP
+      phaseProgress: baseProgress, // Use analysis score as starting point
       questionsAsked: 0,
       createdAt: new Date().toISOString(),
       metadata: {

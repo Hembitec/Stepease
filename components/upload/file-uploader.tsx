@@ -2,10 +2,10 @@
 "use client"
 
 import { useState, useRef, useCallback } from "react"
-import { Upload, FileText, CheckCircle2, AlertCircle, Loader2 } from "lucide-react"
-import { Progress } from "@/components/ui/progress"
+import { Upload, AlertCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { AnalysisResult } from "@/lib/sop-analyzer"
+import { ProcessingStepper, type ProcessingStage, type ErrorStage } from "./processing-stepper"
 
 interface FileUploaderProps {
     onAnalysisComplete: (result: { analysis: AnalysisResult; processedFile: any }) => void
@@ -13,10 +13,13 @@ interface FileUploaderProps {
 
 export function FileUploader({ onAnalysisComplete }: FileUploaderProps) {
     const [isDragging, setIsDragging] = useState(false)
-    const [isUploading, setIsUploading] = useState(false)
+    const [processingStage, setProcessingStage] = useState<ProcessingStage>("idle")
+    const [errorStage, setErrorStage] = useState<ErrorStage>(null)
     const [error, setError] = useState<string | null>(null)
 
     const fileInputRef = useRef<HTMLInputElement>(null)
+
+    const isProcessing = processingStage !== "idle" && processingStage !== "error"
 
     const handleDragOver = useCallback((e: React.DragEvent) => {
         e.preventDefault()
@@ -40,6 +43,12 @@ export function FileUploader({ onAnalysisComplete }: FileUploaderProps) {
         if (file) handleFile(file)
     }, [])
 
+    const resetState = () => {
+        setProcessingStage("idle")
+        setErrorStage(null)
+        setError(null)
+    }
+
     const handleFile = async (file: File) => {
         // Validation
         const validTypes = [
@@ -57,80 +66,133 @@ export function FileUploader({ onAnalysisComplete }: FileUploaderProps) {
             return
         }
 
-        setIsUploading(true)
-        setError(null)
+        // Reset and start EXTRACTION stage
+        resetState()
+        setProcessingStage("extracting")
 
         const formData = new FormData()
         formData.append("file", file)
 
         try {
-            const response = await fetch("/api/analyze-sop", {
+            // Step 1: EXTRACTION
+            const extractResponse = await fetch("/api/extract-file", {
                 method: "POST",
                 body: formData
             })
 
-            if (!response.ok) throw new Error("Analysis failed")
+            const extractData = await extractResponse.json()
 
-            const data = await response.json()
-            onAnalysisComplete(data)
+            if (!extractResponse.ok) {
+                setProcessingStage("error")
+                setErrorStage("extraction")
+                setError(extractData.error || "Failed to extract text from file.")
+                return
+            }
+
+            // Step 2: ANALYSIS - Now update to analysis stage
+            setProcessingStage("analyzing")
+
+            const analyzeResponse = await fetch("/api/analyze-content", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ content: extractData.processedFile.content })
+            })
+
+            const analyzeData = await analyzeResponse.json()
+
+            if (!analyzeResponse.ok) {
+                setProcessingStage("error")
+                setErrorStage("analysis")
+                setError(analyzeData.error || "Failed to analyze SOP content.")
+                return
+            }
+
+            // Step 3: COMPLETE
+            setProcessingStage("complete")
+
+            // Small delay to show completion state before transitioning
+            await new Promise(resolve => setTimeout(resolve, 500))
+
+            onAnalysisComplete({
+                processedFile: extractData.processedFile,
+                analysis: analyzeData.analysis
+            })
+
         } catch (err) {
-            setError("Failed to process file. Please try again.")
+            setProcessingStage("error")
+            setErrorStage("extraction")
+            setError("Network error. Please check your connection and try again.")
             console.error(err)
-        } finally {
-            setIsUploading(false)
         }
     }
 
     return (
         <div className="w-full">
-            <div
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                onClick={() => !isUploading && fileInputRef.current?.click()}
-                className={cn(
-                    "border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-all duration-200",
-                    isDragging
-                        ? "border-blue-500 bg-blue-50"
-                        : "border-slate-200 hover:border-blue-400 hover:bg-slate-50",
-                    isUploading && "pointer-events-none opacity-50"
-                )}
-            >
-                <input
-                    ref={fileInputRef}
-                    type="file"
-                    className="hidden"
-                    accept=".pdf,.docx,.txt,.md"
-                    onChange={handleFileSelect}
+            {/* Processing Stepper - shown during processing or error */}
+            {processingStage !== "idle" && (
+                <ProcessingStepper
+                    stage={processingStage}
+                    errorStage={errorStage}
+                    errorMessage={error || undefined}
                 />
+            )}
 
-                {isUploading ? (
+            {/* Upload Zone - shown when idle or on error */}
+            {(processingStage === "idle" || processingStage === "error") && (
+                <div
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    onClick={() => !isProcessing && fileInputRef.current?.click()}
+                    className={cn(
+                        "border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-all duration-200",
+                        isDragging
+                            ? "border-primary bg-primary/5"
+                            : "border-border hover:border-primary/50 hover:bg-muted/50",
+                        isProcessing && "pointer-events-none opacity-50"
+                    )}
+                >
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        className="hidden"
+                        accept=".pdf,.docx,.txt,.md"
+                        onChange={handleFileSelect}
+                    />
+
                     <div className="flex flex-col items-center gap-4">
-                        <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
-                        <p className="text-sm text-slate-600 font-medium">Analyzing your SOP...</p>
-                        <p className="text-xs text-slate-400">This usually takes 10-20 seconds</p>
-                    </div>
-                ) : (
-                    <div className="flex flex-col items-center gap-4">
-                        <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+                        <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center">
                             <Upload className="w-8 h-8" />
                         </div>
                         <div>
-                            <p className="text-lg font-semibold text-slate-900">
+                            <p className="text-lg font-semibold text-foreground">
                                 Click to upload or drag and drop
                             </p>
-                            <p className="text-sm text-slate-500 mt-1">
+                            <p className="text-sm text-muted-foreground mt-1">
                                 PDF, Word, or Text (max 10MB)
                             </p>
                         </div>
                     </div>
-                )}
-            </div>
+                </div>
+            )}
 
-            {error && (
-                <div className="mt-4 p-4 bg-red-50 text-red-700 rounded-lg flex items-center gap-2">
-                    <AlertCircle className="w-5 h-5" />
+            {/* Error without stepper context (validation errors) */}
+            {error && processingStage === "idle" && (
+                <div className="mt-4 p-4 bg-destructive/10 text-destructive rounded-lg flex items-center gap-2">
+                    <AlertCircle className="w-5 h-5 flex-shrink-0" />
                     <p className="text-sm">{error}</p>
+                </div>
+            )}
+
+            {/* Retry button on error */}
+            {processingStage === "error" && (
+                <div className="mt-4 text-center">
+                    <button
+                        onClick={resetState}
+                        className="text-sm text-primary hover:underline font-medium"
+                    >
+                        Try uploading a different file
+                    </button>
                 </div>
             )}
         </div>
