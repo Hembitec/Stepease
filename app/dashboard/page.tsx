@@ -2,6 +2,8 @@
 
 import Link from "next/link"
 import { DashboardLayout } from "@/components/layout/dashboard-layout"
+import { useQuery } from "convex/react"
+import { api } from "@/convex/_generated/api"
 import { useSOPContext } from "@/lib/sop-context"
 import {
   Sparkles,
@@ -16,12 +18,14 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { DraftsSection } from "@/components/dashboard/drafts-section"
 
 export default function DashboardPage() {
   const { sops } = useSOPContext()
+  const sessions = useQuery(api.sessions.list) ?? []
   const recentSOPs = sops.slice(0, 5)
 
-  const draftCount = sops.filter((s) => s.status === "draft").length
+  const draftCount = sessions.length
   const completeCount = sops.filter((s) => s.status === "complete").length
 
   // Get current date for greeting
@@ -175,6 +179,9 @@ export default function DashboardPage() {
             </div>
           </Link>
         </div>
+
+        {/* In Progress Sessions */}
+        <DraftsSection />
 
         {/* Recent SOPs */}
         <div>

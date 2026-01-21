@@ -2,10 +2,13 @@
 
 // =============================================================================
 // Stepease - SOP CONTEXT PROVIDER
-// Global state management for SOP creation with 5-phase conversation flow
+// Global state management with Convex real-time persistence
 // =============================================================================
 
 import { createContext, useContext, useState, useCallback, type ReactNode } from "react"
+import { useQuery, useMutation } from "convex/react"
+import { api } from "@/convex/_generated/api"
+import type { Id } from "@/convex/_generated/dataModel"
 import {
   type Note,
   type ChatMessage,
@@ -17,35 +20,6 @@ import {
   calculateOverallProgress,
 } from "./types"
 import type { AnalysisResult } from "./sop-analyzer"
-
-// -----------------------------------------------------------------------------
-// Mock Data for Initial State
-// -----------------------------------------------------------------------------
-
-const MOCK_SOPS: SOP[] = [
-  {
-    id: "sop-001",
-    title: "Invoice Approval Procedure v2.0",
-    department: "Finance",
-    status: "complete",
-    createdAt: "2025-12-18T10:00:00Z",
-    updatedAt: "2025-12-20T08:30:00Z",
-    content: `# Invoice Approval Procedure v2.0\n\n**Document ID:** SOP-FIN-001\n**Version:** 2.0\n**Effective Date:** December 20, 2025\n\n## 1. PURPOSE\nThis SOP establishes standardized procedures for invoice approval.\n\n## 2. SCOPE\nApplies to Accounts Payable team and all department managers.\n\n## 3. PROCEDURE\n1. Receive invoice\n2. Verify details\n3. Route for approval\n4. Process payment`,
-    notes: [],
-    chatHistory: [],
-  },
-  {
-    id: "sop-002",
-    title: "Employee Onboarding Process",
-    department: "HR",
-    status: "draft",
-    createdAt: "2025-12-19T14:00:00Z",
-    updatedAt: "2025-12-19T16:45:00Z",
-    content: "# Employee Onboarding Process\n\n*Draft in progress...*",
-    notes: [],
-    chatHistory: [],
-  },
-]
 
 // -----------------------------------------------------------------------------
 // Context Types
@@ -70,7 +44,9 @@ interface SOPContextType {
 
   // Session Management (for active creation)
   session: SessionState | null
+  activeSessionId: Id<"sessions"> | null
   startNewSession: () => string
+  resumeSession: (sessionId: string) => void
   startImprovementSession: (content: string, analysis: AnalysisResult) => string
   updateSession: (updates: Partial<SessionState>) => void
   endSession: () => void
@@ -103,107 +79,186 @@ const SOPContext = createContext<SOPContextType | undefined>(undefined)
 // -----------------------------------------------------------------------------
 
 export function SOPProvider({ children }: { children: ReactNode }) {
-  // SOP Library State
-  const [sops, setSops] = useState<SOP[]>(MOCK_SOPS)
-  const [currentSOP, setCurrentSOP] = useState<SOP | null>(null)
+  // Convex Queries - Real-time data from database
+  const convexSops = useQuery(api.sops.list) ?? []
+  const convexSessions = useQuery(api.sessions.list) ?? []
 
-  // Active Session State
-  const [session, setSession] = useState<SessionState | null>(null)
+  // Convex Mutations
+  const createSopMutation = useMutation(api.sops.create)
+  const updateSopMutation = useMutation(api.sops.update)
+  const removeSopMutation = useMutation(api.sops.remove)
+  const addSopNoteMutation = useMutation(api.sops.addNote)
+  const addSopMessageMutation = useMutation(api.sops.addMessage)
+
+  const createSessionMutation = useMutation(api.sessions.create)
+  const addSessionMessageMutation = useMutation(api.sessions.addMessage)
+  const addSessionNotesMutation = useMutation(api.sessions.addNotes)
+  const updateSessionProgressMutation = useMutation(api.sessions.updateProgress)
+  const removeSessionMutation = useMutation(api.sessions.remove)
+
+  // Local State (UI-only state)
+  const [currentSOP, setCurrentSOP] = useState<SOP | null>(null)
+  const [activeSessionId, setActiveSessionId] = useState<Id<"sessions"> | null>(null)
+  const [localSession, setLocalSession] = useState<SessionState | null>(null)
+
+  // Transform Convex SOPs to local SOP type (add 'id' field from '_id')
+  const sops: SOP[] = convexSops.map((s) => ({
+    id: s._id,
+    title: s.title,
+    department: s.department,
+    status: s.status as SOP["status"],
+    createdAt: s.createdAt,
+    updatedAt: s.updatedAt,
+    content: s.content,
+    notes: s.notes as Note[],
+    chatHistory: s.chatHistory as ChatMessage[],
+    sessionId: s.sessionId, // Link back to original session
+  }))
+
+  // Get current session from Convex if we have an activeSessionId
+  const activeConvexSession = convexSessions.find(s => s._id === activeSessionId)
+  const session: SessionState | null = activeConvexSession ? {
+    id: activeConvexSession._id,
+    title: activeConvexSession.title,
+    messages: activeConvexSession.messages as ChatMessage[],
+    notes: activeConvexSession.notes as Note[],
+    phase: activeConvexSession.phase as ConversationPhase,
+    phaseProgress: activeConvexSession.phaseProgress,
+    questionsAsked: activeConvexSession.questionsAsked,
+    createdAt: activeConvexSession.createdAt,
+    metadata: activeConvexSession.metadata,
+  } : localSession
 
   // -------------------------------------------------------------------------
   // SOP CRUD Operations
   // -------------------------------------------------------------------------
 
-  const addSOP = useCallback((sop: SOP) => {
-    setSops((prev) => [...prev, sop])
-  }, [])
-
-  const updateSOP = useCallback((id: string, updates: Partial<SOP>) => {
-    setSops((prev) =>
-      prev.map((sop) =>
-        sop.id === id
-          ? { ...sop, ...updates, updatedAt: new Date().toISOString() }
-          : sop
-      )
-    )
-
-    // Update currentSOP if it's the one being modified
-    if (currentSOP?.id === id) {
-      setCurrentSOP((prev) => (prev ? { ...prev, ...updates } : null))
+  const addSOP = useCallback(async (sop: SOP) => {
+    try {
+      await createSopMutation({
+        title: sop.title,
+        department: sop.department,
+        status: sop.status,
+        content: sop.content,
+        sessionId: sop.sessionId, // Link back to original session
+        notes: sop.notes.map(n => ({
+          id: n.id,
+          category: n.category,
+          priority: n.priority,
+          content: n.content,
+          relatedTo: n.relatedTo,
+          action: n.action,
+          timestamp: n.timestamp,
+          source: n.source,
+        })),
+        chatHistory: sop.chatHistory.map(m => ({
+          role: m.role,
+          content: m.content,
+          timestamp: m.timestamp,
+        })),
+      })
+    } catch (error) {
+      console.error("Failed to add SOP:", error)
     }
-  }, [currentSOP?.id])
+  }, [createSopMutation])
 
-  const deleteSOP = useCallback((id: string) => {
-    setSops((prev) => prev.filter((sop) => sop.id !== id))
-    if (currentSOP?.id === id) {
-      setCurrentSOP(null)
+  const updateSOP = useCallback(async (id: string, updates: Partial<SOP>) => {
+    try {
+      await updateSopMutation({
+        id: id as Id<"sops">,
+        title: updates.title,
+        department: updates.department,
+        status: updates.status,
+        content: updates.content,
+      })
+      // Update currentSOP if it's the one being modified
+      if (currentSOP?.id === id) {
+        setCurrentSOP((prev) => (prev ? { ...prev, ...updates } : null))
+      }
+    } catch (error) {
+      console.error("Failed to update SOP:", error)
     }
-  }, [currentSOP?.id])
+  }, [updateSopMutation, currentSOP?.id])
+
+  const deleteSOP = useCallback(async (id: string) => {
+    try {
+      await removeSopMutation({ id: id as Id<"sops"> })
+      if (currentSOP?.id === id) {
+        setCurrentSOP(null)
+      }
+    } catch (error) {
+      console.error("Failed to delete SOP:", error)
+    }
+  }, [removeSopMutation, currentSOP?.id])
 
   // -------------------------------------------------------------------------
   // Note Operations (for saved SOPs)
   // -------------------------------------------------------------------------
 
-  const addNote = useCallback((sopId: string, note: Note) => {
-    setSops((prev) =>
-      prev.map((sop) =>
-        sop.id === sopId
-          ? { ...sop, notes: [...sop.notes, note], updatedAt: new Date().toISOString() }
-          : sop
-      )
-    )
-  }, [])
+  const addNote = useCallback(async (sopId: string, note: Note) => {
+    try {
+      await addSopNoteMutation({
+        sopId: sopId as Id<"sops">,
+        note: {
+          id: note.id,
+          category: note.category,
+          priority: note.priority,
+          content: note.content,
+          relatedTo: note.relatedTo,
+          action: note.action,
+          timestamp: note.timestamp,
+          source: note.source,
+        },
+      })
+    } catch (error) {
+      console.error("Failed to add note:", error)
+    }
+  }, [addSopNoteMutation])
 
   const updateNote = useCallback((sopId: string, noteId: string, updates: Partial<Note>) => {
-    setSops((prev) =>
-      prev.map((sop) =>
-        sop.id === sopId
-          ? {
-            ...sop,
-            notes: sop.notes.map((n) => (n.id === noteId ? { ...n, ...updates } : n)),
-            updatedAt: new Date().toISOString(),
-          }
-          : sop
-      )
-    )
+    // Note: Convex doesn't have a direct updateNote mutation yet
+    // This would need to be implemented in convex/sops.ts if needed
+    console.warn("updateNote not yet implemented in Convex backend")
   }, [])
 
   const deleteNote = useCallback((sopId: string, noteId: string) => {
-    setSops((prev) =>
-      prev.map((sop) =>
-        sop.id === sopId
-          ? {
-            ...sop,
-            notes: sop.notes.filter((n) => n.id !== noteId),
-            updatedAt: new Date().toISOString(),
-          }
-          : sop
-      )
-    )
+    // Note: Convex doesn't have a direct deleteNote mutation yet
+    console.warn("deleteNote not yet implemented in Convex backend")
   }, [])
 
   // -------------------------------------------------------------------------
   // Message Operations (for saved SOPs)
   // -------------------------------------------------------------------------
 
-  const addMessage = useCallback((sopId: string, message: ChatMessage) => {
-    setSops((prev) =>
-      prev.map((sop) =>
-        sop.id === sopId
-          ? { ...sop, chatHistory: [...sop.chatHistory, message] }
-          : sop
-      )
-    )
-  }, [])
+  const addMessage = useCallback(async (sopId: string, message: ChatMessage) => {
+    try {
+      await addSopMessageMutation({
+        sopId: sopId as Id<"sops">,
+        role: message.role,
+        content: message.content,
+      })
+    } catch (error) {
+      console.error("Failed to add message:", error)
+    }
+  }, [addSopMessageMutation])
 
   // -------------------------------------------------------------------------
   // Session Management
   // -------------------------------------------------------------------------
 
+  // -------------------------------------------------------------------------
+  // Session Management
+  // -------------------------------------------------------------------------
+
+  const resumeSession = useCallback((sessionId: string) => {
+    setActiveSessionId(sessionId as Id<"sessions">)
+    setLocalSession(null) // Ensure we use the Convex data
+  }, [])
+
   const startNewSession = useCallback((): string => {
-    const newId = generateId("session")
+    const tempId = generateId("session")
     const newSession: SessionState = {
-      id: newId,
+      id: tempId,
       title: "New SOP",
       messages: [],
       notes: [],
@@ -212,12 +267,16 @@ export function SOPProvider({ children }: { children: ReactNode }) {
       questionsAsked: 0,
       createdAt: new Date().toISOString(),
     }
-    setSession(newSession)
-    return newId
+
+    // Store locally ONLY - Do not save to DB yet (Lazy Creation)
+    setLocalSession(newSession)
+    setActiveSessionId(null)
+
+    return tempId
   }, [])
 
   const startImprovementSession = useCallback((content: string, analysis: AnalysisResult): string => {
-    const newId = generateId("session")
+    const tempId = generateId("session")
 
     // Create initial notes from analysis improvements
     const improvementNotes: Note[] = analysis.improvements.map(imp => ({
@@ -231,36 +290,59 @@ export function SOPProvider({ children }: { children: ReactNode }) {
       action: "Needs addressing",
     }))
 
-    // Calculate initial progress based on analysis - improvements already done partially
-    // Use the overall quality score as a baseline for progress
-    const baseProgress = Math.min(analysis.quality.overall, 75) // Cap at 75% since we're improving
+    const baseProgress = Math.min(analysis.quality.overall, 75)
 
-    const newSession: SessionState = {
-      id: newId,
+    // For improvement, we DO save immediately because we have valuable analysis data
+    // validation that we don't want to lose if the user refreshes.
+    createSessionMutation({
       title: "SOP Improvement",
-      messages: [], // Start with empty messages - AI greeting will be shown separately
-      notes: improvementNotes,
-      phase: "process", // Start at process phase since we already have the foundation from the analyzed SOP
-      phaseProgress: baseProgress, // Use analysis score as starting point
-      questionsAsked: 0,
-      createdAt: new Date().toISOString(),
+      phase: "process",
       metadata: {
         mode: "improve",
-        originalContent: content, // Store original SOP for AI context
-        analysisResult: analysis
-      }
-    }
+        originalContent: content,
+        analysisResult: analysis,
+        initialProgress: baseProgress,
+      },
+    }).then((id) => {
+      setActiveSessionId(id)
 
-    setSession(newSession)
-    return newId
-  }, [])
+      // Add initial notes immediately
+      if (improvementNotes.length > 0) {
+        addSessionNotesMutation({
+          sessionId: id,
+          notes: improvementNotes.map(n => ({
+            id: n.id,
+            category: n.category,
+            priority: n.priority,
+            content: n.content,
+            relatedTo: n.relatedTo,
+            action: n.action,
+            timestamp: n.timestamp,
+            source: n.source,
+          })),
+        }).catch(console.error)
+      }
+    }).catch(console.error)
+
+    return tempId
+  }, [createSessionMutation, addSessionNotesMutation])
 
   const updateSession = useCallback((updates: Partial<SessionState>) => {
-    setSession((prev) => (prev ? { ...prev, ...updates } : null))
-  }, [])
+    if (activeSessionId && updates.phase !== undefined) {
+      updateSessionProgressMutation({
+        sessionId: activeSessionId,
+        phase: updates.phase,
+        phaseProgress: updates.phaseProgress,
+      }).catch(console.error)
+    }
+    // Also update local session if exists
+    setLocalSession((prev) => (prev ? { ...prev, ...updates } : null))
+  }, [activeSessionId, updateSessionProgressMutation])
 
   const endSession = useCallback(() => {
-    setSession(null)
+    // We don't delete from DB here anymore, just clear local state
+    setActiveSessionId(null)
+    setLocalSession(null)
   }, [])
 
   // -------------------------------------------------------------------------
@@ -268,20 +350,93 @@ export function SOPProvider({ children }: { children: ReactNode }) {
   // -------------------------------------------------------------------------
 
   const addSessionNote = useCallback((note: Note) => {
-    setSession((prev) =>
-      prev ? { ...prev, notes: [...prev.notes, note] } : null
-    )
-  }, [])
+    if (activeSessionId) {
+      addSessionNotesMutation({
+        sessionId: activeSessionId,
+        notes: [{
+          id: note.id,
+          category: note.category,
+          priority: note.priority,
+          content: note.content,
+          relatedTo: note.relatedTo,
+          action: note.action,
+          timestamp: note.timestamp,
+          source: note.source,
+        }],
+      }).catch(console.error)
+    }
+    // Also update local
+    setLocalSession((prev) => prev ? { ...prev, notes: [...prev.notes, note] } : null)
+  }, [activeSessionId, addSessionNotesMutation])
 
   const addSessionNotes = useCallback((notes: Note[]) => {
     if (notes.length === 0) return
-    setSession((prev) =>
-      prev ? { ...prev, notes: [...prev.notes, ...notes] } : null
+    if (activeSessionId) {
+      addSessionNotesMutation({
+        sessionId: activeSessionId,
+        notes: notes.map(n => ({
+          id: n.id,
+          category: n.category,
+          priority: n.priority,
+          content: n.content,
+          relatedTo: n.relatedTo,
+          action: n.action,
+          timestamp: n.timestamp,
+          source: n.source,
+        })),
+      }).catch(console.error)
+    }
+    setLocalSession((prev) => prev ? { ...prev, notes: [...prev.notes, ...notes] } : null)
+  }, [activeSessionId, addSessionNotesMutation])
+
+  // -------------------------------------------------------------------------
+  // Session Message Operations
+  // -------------------------------------------------------------------------
+
+  const addSessionMessage = useCallback(async (message: ChatMessage) => {
+    // If we have an active session ID, just add the message
+    if (activeSessionId) {
+      await addSessionMessageMutation({
+        sessionId: activeSessionId,
+        role: message.role,
+        content: message.content,
+      })
+    } else {
+      // Lazy Create: No ID yet? Create the session NOW.
+      try {
+        const id = await createSessionMutation({
+          title: "New SOP",
+          phase: "foundation",
+          metadata: { mode: "create" },
+        })
+        setActiveSessionId(id)
+
+        // NOW add the message to the new session
+        await addSessionMessageMutation({
+          sessionId: id,
+          role: message.role,
+          content: message.content,
+        })
+      } catch (error) {
+        console.error("Failed to lazily create session:", error)
+      }
+    }
+
+    // Always update local state for immediate UI feedback
+    setLocalSession((prev) =>
+      prev
+        ? {
+          ...prev,
+          messages: [...prev.messages, message],
+          questionsAsked: message.role === "ai" ? prev.questionsAsked + 1 : prev.questionsAsked,
+        }
+        : null
     )
-  }, [])
+  }, [activeSessionId, addSessionMessageMutation, createSessionMutation])
 
   const updateSessionNote = useCallback((noteId: string, updates: Partial<Note>) => {
-    setSession((prev) =>
+    // Local update only for now
+    setLocalSession((prev) =>
       prev
         ? {
           ...prev,
@@ -294,7 +449,7 @@ export function SOPProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const deleteSessionNote = useCallback((noteId: string) => {
-    setSession((prev) =>
+    setLocalSession((prev) =>
       prev
         ? { ...prev, notes: prev.notes.filter((n) => n.id !== noteId) }
         : null
@@ -305,24 +460,21 @@ export function SOPProvider({ children }: { children: ReactNode }) {
   // Session Message Operations
   // -------------------------------------------------------------------------
 
-  const addSessionMessage = useCallback((message: ChatMessage) => {
-    setSession((prev) =>
-      prev
-        ? {
-          ...prev,
-          messages: [...prev.messages, message],
-          questionsAsked: message.role === "ai" ? prev.questionsAsked + 1 : prev.questionsAsked,
-        }
-        : null
-    )
-  }, [])
+
 
   // -------------------------------------------------------------------------
   // Phase Management
   // -------------------------------------------------------------------------
 
   const setSessionPhase = useCallback((phase: ConversationPhase, progress?: number) => {
-    setSession((prev) =>
+    if (activeSessionId) {
+      updateSessionProgressMutation({
+        sessionId: activeSessionId,
+        phase,
+        phaseProgress: progress,
+      }).catch(console.error)
+    }
+    setLocalSession((prev) =>
       prev
         ? {
           ...prev,
@@ -331,19 +483,29 @@ export function SOPProvider({ children }: { children: ReactNode }) {
         }
         : null
     )
-  }, [])
+  }, [activeSessionId, updateSessionProgressMutation])
 
   const advancePhase = useCallback(() => {
-    setSession((prev) => {
+    const currentPhase = session?.phase
+    if (!currentPhase) return
+
+    const nextPhase = getNextPhase(currentPhase)
+    if (activeSessionId) {
+      updateSessionProgressMutation({
+        sessionId: activeSessionId,
+        phase: nextPhase,
+        phaseProgress: 0,
+      }).catch(console.error)
+    }
+    setLocalSession((prev) => {
       if (!prev) return null
-      const nextPhase = getNextPhase(prev.phase)
       return {
         ...prev,
         phase: nextPhase,
         phaseProgress: 0,
       }
     })
-  }, [])
+  }, [session?.phase, activeSessionId, updateSessionProgressMutation])
 
   // -------------------------------------------------------------------------
   // Session Finalization
@@ -366,10 +528,10 @@ export function SOPProvider({ children }: { children: ReactNode }) {
 
     addSOP(newSOP)
     setCurrentSOP(newSOP)
-    setSession(null) // End the session
+    endSession()
 
     return newSOP
-  }, [session, addSOP])
+  }, [session, addSOP, endSession])
 
   // -------------------------------------------------------------------------
   // Utility Functions
@@ -415,7 +577,9 @@ export function SOPProvider({ children }: { children: ReactNode }) {
 
     // Session Management
     session,
+    activeSessionId,
     startNewSession,
+    resumeSession,
     startImprovementSession,
     updateSession,
     endSession,

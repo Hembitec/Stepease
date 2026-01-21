@@ -63,7 +63,11 @@ export function SOPListItem({ sop, onDelete, onArchive }: SOPListItemProps) {
 
       {/* Actions */}
       <div className="flex items-center gap-2">
-        <Link href={sop.status === "draft" ? `/create?id=${sop.id}` : `/preview/${sop.id}`}>
+        <Link href={
+          sop.status === "draft"
+            ? (sop.sessionId ? `/create?session=${sop.sessionId}` : `/create?id=${sop.id}`)
+            : `/preview/${sop.id}`
+        }>
           <Button variant="outline" size="sm" className="gap-1.5 bg-transparent">
             {sop.status === "draft" ? (
               <>

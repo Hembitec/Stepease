@@ -2,19 +2,19 @@
 // Stepease - GENERATE SOP API ROUTE
 // Transforms collected notes into a complete SOP document
 // Supports both CREATE (new SOP) and IMPROVE (existing SOP) modes
+// Uses multi-provider fallback system for reliability
 // =============================================================================
 
-import { streamText } from "ai"
-import { google } from "@ai-sdk/google"
-import type { Note, ChatMessage } from "@/lib/types"
-import type { AnalysisResult } from "@/lib/sop-analyzer"
+import { streamText } from 'ai';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { createGroq } from '@ai-sdk/groq';
+import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
+import { streamWithFallback, getCachedProviderChain } from '@/lib/ai-fallback';
+import type { Note, ChatMessage } from '@/lib/types';
+import type { AnalysisResult } from '@/lib/sop-analyzer';
+import { ProviderConfig } from '@/lib/ai-types';
 
-// Allow longer execution for document generation
-export const maxDuration = 60
-
-// -----------------------------------------------------------------------------
-// SOP Generation System Prompt (for CREATE mode)
-// -----------------------------------------------------------------------------
+export const maxDuration = 60;
 
 const CREATE_SOP_SYSTEM_PROMPT = `You are an expert technical writer specializing in creating comprehensive Standard Operating Procedures (SOPs). Your task is to generate a complete, professional SOP document from the provided conversation notes.
 
@@ -90,11 +90,7 @@ Generate the SOP in clean Markdown format with the following structure:
 6. Include decision points with clear criteria
 7. Add visual aids placeholders where helpful: [DIAGRAM: description]
 
-Generate a thorough, professional SOP that could be immediately used in a real organization.`
-
-// -----------------------------------------------------------------------------
-// SOP Improvement System Prompt (for IMPROVE mode)
-// -----------------------------------------------------------------------------
+Generate a thorough, professional SOP that could be immediately used in a real organization.`;
 
 const IMPROVE_SOP_SYSTEM_PROMPT = `You are an expert SOP editor and technical writer. Your task is to IMPROVE an existing SOP by:
 1. PRESERVING all the good content from the original
@@ -124,98 +120,82 @@ Generate the improved SOP in clean Markdown format. Include all standard SOP sec
 - Appendices (if applicable)
 - Revision History
 
-Use tables where appropriate for clarity.`
-
-// -----------------------------------------------------------------------------
-// Helper: Organize Notes by Category
-// -----------------------------------------------------------------------------
+Use tables where appropriate for clarity.`;
 
 function organizeNotes(notes: Note[]): Record<string, Note[]> {
-  const notesByCategory: Record<string, Note[]> = {}
+  const notesByCategory: Record<string, Note[]> = {};
 
   for (const note of notes) {
-    const category = note.category || "OTHER"
+    const category = note.category || 'OTHER';
     if (!notesByCategory[category]) {
-      notesByCategory[category] = []
+      notesByCategory[category] = [];
     }
-    notesByCategory[category].push(note)
+    notesByCategory[category].push(note);
   }
 
-  return notesByCategory
+  return notesByCategory;
 }
-
-// -----------------------------------------------------------------------------
-// Helper: Format Notes for Prompt
-// -----------------------------------------------------------------------------
 
 function formatNotesForPrompt(notesByCategory: Record<string, Note[]>): string {
   return Object.entries(notesByCategory)
     .map(([category, categoryNotes]) => {
       const formattedNotes = categoryNotes
         .map((n, i) => {
-          let noteText = `  ${i + 1}. ${n.content}`
-          if (n.relatedTo) noteText += ` (Related: ${n.relatedTo})`
-          if (n.action) noteText += ` - Action: ${n.action}`
-          return noteText
+          let noteText = `  ${i + 1}. ${n.content}`;
+          if (n.relatedTo) noteText += ` (Related: ${n.relatedTo})`;
+          if (n.action) noteText += ` - Action: ${n.action}`;
+          return noteText;
         })
-        .join("\n")
+        .join('\n');
 
-      return `### ${category.replace(/_/g, " ")}\n${formattedNotes}`
+      return `### ${category.replace(/_/g, ' ')}\n${formattedNotes}`;
     })
-    .join("\n\n")
+    .join('\n\n');
 }
-
-// -----------------------------------------------------------------------------
-// Helper: Get Missing Sections from Structure
-// -----------------------------------------------------------------------------
 
 function getMissingSections(structure: AnalysisResult['structure']): string[] {
   const sectionMap: Record<string, boolean> = {
-    'Header': structure.hasHeader,
-    'Purpose': structure.hasPurpose,
-    'Scope': structure.hasScope,
-    'Roles': structure.hasRoles,
-    'Definitions': structure.hasDefinitions,
-    'References': structure.hasReferences,
-    'Materials': structure.hasMaterials,
-    'Procedures': structure.hasProcedures,
-    'Quality': structure.hasQuality,
-    'Troubleshooting': structure.hasTroubleshooting,
-    'Appendices': structure.hasAppendices,
-    'Revision': structure.hasRevision,
-  }
+    Header: structure.hasHeader,
+    Purpose: structure.hasPurpose,
+    Scope: structure.hasScope,
+    Roles: structure.hasRoles,
+    Definitions: structure.hasDefinitions,
+    References: structure.hasReferences,
+    Materials: structure.hasMaterials,
+    Procedures: structure.hasProcedures,
+    Quality: structure.hasQuality,
+    Troubleshooting: structure.hasTroubleshooting,
+    Appendices: structure.hasAppendices,
+    Revision: structure.hasRevision,
+  };
 
   return Object.entries(sectionMap)
-    .filter(([_, present]) => !present)
-    .map(([section]) => section)
+    .filter(([, present]) => !present)
+    .map(([section]) => section);
 }
 
-// -----------------------------------------------------------------------------
-// Helper: Format Analysis for Prompt
-// -----------------------------------------------------------------------------
-
 function formatAnalysisForPrompt(analysis: AnalysisResult): string {
-  const structure = analysis.structure
-  const missingSections = getMissingSections(structure)
+  const structure = analysis.structure;
+  const missingSections = getMissingSections(structure);
 
-  const presentSections: string[] = []
-  if (structure.hasHeader) presentSections.push('Header')
-  if (structure.hasPurpose) presentSections.push('Purpose')
-  if (structure.hasScope) presentSections.push('Scope')
-  if (structure.hasRoles) presentSections.push('Roles')
-  if (structure.hasDefinitions) presentSections.push('Definitions')
-  if (structure.hasReferences) presentSections.push('References')
-  if (structure.hasMaterials) presentSections.push('Materials')
-  if (structure.hasProcedures) presentSections.push('Procedures')
-  if (structure.hasQuality) presentSections.push('Quality')
-  if (structure.hasTroubleshooting) presentSections.push('Troubleshooting')
-  if (structure.hasAppendices) presentSections.push('Appendices')
-  if (structure.hasRevision) presentSections.push('Revision')
+  const presentSections: string[] = [];
+  if (structure.hasHeader) presentSections.push('Header');
+  if (structure.hasPurpose) presentSections.push('Purpose');
+  if (structure.hasScope) presentSections.push('Scope');
+  if (structure.hasRoles) presentSections.push('Roles');
+  if (structure.hasDefinitions) presentSections.push('Definitions');
+  if (structure.hasReferences) presentSections.push('References');
+  if (structure.hasMaterials) presentSections.push('Materials');
+  if (structure.hasProcedures) presentSections.push('Procedures');
+  if (structure.hasQuality) presentSections.push('Quality');
+  if (structure.hasTroubleshooting) presentSections.push('Troubleshooting');
+  if (structure.hasAppendices) presentSections.push('Appendices');
+  if (structure.hasRevision) presentSections.push('Revision');
 
-  const strengthsList = analysis.strengths.map(s => `✓ ${s}`).join('\n')
-  const issuesList = analysis.improvements.map(i =>
-    `• [${i.priority}] ${i.category}: ${i.description}`
-  ).join('\n')
+  const strengthsList = analysis.strengths.map((s) => `✓ ${s}`).join('\n');
+  const issuesList = analysis.improvements.map(
+    (i) => `• [${i.priority}] ${i.category}: ${i.description}`
+  ).join('\n');
 
   let result = `## Analysis Results
 **Quality Score:** ${analysis.quality.overall}/100
@@ -228,38 +208,29 @@ ${strengthsList}
 ${issuesList}
 
 ### Structure Analysis:
-`
+`;
 
   if (presentSections.length > 0) {
-    result += `**Present Sections:** ${presentSections.join(', ')}\n`
+    result += `**Present Sections:** ${presentSections.join(', ')}\n`;
   }
   if (missingSections.length > 0) {
-    result += `**Missing Sections (ADD THESE):** ${missingSections.join(', ')}\n`
+    result += `**Missing Sections (ADD THESE):** ${missingSections.join(', ')}\n`;
   }
 
-  return result
+  return result;
 }
 
-// -----------------------------------------------------------------------------
-// Helper: Format Conversation for Prompt
-// -----------------------------------------------------------------------------
-
 function formatConversationForPrompt(messages: ChatMessage[]): string {
-  // Filter to only include user and assistant messages (not system)
-  const relevantMessages = messages.filter(m => m.role === 'user' || m.role === 'ai')
+  const relevantMessages = messages.filter((m) => m.role === 'user' || m.role === 'ai');
 
   if (relevantMessages.length === 0) {
-    return "No improvement conversation available."
+    return 'No improvement conversation available.';
   }
 
   return relevantMessages
-    .map(msg => `**${msg.role.toUpperCase()}:** ${msg.content}`)
-    .join('\n\n')
+    .map((msg) => `**${msg.role.toUpperCase()}:** ${msg.content}`)
+    .join('\n\n');
 }
-
-// -----------------------------------------------------------------------------
-// Build Improvement Prompt
-// -----------------------------------------------------------------------------
 
 function buildImprovementPrompt(
   originalContent: string,
@@ -268,51 +239,51 @@ function buildImprovementPrompt(
   notes: Note[],
   title: string
 ): string {
-  const notesByCategory = organizeNotes(notes)
-  const notesContext = formatNotesForPrompt(notesByCategory)
+  const notesByCategory = organizeNotes(notes);
+  const notesContext = formatNotesForPrompt(notesByCategory);
+
+  // Format the current date
+  const currentDate = new Date().toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
 
   let prompt = `# TASK: Improve Existing SOP
 
+**Today's Date:** ${currentDate}
 **SOP Title:** ${title}
 
-`
+`;
 
-  // Add original SOP content
   prompt += `## ORIGINAL SOP CONTENT
 === START OF ORIGINAL ===
 ${originalContent}
 === END OF ORIGINAL ===
 
-`
+`;
 
-  // Add analysis results if available
   if (analysis) {
-    prompt += formatAnalysisForPrompt(analysis)
-    prompt += '\n\n'
+    prompt += formatAnalysisForPrompt(analysis);
+    prompt += '\n\n';
   }
 
-  // Add conversation history
   prompt += `## IMPROVEMENT CONVERSATION
 The following conversation was had to gather information for improvements:
 
 ${formatConversationForPrompt(conversationHistory)}
 
-`
+`;
 
-  // Add extracted notes
   prompt += `## EXTRACTED NOTES FROM CONVERSATION
 These notes contain specific information to incorporate:
 
 ${notesContext}
 
-`
+`;
 
-  // Build missing sections string
-  const missingSectionsStr = analysis
-    ? getMissingSections(analysis.structure).join(', ')
-    : ''
+  const missingSectionsStr = analysis ? getMissingSections(analysis.structure).join(', ') : '';
 
-  // Add specific instructions
   prompt += `## YOUR TASK
 Generate an IMPROVED version of the SOP that:
 
@@ -324,23 +295,27 @@ Generate an IMPROVED version of the SOP that:
 
 IMPORTANT: This is an improvement, not a rewrite. The goal is to enhance the existing SOP while preserving its strengths.
 
-Generate the complete improved SOP now in Markdown format:`
+Generate the complete improved SOP now in Markdown format:`;
 
-  return prompt
+  return prompt;
 }
 
-// -----------------------------------------------------------------------------
-// Build Create Prompt
-// -----------------------------------------------------------------------------
-
 function buildCreatePrompt(notes: Note[], title: string, description?: string): string {
-  const notesByCategory = organizeNotes(notes)
-  const notesContext = formatNotesForPrompt(notesByCategory)
+  const notesByCategory = organizeNotes(notes);
+  const notesContext = formatNotesForPrompt(notesByCategory);
+
+  // Format the current date
+  const currentDate = new Date().toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
 
   return `Generate a complete SOP document based on these conversation notes:
 
-${title ? `**SOP Title:** ${title}` : ""}
-${description ? `**Description:** ${description}` : ""}
+**Today's Date:** ${currentDate}
+${title ? `**SOP Title:** ${title}` : ''}
+${description ? `**Description:** ${description}` : ''}
 
 ## Collected Information:
 
@@ -351,85 +326,133 @@ Please generate a comprehensive, well-structured SOP document in Markdown format
 2. Infer reasonable details where information might be missing
 3. Use professional language appropriate for an official document
 4. Include placeholder markers [TBD] for any critical information that couldn't be determined
-5. Add helpful notes and warnings where appropriate`
+5. Add helpful notes and warnings where appropriate
+6. Use today's date (${currentDate}) for the Effective Date, Last Reviewed, and Revision History`;
 }
 
-// -----------------------------------------------------------------------------
-// POST Handler
-// -----------------------------------------------------------------------------
+interface RequestBody {
+  mode?: 'create' | 'improve';
+  notes?: Note[];
+  title?: string;
+  description?: string;
+  originalContent?: string;
+  analysis?: AnalysisResult;
+  conversationHistory?: ChatMessage[];
+}
+
+function createStreamFunctions(
+  body: RequestBody,
+  providers: ProviderConfig[]
+): Array<() => Promise<Response>> {
+  const providerCache = new Map<string, any>();
+
+  return providers.map((provider) => {
+    return async () => {
+      let systemPrompt: string;
+      let userPrompt: string;
+
+      if (body.mode === 'improve' && body.originalContent) {
+        systemPrompt = IMPROVE_SOP_SYSTEM_PROMPT;
+        userPrompt = buildImprovementPrompt(
+          body.originalContent,
+          body.analysis || null,
+          body.conversationHistory || [],
+          body.notes || [],
+          body.title || 'Standard Operating Procedure'
+        );
+      } else {
+        systemPrompt = CREATE_SOP_SYSTEM_PROMPT;
+        userPrompt = buildCreatePrompt(
+          body.notes || [],
+          body.title || 'Standard Operating Procedure',
+          body.description
+        );
+      }
+
+      // Google Provider
+      if (provider.name === 'google') {
+        let googleProvider = providerCache.get(provider.name);
+        if (!googleProvider) {
+          googleProvider = createGoogleGenerativeAI({
+            apiKey: provider.apiKey,
+          });
+          providerCache.set(provider.name, googleProvider);
+        }
+
+        const result = streamText({
+          model: googleProvider(provider.model),
+          system: systemPrompt,
+          prompt: userPrompt,
+          temperature: 0.3,
+        });
+        return result.toTextStreamResponse();
+      }
+      // Groq Provider
+      else if (provider.name.toLowerCase().includes('groq')) {
+        let groqProvider = providerCache.get(provider.name);
+        if (!groqProvider) {
+          groqProvider = createGroq({
+            apiKey: provider.apiKey,
+          });
+          providerCache.set(provider.name, groqProvider);
+        }
+
+        const result = streamText({
+          model: groqProvider(provider.model),
+          system: systemPrompt,
+          prompt: userPrompt,
+          temperature: 0.3,
+        });
+        return result.toTextStreamResponse();
+      }
+      // Generic OpenAI Compatible
+      else {
+        let openaiCompatible = providerCache.get(provider.name);
+        if (!openaiCompatible) {
+          openaiCompatible = createOpenAICompatible({
+            baseURL: provider.baseUrl || 'https://api.example.com/v1',
+            name: provider.name,
+            apiKey: provider.apiKey,
+          });
+          providerCache.set(provider.name, openaiCompatible);
+        }
+
+        const result = streamText({
+          model: openaiCompatible(provider.model) as any,
+          system: systemPrompt,
+          prompt: userPrompt,
+          temperature: 0.3,
+        });
+        return result.toTextStreamResponse();
+      }
+    };
+  });
+}
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json()
+    const body = await req.json() as RequestBody;
 
-    // Extract all possible fields
-    const {
-      mode = 'create',
-      notes = [],
-      title = 'Standard Operating Procedure',
-      description,
-      originalContent,
-      analysis,
-      conversationHistory = []
-    } = body as {
-      mode?: 'create' | 'improve'
-      notes: Note[]
-      title?: string
-      description?: string
-      originalContent?: string
-      analysis?: AnalysisResult
-      conversationHistory?: ChatMessage[]
-    }
+    const providers = getCachedProviderChain();
+    const streamFunctions = createStreamFunctions(body, providers);
 
-    let systemPrompt: string
-    let userPrompt: string
+    const { response } = await streamWithFallback(streamFunctions, providers);
 
-    if (mode === 'improve' && originalContent) {
-      // IMPROVEMENT MODE: Use full context
-      console.log('Generating improved SOP with full context...')
-      console.log(`- Original content length: ${originalContent.length} chars`)
-      console.log(`- Analysis available: ${!!analysis}`)
-      console.log(`- Conversation messages: ${conversationHistory.length}`)
-      console.log(`- Notes collected: ${notes.length}`)
-
-      systemPrompt = IMPROVE_SOP_SYSTEM_PROMPT
-      userPrompt = buildImprovementPrompt(
-        originalContent,
-        analysis || null,
-        conversationHistory,
-        notes,
-        title
-      )
-    } else {
-      // CREATE MODE: Generate from notes only
-      console.log('Generating new SOP from notes...')
-      console.log(`- Notes collected: ${notes.length}`)
-
-      systemPrompt = CREATE_SOP_SYSTEM_PROMPT
-      userPrompt = buildCreatePrompt(notes, title, description)
-    }
-
-    // Stream the response
-    const result = streamText({
-      model: google("gemini-3-flash-preview"),
-      system: systemPrompt,
-      prompt: userPrompt,
-      temperature: 0.3, // Lower temperature for more consistent output
-    })
-
-    return result.toTextStreamResponse()
+    return response;
   } catch (error) {
-    console.error("Generate SOP API Error:", error)
+    console.error('[AI-PROVIDER] Generate SOP API Error:', error);
+
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
     return new Response(
       JSON.stringify({
-        error: "Failed to generate SOP",
-        details: error instanceof Error ? error.message : "Unknown error"
+        error: 'Failed to generate SOP',
+        details: errorMessage,
       }),
       {
-        status: 500,
-        headers: { "Content-Type": "application/json" }
+        status: 503,
+        headers: { 'Content-Type': 'application/json' },
       }
-    )
+    );
   }
 }

@@ -152,16 +152,55 @@ export default function ReviewNotesPage() {
         throw new Error('Failed to generate SOP')
       }
 
-      // Stream the response
+      // Stream the response - AI SDK 6.x uses a data protocol format
       const reader = response.body?.getReader()
       const decoder = new TextDecoder()
       let generatedContent = ''
 
       if (reader) {
+        let buffer = ''
         while (true) {
           const { done, value } = await reader.read()
           if (done) break
-          generatedContent += decoder.decode(value, { stream: true })
+
+          buffer += decoder.decode(value, { stream: true })
+
+          // Parse AI SDK data protocol lines
+          // Format: "0:\"text content\"\n" for text chunks
+          const lines = buffer.split('\n')
+          buffer = lines.pop() || '' // Keep incomplete line in buffer
+
+          for (const line of lines) {
+            if (line.startsWith('0:')) {
+              try {
+                // Parse the JSON string after "0:"
+                const jsonStr = line.slice(2)
+                const text = JSON.parse(jsonStr)
+                if (typeof text === 'string') {
+                  generatedContent += text
+                }
+              } catch {
+                // If parsing fails, try direct text extraction
+                const match = line.match(/^0:"(.*)"/)?.[1]
+                if (match) {
+                  generatedContent += match.replace(/\\n/g, '\n').replace(/\\"/g, '"')
+                }
+              }
+            }
+          }
+        }
+
+        // Process any remaining buffer
+        if (buffer.startsWith('0:')) {
+          try {
+            const jsonStr = buffer.slice(2)
+            const text = JSON.parse(jsonStr)
+            if (typeof text === 'string') {
+              generatedContent += text
+            }
+          } catch {
+            // Ignore incomplete data
+          }
         }
       }
 
@@ -177,6 +216,7 @@ export default function ReviewNotesPage() {
           chatHistory: session?.messages || [],
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
+          sessionId: session?.id, // Link back to original session
         }
         addSOP(newSOP)
       } else {

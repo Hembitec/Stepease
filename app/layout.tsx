@@ -4,6 +4,7 @@ import { Familjen_Grotesk, Inter } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { ClerkProvider } from "@clerk/nextjs"
 import { SOPProvider } from "@/lib/sop-context"
+import ConvexClientProvider from "@/components/ConvexClientProvider"
 import "./globals.css"
 
 const familjenGrotesk = Familjen_Grotesk({
@@ -42,8 +43,10 @@ export default function RootLayout({
     >
       <html lang="en" className={`${familjenGrotesk.variable} ${inter.variable}`}>
         <body className="font-sans antialiased" suppressHydrationWarning>
-          <SOPProvider>{children}</SOPProvider>
-          <Analytics />
+          <ConvexClientProvider>
+            <SOPProvider>{children}</SOPProvider>
+            <Analytics />
+          </ConvexClientProvider>
         </body>
       </html>
     </ClerkProvider>

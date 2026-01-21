@@ -100,7 +100,7 @@ function CreateSOPPageContent() {
   const mode = searchParams.get('mode') ?? 'create'
   const isImprovementMode = mode === 'improve'
 
-  const { addSOP, session, startNewSession, addSessionNotes, setSessionPhase } = useSOPContext()
+  const { addSOP, session, startNewSession, resumeSession, addSessionMessage, addSessionNotes, setSessionPhase } = useSOPContext()
 
   // Local state
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([])
@@ -117,27 +117,47 @@ function CreateSOPPageContent() {
 
   // Initialize session on mount
   useEffect(() => {
-    if (!session && !isImprovementMode) {
+    const sessionId = searchParams.get('session')
+
+    // CASE 1: Resume Existing Session
+    if (sessionId) {
+      // If we don't have a session loaded, OR the loaded session doesn't match the URL, resume it
+      if (!session || session.id !== sessionId) {
+        resumeSession(sessionId)
+      }
+    }
+    // CASE 2: New Session (Lazy Create)
+    else if (!session && !isImprovementMode) {
       startNewSession()
     }
+  }, [session?.id, isImprovementMode, startNewSession, resumeSession, searchParams])
 
-    // For improvement mode, load session data
-    if (session && isImprovementMode && !initialMessageShown) {
-      setNotes(session.notes)
-      if (session.messages.length > 0) {
+  // Load session data when session becomes available (for both create and improve modes)
+  useEffect(() => {
+    if (session && !initialMessageShown) {
+      // Load notes from session
+      if (session.notes && session.notes.length > 0) {
+        setNotes(session.notes)
+      }
+
+      // Load chat history from session
+      if (session.messages && session.messages.length > 0) {
         setChatHistory(session.messages)
       }
-      setCurrentPhase(session.phase)
 
-      // Initialize improvement status tracking
-      if (session.metadata?.analysisResult) {
+      // Load current phase and progress
+      setCurrentPhase(session.phase)
+      setProgress(session.phaseProgress)
+
+      // For improvement mode, initialize status tracking
+      if (isImprovementMode && session.metadata?.analysisResult) {
         const status = initializeImprovementStatus(session.metadata.analysisResult)
         setImprovementStatus(status)
       }
 
       setInitialMessageShown(true)
     }
-  }, [session, isImprovementMode, startNewSession, initialMessageShown])
+  }, [session, isImprovementMode, initialMessageShown])
 
   // -------------------------------------------------------------------------
   // Object Streaming Hook
@@ -157,6 +177,9 @@ function CreateSOPPageContent() {
         timestamp: new Date().toISOString(),
       }
       setChatHistory((prev) => [...prev, aiMessage])
+
+      // Save AI message to session
+      addSessionMessage(aiMessage)
 
       // Extract and add notes
       if (object.notes && object.notes.length > 0) {
@@ -224,10 +247,19 @@ function CreateSOPPageContent() {
     setChatHistory(newHistory)
     setInputValue("")
 
+    // Save user message to session
+    addSessionMessage(userMessage)
+
     // Use current mode and messages for the request
     submit({
       messages: newHistory,
       mode: mode,
+      // Pass existing notes so AI knows the context
+      existingNotes: notes.length > 0 ? notes.map(n => ({
+        category: n.category,
+        content: n.content,
+        relatedTo: n.relatedTo,
+      })) : undefined,
       // Pass analysis context for improvement mode
       ...(isImprovementMode && session?.metadata?.analysisResult && {
         analysisContext: session.metadata.analysisResult
@@ -260,10 +292,11 @@ function CreateSOPPageContent() {
       content: "",
       notes,
       chatHistory,
+      sessionId: session?.id, // Link back to original session
     }
     addSOP(newSOP)
     router.push("/dashboard")
-  }, [notes, chatHistory, addSOP, router])
+  }, [notes, chatHistory, addSOP, router, session?.id])
 
   const handleReview = useCallback(() => {
     const sopId = `sop-${Date.now()}`
@@ -277,10 +310,11 @@ function CreateSOPPageContent() {
       content: "",
       notes,
       chatHistory,
+      sessionId: session?.id, // Link back to original session
     }
     addSOP(newSOP)
     router.push(`/review/${sopId}`)
-  }, [notes, chatHistory, addSOP, router])
+  }, [notes, chatHistory, addSOP, router, session?.id])
 
   const handleDeleteNote = useCallback((id: string) => {
     setNotes((prev) => prev.filter((n) => n.id !== id))
@@ -405,9 +439,9 @@ function CreateSOPPageContent() {
               <MessageBubble role="assistant" content={initialGreeting} />
 
               {/* Chat history */}
-              {chatHistory.map((message) => (
+              {chatHistory.map((message, index) => (
                 <MessageBubble
-                  key={message.id}
+                  key={message.id || `msg-${index}`}
                   role={message.role === "ai" ? "assistant" : "user"}
                   content={message.content}
                 />

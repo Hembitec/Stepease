@@ -171,6 +171,7 @@ export interface SOP {
     content: string
     notes: Note[]
     chatHistory: ChatMessage[]
+    sessionId?: string // Link back to original session for draft SOPs
 }
 
 // -----------------------------------------------------------------------------
