@@ -1,0 +1,27 @@
+{
+    "name": "StepEase",
+    "short_name": "StepEase",
+    "description": "AI-powered SOP builder that helps you create professional Standard Operating Procedures",
+    "icons": [
+        {
+            "src": "/favicon.ico",
+            "sizes": "48x48",
+            "type": "image/x-icon"
+        },
+        {
+            "src": "/icon.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#3b82f6",
+    "orientation": "portrait-primary",
+    "categories": [
+        "business",
+        "productivity"
+    ]
+}

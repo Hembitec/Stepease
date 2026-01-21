@@ -1,0 +1,28 @@
+# StepEase
+> AI-powered Standard Operating Procedure builder
+
+## About
+StepEase is an AI-powered application that helps businesses create, improve, and manage professional Standard Operating Procedures (SOPs). Users can have natural conversations with the AI to extract procedure information, which is then compiled into well-structured SOP documents.
+
+## Key Features
+- Conversational SOP creation through AI chat
+- SOP analysis and improvement suggestions
+- Note extraction and organization by category
+- Export to multiple formats (PDF, Markdown, DOCX)
+- Session-based workflow with draft management
+
+## How It Works
+1. Start a conversation about your procedure
+2. AI extracts key information into structured notes
+3. Review and edit notes before generation
+4. Generate a complete, professional SOP document
+5. Approve, modify, or regenerate as needed
+
+## Technical Details
+- Built with Next.js 16 and React
+- Uses Convex for real-time database
+- Authentication via Clerk
+- AI powered by Google Gemini and Groq
+
+## Contact
+For questions or support, visit https://stepease.com

@@ -5,6 +5,7 @@ import { DashboardLayout } from "@/components/layout/dashboard-layout"
 import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { useSOPContext } from "@/lib/sop-context"
+import { useSidebar } from "@/components/layout/sidebar-context"
 import {
   Sparkles,
   Upload,
@@ -15,6 +16,7 @@ import {
   Plus,
   TrendingUp,
   Calendar,
+  Menu,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -22,6 +24,8 @@ import { DraftsSection } from "@/components/dashboard/drafts-section"
 
 export default function DashboardPage() {
   const { sops } = useSOPContext()
+  const { toggleMobileMenu } = useSidebar()
+
   const sessions = useQuery(api.sessions.list) ?? []
   const recentSOPs = sops.slice(0, 5)
 
@@ -49,9 +53,17 @@ export default function DashboardPage() {
                 <Calendar className="w-4 h-4" />
                 {formattedDate}
               </p>
-              <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-1">
-                {greeting}, John 👋
-              </h1>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={toggleMobileMenu}
+                  className="md:hidden p-1 -ml-1 text-slate-600 hover:text-slate-900"
+                >
+                  <Menu className="w-6 h-6" />
+                </button>
+                <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-1">
+                  {greeting}, John 👋
+                </h1>
+              </div>
               <p className="text-slate-500">
                 Pick up where you left off or start something new.
               </p>

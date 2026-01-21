@@ -9,7 +9,8 @@ import { SOPListItem } from "@/components/library/sop-list-item"
 import { SOPGridCard } from "@/components/library/sop-grid-card"
 import { SOPTable } from "@/components/library/sop-table"
 import { useSOPContext } from "@/lib/sop-context"
-import { Search, Plus, List, LayoutGrid, Table, FileText, Clock, Sparkles, Upload, ArrowRight, Play } from "lucide-react"
+import { useSidebar } from "@/components/layout/sidebar-context"
+import { Search, Plus, List, LayoutGrid, Table, FileText, Clock, Sparkles, Upload, ArrowRight, Play, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { calculateOverallProgress, type ConversationPhase } from "@/lib/types"
@@ -21,6 +22,7 @@ type LibraryTab = "completed" | "in-progress"
 
 export default function LibraryPage() {
   const { sops, deleteSOP, updateSOP } = useSOPContext()
+  const { toggleMobileMenu } = useSidebar()
   const sessions = useQuery(api.sessions.list) ?? []
   const [activeTab, setActiveTab] = useState<LibraryTab>("completed")
   const [viewMode, setViewMode] = useState<ViewMode>("list")
@@ -111,7 +113,15 @@ export default function LibraryPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">SOP Library</h1>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={toggleMobileMenu}
+                className="md:hidden p-1 -ml-1 text-slate-600 hover:text-slate-900"
+              >
+                <Menu className="w-6 h-6" />
+              </button>
+              <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">SOP Library</h1>
+            </div>
             <p className="text-gray-500">Manage all your Standard Operating Procedures</p>
           </div>
           <Link href="/create">

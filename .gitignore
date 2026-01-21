@@ -145,3 +145,5 @@ Thumbs.db
 
 # clerk configuration (can include secrets)
 /.clerk/
+preflight.yml
+.clerk/

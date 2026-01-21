@@ -1,17 +1,28 @@
 "use client"
 
 import { DashboardLayout } from "@/components/layout/dashboard-layout"
+import { useSidebar } from "@/components/layout/sidebar-context"
 import { UserProfile } from "@clerk/nextjs"
+import { Menu } from "lucide-react"
 
 export default function SettingsPage() {
+  const { toggleMobileMenu } = useSidebar()
   return (
     <DashboardLayout>
       <div className="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto">
         {/* Header Section */}
         <div className="mb-6 sm:mb-8">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 dark:text-slate-50 mb-1 sm:mb-2">
-            Settings
-          </h1>
+          <div className="flex items-center gap-3 mb-1 sm:mb-2">
+            <button
+              onClick={toggleMobileMenu}
+              className="md:hidden p-1 -ml-1 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 dark:text-slate-50">
+              Settings
+            </h1>
+          </div>
           <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400">
             Manage your account preferences and application settings.
           </p>
