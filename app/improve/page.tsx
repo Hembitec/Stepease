@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { ArrowLeft, HelpCircle, FileText } from "lucide-react"
@@ -26,7 +26,7 @@ interface AnalysisData {
   }
 }
 
-export default function ImproveSOPPage() {
+function ImproveSOPPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { startImprovementSession } = useSOPContext()
@@ -170,5 +170,19 @@ export default function ImproveSOPPage() {
         </main>
       </div>
     </DashboardLayout>
+  )
+}
+
+export default function ImproveSOPPage() {
+  return (
+    <Suspense fallback={
+      <DashboardLayout>
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+          <div className="text-slate-500">Loading...</div>
+        </div>
+      </DashboardLayout>
+    }>
+      <ImproveSOPPageContent />
+    </Suspense>
   )
 }
