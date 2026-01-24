@@ -23,103 +23,55 @@ export interface ImprovementProgress {
 // -----------------------------------------------------------------------------
 
 /**
- * Generates a context-aware greeting for improvement mode
- * References the analysis results and starts with the highest priority issue
+ * Generates a clean, conversational greeting for improvement mode
+ * No scores, no emojis, no verbose analysis - just a friendly start
  */
 export function generateImprovementGreeting(analysis: AnalysisResult): string {
     const { high, medium, low } = categorizeImprovementsByPriority(analysis)
     const firstIssue = high[0] || medium[0] || low[0]
 
-    let greeting = buildGreetingHeader(analysis, high.length, medium.length, low.length)
-
-    if (firstIssue) {
-        greeting += buildFirstIssueSection(firstIssue)
+    if (!firstIssue) {
+        return "I've reviewed your SOP. It looks quite complete! Is there anything specific you'd like to improve or add?"
     }
 
-    return greeting
+    // Generate a simple, conversational question about the first issue
+    const question = getConversationalQuestion(firstIssue)
+
+    return `I've reviewed your SOP. Let's work through a few improvements together.\n\n${question}`
 }
 
-function buildGreetingHeader(
-    analysis: AnalysisResult,
-    highCount: number,
-    mediumCount: number,
-    lowCount: number
-): string {
-    let header = `I've analyzed your SOP and identified **${analysis.improvements.length} areas for improvement**.
-
-📊 **Current Quality Score:** ${analysis.quality.overall}/100
-📋 **Completeness:** ${analysis.structure.completenessScore}%
-`
-
-    if (highCount > 0) {
-        header += `\n🔴 **HIGH Priority:** ${highCount} issue${highCount > 1 ? 's' : ''}`
-    }
-    if (mediumCount > 0) {
-        header += `\n🟡 **MEDIUM Priority:** ${mediumCount} issue${mediumCount > 1 ? 's' : ''}`
-    }
-    if (lowCount > 0) {
-        header += `\n🔵 **LOW Priority:** ${lowCount} issue${lowCount > 1 ? 's' : ''}`
-    }
-
-    header += `\n\nLet's address these one by one, starting with the highest priority.`
-
-    return header
-}
-
-function buildFirstIssueSection(issue: AnalysisResult['improvements'][0]): string {
-    let section = `
-
----
-
-📋 **Addressing: ${issue.description}** (${issue.priority.toUpperCase()})
-
-${issue.suggestion}
-
-Let me ask you some questions to help fill this gap:`
-
-    // Add specific questions based on issue type
-    section += getQuestionsForIssue(issue)
-
-    return section
-}
-
-function getQuestionsForIssue(issue: AnalysisResult['improvements'][0]): string {
+/**
+ * Converts an improvement issue into a natural conversational question
+ */
+function getConversationalQuestion(issue: AnalysisResult['improvements'][0]): string {
     const desc = issue.description.toLowerCase()
 
     if (desc.includes("role") || desc.includes("responsibilit")) {
-        return `
-
-1. Who is the primary person/role responsible for this process?
-2. Who reviews or approves the work?
-3. Who should be contacted if there's an issue?`
+        return "First, who is the primary person or role responsible for this process?"
     }
 
     if (desc.includes("revision") || desc.includes("version") || desc.includes("history")) {
-        return `
-
-1. What version number should this SOP be?
-2. When was the last significant update made?
-3. Who typically makes updates to this document?`
+        return "First, what version number should this SOP be, and when was it last updated?"
     }
 
-    if (desc.includes("troubleshoot") || desc.includes("error") || desc.includes("issue")) {
-        return `
-
-1. What are the most common problems users face with this process?
-2. What should someone do if they encounter an error?
-3. Who should they contact for help?`
+    if (desc.includes("troubleshoot") || desc.includes("error") || desc.includes("issue") || desc.includes("failure")) {
+        return "First, what are the most common problems people run into with this process, and what should they do if something goes wrong?"
     }
 
     if (desc.includes("reference") || desc.includes("document") || desc.includes("related")) {
-        return `
-
-1. Are there any related documents or policies this SOP references?
-2. Are there external standards or regulations this follows?`
+        return "First, are there any related documents, policies, or standards that this SOP references?"
     }
 
-    return `
+    if (desc.includes("material") || desc.includes("tool") || desc.includes("equipment") || desc.includes("software")) {
+        return "First, what tools, equipment, or software are needed for this process?"
+    }
 
-Can you provide more details about: ${issue.description.toLowerCase()}?`
+    if (desc.includes("quality") || desc.includes("success") || desc.includes("criteria")) {
+        return "First, how do you know when this process has been completed successfully? What does a good outcome look like?"
+    }
+
+    // Default: ask about the issue directly but conversationally
+    return `First, let me ask about this: ${issue.description.toLowerCase()}. Can you provide more details?`
 }
 
 // -----------------------------------------------------------------------------
@@ -214,21 +166,14 @@ export function areAllImprovementsAddressed(
 }
 
 /**
- * Generates completion message when all improvements are done
+ * Generates clean completion message when all improvements are done
  */
 export function generateCompletionMessage(
     originalScore: number,
     estimatedScore: number,
     totalImprovements: number
 ): string {
-    return `🎉 **Excellent! We've addressed all ${totalImprovements} improvements!**
+    return `Great, we've covered all ${totalImprovements} improvements! Your SOP is now more complete.
 
-📊 **Quality Score:** ${originalScore}/100 → **${estimatedScore}/100**
-
-Your SOP is now significantly more complete and professional.
-
-Would you like to:
-1. **Review all the changes** before generating
-2. **Make additional edits** to any section
-3. **Generate the improved SOP** now`
+You can review the changes in the notes panel, make additional edits, or generate the improved SOP when you're ready.`
 }

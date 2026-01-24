@@ -40,7 +40,11 @@ export default function ReviewNotesPage() {
   const isImprovementMode = session?.metadata?.mode === 'improve'
 
   // Use session notes if in improvement mode and no SOP exists yet
-  const initialNotes = sop?.notes || session?.notes || []
+  // Deduplicate notes by ID (in case of data corruption)
+  const rawNotes = sop?.notes || session?.notes || []
+  const initialNotes = rawNotes.filter((note, index, self) =>
+    index === self.findIndex((n) => n.id === note.id)
+  )
 
   const [notes, setNotes] = useState<Note[]>(initialNotes)
   const [searchQuery, setSearchQuery] = useState("")
@@ -152,57 +156,23 @@ export default function ReviewNotesPage() {
         throw new Error('Failed to generate SOP')
       }
 
-      // Stream the response - AI SDK 6.x uses a data protocol format
+      // Stream the response - toTextStreamResponse() returns plain text chunks
       const reader = response.body?.getReader()
       const decoder = new TextDecoder()
       let generatedContent = ''
 
       if (reader) {
-        let buffer = ''
         while (true) {
           const { done, value } = await reader.read()
           if (done) break
-
-          buffer += decoder.decode(value, { stream: true })
-
-          // Parse AI SDK data protocol lines
-          // Format: "0:\"text content\"\n" for text chunks
-          const lines = buffer.split('\n')
-          buffer = lines.pop() || '' // Keep incomplete line in buffer
-
-          for (const line of lines) {
-            if (line.startsWith('0:')) {
-              try {
-                // Parse the JSON string after "0:"
-                const jsonStr = line.slice(2)
-                const text = JSON.parse(jsonStr)
-                if (typeof text === 'string') {
-                  generatedContent += text
-                }
-              } catch {
-                // If parsing fails, try direct text extraction
-                const match = line.match(/^0:"(.*)"/)?.[1]
-                if (match) {
-                  generatedContent += match.replace(/\\n/g, '\n').replace(/\\"/g, '"')
-                }
-              }
-            }
-          }
+          // Plain text stream - just concatenate the chunks directly
+          generatedContent += decoder.decode(value, { stream: true })
         }
-
-        // Process any remaining buffer
-        if (buffer.startsWith('0:')) {
-          try {
-            const jsonStr = buffer.slice(2)
-            const text = JSON.parse(jsonStr)
-            if (typeof text === 'string') {
-              generatedContent += text
-            }
-          } catch {
-            // Ignore incomplete data
-          }
-        }
+        // Flush any remaining bytes
+        generatedContent += decoder.decode()
       }
+
+      console.log('[Generate SOP] Content length:', generatedContent.length)
 
       // Update the SOP/session with the generated content
       if (!sop) {
@@ -218,17 +188,17 @@ export default function ReviewNotesPage() {
           updatedAt: new Date().toISOString(),
           sessionId: session?.id, // Link back to original session
         }
-        addSOP(newSOP)
+        await addSOP(newSOP)
       } else {
         // SOP exists, update it
-        updateSOP(sop.id, {
+        await updateSOP(sop.id, {
           content: generatedContent,
           notes,
           status: 'draft'
         })
       }
 
-      // Navigate to preview
+      // Navigate to preview after database write completes
       router.push(`/preview/${sessionId}`)
     } catch (error) {
       console.error('Generation error:', error)

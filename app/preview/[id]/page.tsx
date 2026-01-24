@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter, useParams } from "next/navigation"
 import { ArrowLeft, FileText, Eye, Pencil, CheckCircle, Copy, Check } from "lucide-react"
@@ -18,12 +18,23 @@ export default function SOPPreviewPage() {
   const params = useParams()
   const { sops, updateSOP } = useSOPContext()
 
-  const sop = sops.find((s) => s.id === params.id) || sops[0]
+  // Find SOP by ID first, then by sessionId (for improvement mode where Convex generates a new ID)
+  const sop = sops.find((s) => s.id === params.id)
+    || sops.find((s) => s.sessionId === params.id)
+    || sops[0]
+
   const [content, setContent] = useState(sop?.content || "")
   const [viewMode, setViewMode] = useState<ViewMode>("preview")
   const [editingSection, setEditingSection] = useState<{ title: string; content: string } | null>(null)
   const [copied, setCopied] = useState(false)
   const [approving, setApproving] = useState(false)
+
+  // Update content when SOP loads/changes (handles async Convex data)
+  useEffect(() => {
+    if (sop?.content && sop.content !== content) {
+      setContent(sop.content)
+    }
+  }, [sop?.content])
 
   const handleCopyMarkdown = async () => {
     await navigator.clipboard.writeText(content)

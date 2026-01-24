@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { ArrowLeft, HelpCircle, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { FileUploader } from "@/components/upload/file-uploader"
@@ -28,11 +28,20 @@ interface AnalysisData {
 
 export default function ImproveSOPPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { startImprovementSession } = useSOPContext()
   const [phase, setPhase] = useState<Phase>("upload")
   const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null)
   const [pastedText, setPastedText] = useState("")
   const [isAnalyzingText, setIsAnalyzingText] = useState(false)
+
+  // Redirect if session param exists (bookmarked URL or stale link)
+  const sessionId = searchParams.get('session')
+  useEffect(() => {
+    if (sessionId) {
+      router.replace(`/create?mode=improve&session=${sessionId}`)
+    }
+  }, [sessionId, router])
 
   const handleAnalysisComplete = (data: AnalysisData) => {
     setAnalysisData(data)

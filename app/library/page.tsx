@@ -185,7 +185,9 @@ export default function LibraryPage() {
                   return (
                     <Link
                       key={session._id}
-                      href={isImprove ? `/improve?session=${session._id}` : `/create?session=${session._id}`}
+                      href={isImprove
+                        ? `/create?mode=improve&session=${session._id}`
+                        : `/create?session=${session._id}`}
                       className="group block"
                     >
                       <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm hover:shadow-lg hover:border-amber-200 transition-all flex items-center gap-4">

@@ -99,10 +99,18 @@ export const addNotes = mutation({
         const session = await ctx.db.get(args.sessionId);
         if (!session) throw new Error("Session not found");
 
-        await ctx.db.patch(args.sessionId, {
-            notes: [...session.notes, ...args.notes],
-            updatedAt: new Date().toISOString(),
-        });
+        // Get existing note IDs to prevent duplicates
+        const existingIds = new Set(session.notes.map(n => n.id));
+
+        // Filter out notes that already exist
+        const newNotes = args.notes.filter(n => !existingIds.has(n.id));
+
+        if (newNotes.length > 0) {
+            await ctx.db.patch(args.sessionId, {
+                notes: [...session.notes, ...newNotes],
+                updatedAt: new Date().toISOString(),
+            });
+        }
     },
 });
 

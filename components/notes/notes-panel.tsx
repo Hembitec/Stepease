@@ -304,11 +304,21 @@ export function NotesPanel({
 }: NotesPanelProps) {
   const [viewMode, setViewMode] = useState<"grouped" | "list">("grouped")
 
+  // Deduplicate notes by ID to prevent duplicate key errors
+  const uniqueNotes = useMemo(() => {
+    const seen = new Set<string>()
+    return notes.filter(note => {
+      if (seen.has(note.id)) return false
+      seen.add(note.id)
+      return true
+    })
+  }, [notes])
+
   // Group notes by category
   const groupedNotes = useMemo(() => {
     const groups: Partial<Record<NoteCategory, Note[]>> = {}
 
-    for (const note of notes) {
+    for (const note of uniqueNotes) {
       if (!groups[note.category]) {
         groups[note.category] = []
       }
@@ -316,7 +326,7 @@ export function NotesPanel({
     }
 
     return groups
-  }, [notes])
+  }, [uniqueNotes])
 
   // Order categories by priority (procedure steps first, etc.)
   const categoryOrder: NoteCategory[] = [
@@ -347,7 +357,7 @@ export function NotesPanel({
       <div className="p-4 border-b border-slate-200 bg-white">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-slate-900">Extracted Notes</h3>
-          <span className="text-sm text-slate-500">{notes.length} notes</span>
+          <span className="text-sm text-slate-500">{uniqueNotes.length} notes</span>
         </div>
 
         {/* Phase Progress */}
@@ -370,7 +380,7 @@ export function NotesPanel({
           )}
 
           {/* Notes */}
-          {notes.length === 0 ? (
+          {uniqueNotes.length === 0 ? (
             <div className="text-center py-12">
               <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
                 <FileEdit className="w-6 h-6 text-slate-400" />
@@ -395,7 +405,7 @@ export function NotesPanel({
             </div>
           ) : (
             <div className="space-y-2">
-              {notes.map((note) => (
+              {uniqueNotes.map((note) => (
                 <NoteCard
                   key={note.id}
                   note={note}
@@ -437,7 +447,7 @@ export function NotesPanel({
 
         <Button
           onClick={onReview}
-          disabled={notes.length === 0}
+          disabled={uniqueNotes.length === 0}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white gap-2"
         >
           <Sparkles className="w-4 h-4" />
