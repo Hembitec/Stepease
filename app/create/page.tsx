@@ -100,7 +100,7 @@ function CreateSOPPageContent() {
   const mode = searchParams.get('mode') ?? 'create'
   const isImprovementMode = mode === 'improve'
 
-  const { addSOP, session, startNewSession, resumeSession, addSessionMessage, addSessionNotes, setSessionPhase } = useSOPContext()
+  const { addSOP, session, startNewSession, resumeSession, addSessionMessage, addSessionNotes, setSessionPhase, updateSessionTitle } = useSOPContext()
 
   // Local state
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([])
@@ -206,6 +206,12 @@ function CreateSOPPageContent() {
       if (typeof object.progress === "number") {
         setProgress(object.progress)
       }
+
+      // Update session title if AI provided one and current title is generic
+      if (object.title && session?.title &&
+        (session.title === "New SOP" || session.title === "New SOP Draft" || session.title === "SOP Improvement")) {
+        updateSessionTitle(object.title)
+      }
     },
   })
 
@@ -284,7 +290,7 @@ function CreateSOPPageContent() {
   const handleSaveDraft = useCallback(() => {
     const newSOP: SOP = {
       id: `sop-${Date.now()}`,
-      title: "New SOP Draft",
+      title: session?.title || "New SOP Draft", // Use session title
       department: "General",
       status: "draft",
       createdAt: new Date().toISOString(),
@@ -296,13 +302,13 @@ function CreateSOPPageContent() {
     }
     addSOP(newSOP)
     router.push("/dashboard")
-  }, [notes, chatHistory, addSOP, router, session?.id])
+  }, [notes, chatHistory, addSOP, router, session?.id, session?.title])
 
   const handleReview = useCallback(() => {
     const sopId = `sop-${Date.now()}`
     const newSOP: SOP = {
       id: sopId,
-      title: "New SOP",
+      title: session?.title || "New SOP", // Use session title
       department: "General",
       status: "draft",
       createdAt: new Date().toISOString(),
@@ -314,7 +320,7 @@ function CreateSOPPageContent() {
     }
     addSOP(newSOP)
     router.push(`/review/${sopId}`)
-  }, [notes, chatHistory, addSOP, router, session?.id])
+  }, [notes, chatHistory, addSOP, router, session?.id, session?.title])
 
   const handleDeleteNote = useCallback((id: string) => {
     setNotes((prev) => prev.filter((n) => n.id !== id))

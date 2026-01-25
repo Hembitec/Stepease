@@ -70,6 +70,9 @@ interface SOPContextType {
   // Utilities
   getSessionNotesByCategory: () => Record<string, Note[]>
   getSessionProgress: () => number
+
+  // Title Management
+  updateSessionTitle: (title: string) => void
 }
 
 const SOPContext = createContext<SOPContextType | undefined>(undefined)
@@ -94,6 +97,7 @@ export function SOPProvider({ children }: { children: ReactNode }) {
   const addSessionMessageMutation = useMutation(api.sessions.addMessage)
   const addSessionNotesMutation = useMutation(api.sessions.addNotes)
   const updateSessionProgressMutation = useMutation(api.sessions.updateProgress)
+  const updateSessionTitleMutation = useMutation(api.sessions.updateTitle)
   const removeSessionMutation = useMutation(api.sessions.remove)
 
   // Local State (UI-only state)
@@ -295,7 +299,7 @@ export function SOPProvider({ children }: { children: ReactNode }) {
     // For improvement, we DO save immediately because we have valuable analysis data
     // validation that we don't want to lose if the user refreshes.
     createSessionMutation({
-      title: "SOP Improvement",
+      title: analysis.title || "SOP Improvement", // Use extracted title from analysis
       phase: "process",
       metadata: {
         mode: "improve",
@@ -555,6 +559,25 @@ export function SOPProvider({ children }: { children: ReactNode }) {
   }, [session])
 
   // -------------------------------------------------------------------------
+  // Title Management
+  // -------------------------------------------------------------------------
+
+  const updateSessionTitle = useCallback(async (title: string) => {
+    if (activeSessionId) {
+      try {
+        await updateSessionTitleMutation({
+          sessionId: activeSessionId,
+          title,
+        })
+      } catch (error) {
+        console.error("Failed to update session title:", error)
+      }
+    }
+    // Also update local session for immediate UI feedback
+    setLocalSession((prev) => prev ? { ...prev, title } : null)
+  }, [activeSessionId, updateSessionTitleMutation])
+
+  // -------------------------------------------------------------------------
   // Context Value
   // -------------------------------------------------------------------------
 
@@ -603,6 +626,9 @@ export function SOPProvider({ children }: { children: ReactNode }) {
     // Utilities
     getSessionNotesByCategory,
     getSessionProgress,
+
+    // Title Management
+    updateSessionTitle,
   }
 
   return (

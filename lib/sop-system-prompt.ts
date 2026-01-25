@@ -289,9 +289,19 @@ You MUST respond in this exact JSON format:
     }
   ],
   "phase": "foundation|process|accountability|quality|examples_collection|finalization|complete",
-  "progress": 0-100
+  "progress": 0-100,
+  "title": "Optional: The SOP title when you understand what it's about"
 }
 \`\`\`
+
+## TITLE GENERATION RULES
+- After 2-3 exchanges, when you understand what the SOP is about, include a "title" field
+- The title should be concise (3-8 words) and descriptive
+- Format: "[Process/Action] [Context]" - e.g., "Customer Onboarding Process", "Server Backup Procedure" 
+- Only include title ONCE when you have enough context (don't repeat it in every response)
+- Do NOT include title in the first message (you don't have context yet)
+- Good titles: "Invoice Approval Procedure", "Employee Onboarding Checklist", "Data Backup Protocol"
+- Bad titles: "New SOP", "Untitled", "Process Document"
 
 ${JSON_EXAMPLES}
 
@@ -496,9 +506,19 @@ When checking for sections, look for the CONTENT, not just headers:
 - MEDIUM: Missing roles, unclear responsibilities, no quality checks, no troubleshooting
 - LOW: Missing revision history, no appendices, formatting suggestions, nice-to-haves
 
+## TITLE EXTRACTION RULES
+You MUST extract or infer a meaningful title for the document:
+- First, look for explicit titles: H1 headings, "Title:" fields, document headers
+- If no explicit title, infer from the main topic/process being documented
+- The title should be 3-8 words, clear and descriptive
+- Good: "Customer Onboarding Process", "Server Backup Procedure", "Invoice Approval Workflow"
+- Bad: "SOP", "Procedure", "Document", "Untitled"
+- Return the title in the "title" field of your response
+
 ## RESPONSE FORMAT (Strict JSON Only)
 \`\`\`json
 {
+  "title": "Extracted or inferred document title",
   "structure": {
     "hasHeader": boolean,
     "hasPurpose": boolean,

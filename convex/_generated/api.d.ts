@@ -9,6 +9,7 @@
  */
 
 import type * as cleanup from "../cleanup.js";
+import type * as migrations from "../migrations.js";
 import type * as sessions from "../sessions.js";
 import type * as sops from "../sops.js";
 
@@ -20,6 +21,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   cleanup: typeof cleanup;
+  migrations: typeof migrations;
   sessions: typeof sessions;
   sops: typeof sops;
 }>;

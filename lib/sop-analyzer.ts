@@ -14,6 +14,7 @@ import { SOP_ANALYSIS_PROMPT } from '@/lib/sop-system-prompt';
 import { ProviderConfig } from '@/lib/ai-types';
 
 export interface AnalysisResult {
+  title: string; // Extracted title from the document
   structure: {
     hasHeader: boolean;
     hasPurpose: boolean;
@@ -46,6 +47,7 @@ export interface AnalysisResult {
 }
 
 const analysisResultSchema = z.object({
+  title: z.string().describe('The extracted or inferred title of the SOP document'),
   structure: z.object({
     hasHeader: z.boolean(),
     hasPurpose: z.boolean(),

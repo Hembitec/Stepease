@@ -137,3 +137,20 @@ export const remove = mutation({
         await ctx.db.delete(args.id);
     },
 });
+
+// Update session title
+export const updateTitle = mutation({
+    args: {
+        sessionId: v.id("sessions"),
+        title: v.string(),
+    },
+    handler: async (ctx, args) => {
+        const session = await ctx.db.get(args.sessionId);
+        if (!session) throw new Error("Session not found");
+
+        await ctx.db.patch(args.sessionId, {
+            title: args.title,
+            updatedAt: new Date().toISOString(),
+        });
+    },
+});
