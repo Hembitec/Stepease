@@ -4,6 +4,12 @@ import { useState } from "react"
 import { Download, FileText, FileIcon, FileCode, Clipboard, Check, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import {
+  generatePDF,
+  generateDOCX,
+  generateHTML,
+  generateMarkdown,
+} from "@/lib/download-utils"
 
 interface DownloadMenuProps {
   content: string
@@ -14,25 +20,43 @@ export function DownloadMenu({ content, title }: DownloadMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const [downloading, setDownloading] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleDownload = (format: string) => {
+  const handleDownload = async (format: string) => {
     setDownloading(format)
+    setError(null)
 
-    setTimeout(() => {
-      // Simulate download
-      const blob = new Blob([content], { type: "text/plain" })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement("a")
-      a.href = url
-      a.download = `${title.replace(/\s+/g, "-").toLowerCase()}.${format === "markdown" ? "md" : format}`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
+    try {
+      const safeTitle = title.replace(/\s+/g, "-").toLowerCase()
 
-      setDownloading(null)
+      switch (format) {
+        case "markdown":
+          generateMarkdown(content, safeTitle)
+          break
+
+        case "html":
+          generateHTML(content, title)
+          break
+
+        case "pdf":
+          await generatePDF(content, safeTitle)
+          break
+
+        case "docx":
+          await generateDOCX(content, safeTitle)
+          break
+
+        default:
+          throw new Error(`Unknown format: ${format}`)
+      }
+
       setIsOpen(false)
-    }, 500)
+    } catch (err) {
+      console.error(`Download failed for ${format}:`, err)
+      setError(`Failed to generate ${format.toUpperCase()}. Please try again.`)
+    } finally {
+      setDownloading(null)
+    }
   }
 
   const handleCopy = async () => {
@@ -61,6 +85,11 @@ export function DownloadMenu({ content, title }: DownloadMenuProps) {
         <>
           <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
           <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-20">
+            {error && (
+              <div className="px-4 py-2 text-xs text-red-600 bg-red-50 border-b border-red-100">
+                {error}
+              </div>
+            )}
             {options.map((option) => (
               <button
                 key={option.id}
