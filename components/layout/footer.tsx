@@ -1,5 +1,6 @@
 import Link from "next/link"
-import { FileText, Twitter, Linkedin, Github } from "lucide-react"
+import Image from "next/image"
+import { Twitter, Linkedin, Github } from "lucide-react"
 
 export function Footer() {
   return (
@@ -8,11 +9,16 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <FileText className="w-5 h-5 text-white" />
+            <div className="flex items-center gap-3 mb-4">
+              <div className="relative w-12 h-12 flex-shrink-0">
+                <Image
+                  src="/icon-bg.png"
+                  alt="Step[Ease]"
+                  fill
+                  className="object-contain rounded-lg"
+                />
               </div>
-              <span className="text-xl font-bold text-white">Stepease</span>
+              <span className="text-3xl font-bold text-white tracking-tight">Step<span className="text-blue-400">[</span>Ease<span className="text-blue-400">]</span></span>
             </div>
             <p className="text-gray-400 max-w-md">
               Transform your business processes with AI-powered SOP creation. Build professional documentation in
@@ -46,40 +52,25 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-white transition-colors">
-                  Templates
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="hover:text-white transition-colors">
-                  API
+                <Link href="/dashboard" className="hover:text-white transition-colors">
+                  Get Started
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Company */}
+          {/* Legal */}
           <div>
-            <h3 className="text-white font-semibold mb-4">Company</h3>
+            <h3 className="text-white font-semibold mb-4">Legal</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="#" className="hover:text-white transition-colors">
-                  About
+                <Link href="/privacy" className="hover:text-white transition-colors">
+                  Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-white transition-colors">
-                  Blog
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="hover:text-white transition-colors">
-                  Contact
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="hover:text-white transition-colors">
-                  Privacy
+                <Link href="/terms" className="hover:text-white transition-colors">
+                  Terms of Service
                 </Link>
               </li>
             </ul>
@@ -87,7 +78,7 @@ export function Footer() {
         </div>
 
         <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-          <p>&copy; {new Date().getFullYear()} Stepease. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Step[Ease]. All rights reserved.</p>
         </div>
       </div>
     </footer>

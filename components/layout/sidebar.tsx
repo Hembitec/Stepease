@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import Image from "next/image"
 import { usePathname, useRouter } from "next/navigation"
 import {
   LayoutDashboard,
@@ -113,28 +112,10 @@ export function Sidebar({ isCollapsed, onToggle, isMobileOpen, onMobileClose }: 
             </button>
           ) : (
             <>
-              {/* Logo */}
-              <div className="relative w-10 h-10 flex-shrink-0">
-                <Image
-                  src="/icon.png"
-                  alt="Logo"
-                  fill
-                  className="object-contain"
-                  priority
-                />
-              </div>
-
-              {/* Name */}
-              {!isMobileOpen && (
-                <span className="text-lg font-bold text-white whitespace-nowrap flex-1">
-                  Stepease
-                </span>
-              )}
-              {isMobileOpen && (
-                <span className="text-lg font-bold text-white whitespace-nowrap flex-1">
-                  Stepease
-                </span>
-              )}
+              {/* Logo Text */}
+              <span className="text-2xl font-bold text-white whitespace-nowrap flex-1 tracking-tight">
+                Step<span className="text-blue-400">[</span>Ease<span className="text-blue-400">]</span>
+              </span>
 
               {/* Toggle Button (desktop) / Close Button (mobile) */}
               {isMobileOpen ? (
@@ -289,7 +270,7 @@ export function Sidebar({ isCollapsed, onToggle, isMobileOpen, onMobileClose }: 
             </AlertDialogTrigger>
             <AlertDialogContent className="bg-slate-900 border-slate-700">
               <AlertDialogHeader>
-                <AlertDialogTitle className="text-white">Sign out of Stepease?</AlertDialogTitle>
+                <AlertDialogTitle className="text-white">Sign out of Step[Ease]?</AlertDialogTitle>
                 <AlertDialogDescription className="text-slate-400">
                   You will be redirected to the landing page. Any unsaved changes may be lost.
                 </AlertDialogDescription>

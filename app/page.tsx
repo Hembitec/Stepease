@@ -162,7 +162,7 @@ const faqs = [
   },
   {
     q: "What formats can I export to?",
-    a: "Export to PDF, Word (.docx), Markdown, or HTML. We also support direct integrations with Confluence, Notion, and SharePoint.",
+    a: "Export to PDF, Word (.docx), Markdown, or HTML. You can easily copy content to paste into Confluence, Notion, or SharePoint.",
   },
 ]
 

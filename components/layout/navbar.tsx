@@ -1,7 +1,6 @@
 "use client"
 
 import Link from "next/link"
-import Image from "next/image"
 import { useState, useEffect } from "react"
 import { Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -36,18 +35,8 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-1.5">
-            <div className="relative h-12 w-12 flex-shrink-0">
-              <Image
-                src="/icon.png"
-                alt="Stepease"
-                fill
-                className="object-contain"
-                priority
-              />
-            </div>
-            <span className="text-xl font-bold text-gray-900 font-inter">Stepease</span>
+          <Link href="/" className="flex items-center">
+            <span className="text-2xl font-bold text-gray-900 font-inter tracking-tight">Step<span className="text-blue-600">[</span>Ease<span className="text-blue-600">]</span></span>
           </Link>
 
           {/* Desktop Navigation */}
