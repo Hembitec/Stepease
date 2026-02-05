@@ -9,7 +9,7 @@ import { useState, useRef, useEffect, useCallback, useMemo, Suspense } from "rea
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { experimental_useObject as useObject } from "@ai-sdk/react"
-import { ArrowLeft, Save, FileEdit, MessageSquare, Bot, User, Send, PanelRightClose, PanelRightOpen } from "lucide-react"
+import { ArrowLeft, Save, FileEdit, MessageSquare, Bot, User, Send, PanelRightClose, PanelRightOpen, Lock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { NotesPanel } from "@/components/notes/notes-panel"
 import { PhaseBadge } from "@/components/chat/phase-indicator"
@@ -25,6 +25,8 @@ import {
   type ImprovementStatus
 } from "@/lib/improvement-helpers"
 import type { AnalysisResult } from "@/lib/sop-analyzer"
+import { useQuery } from "convex/react"
+import { api } from "@/convex/_generated/api"
 
 // -----------------------------------------------------------------------------
 // Initial Greeting Message
@@ -99,6 +101,23 @@ function CreateSOPPageContent() {
   const searchParams = useSearchParams()
   const mode = searchParams.get('mode') ?? 'create'
   const isImprovementMode = mode === 'improve'
+
+  // Limit check - redirect if at limit (unless resuming existing session)
+  const canCreateData = useQuery(api.users.checkCanCreate)
+  const canImproveData = useQuery(api.users.checkCanImprove)
+  const sessionIdFromUrl = searchParams.get('session')
+
+  // Redirect to dashboard if at limit (only for NEW sessions, not resuming)
+  useEffect(() => {
+    if (!sessionIdFromUrl) {
+      // New session - check limits
+      if (isImprovementMode && canImproveData && !canImproveData.canImprove) {
+        router.replace('/dashboard')
+      } else if (!isImprovementMode && canCreateData && !canCreateData.canCreate) {
+        router.replace('/dashboard')
+      }
+    }
+  }, [canCreateData, canImproveData, isImprovementMode, sessionIdFromUrl, router])
 
   const { addSOP, session, startNewSession, resumeSession, addSessionMessage, addSessionNotes, setSessionPhase, updateSessionTitle } = useSOPContext()
 

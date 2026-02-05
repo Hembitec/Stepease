@@ -2,7 +2,8 @@
 
 import { useState, useMemo, useEffect } from "react"
 import Link from "next/link"
-import { useQuery } from "convex/react"
+import { useRouter } from "next/navigation"
+import { useQuery, useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { DashboardLayout } from "@/components/layout/dashboard-layout"
 import { SOPListItem } from "@/components/library/sop-list-item"
@@ -14,6 +15,7 @@ import { Search, Plus, List, LayoutGrid, Table, FileText, Clock, Sparkles, Uploa
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { calculateOverallProgress, type ConversationPhase } from "@/lib/types"
+import { LibrarySkeleton } from "@/components/skeletons"
 
 type ViewMode = "list" | "grid" | "table"
 type StatusFilter = "all" | "draft" | "complete" | "archived"
@@ -21,23 +23,30 @@ type SortOption = "recent" | "a-z" | "z-a" | "department"
 type LibraryTab = "completed" | "in-progress"
 
 export default function LibraryPage() {
+  const router = useRouter()
   const { sops, deleteSOP, updateSOP } = useSOPContext()
   const { toggleMobileMenu } = useSidebar()
-  const sessions = useQuery(api.sessions.list) ?? []
+  const sessionsResult = useQuery(api.sessions.list)
+  const reopenSession = useMutation(api.sessions.reopen)
+
+  // All useState hooks MUST be before any conditional returns (React Rules of Hooks)
   const [activeTab, setActiveTab] = useState<LibraryTab>("completed")
   const [viewMode, setViewMode] = useState<ViewMode>("list")
   const [searchQuery, setSearchQuery] = useState("")
-
-  // Smart Tab defaulting: If user has no completed SOPs but has drafts, show drafts first
-  useEffect(() => {
-    if (sops.length === 0 && sessions.length > 0) {
-      setActiveTab("in-progress")
-    }
-  }, [sops.length, sessions.length])
-
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all")
   const [sortBy, setSortBy] = useState<SortOption>("recent")
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null)
+
+  // Show skeleton while loading
+  if (sessionsResult === undefined) {
+    return (
+      <DashboardLayout>
+        <LibrarySkeleton />
+      </DashboardLayout>
+    )
+  }
+
+  const sessions = sessionsResult ?? []
 
   const filteredSOPs = useMemo(() => {
     let result = [...sops]
@@ -107,6 +116,17 @@ export default function LibraryPage() {
     else if (column === "updatedAt") setSortBy("recent")
   }
 
+  const handleRevise = async (sessionId: string) => {
+    try {
+      // Reopen the session for revisions
+      await reopenSession({ id: sessionId as any })
+      // Navigate to create page with session
+      router.push(`/create?session=${sessionId}`)
+    } catch (e) {
+      console.error("Failed to reopen session:", e)
+    }
+  }
+
   return (
     <DashboardLayout>
       <div className="p-4 sm:p-6 lg:p-8">
@@ -167,7 +187,7 @@ export default function LibraryPage() {
               "px-2 py-0.5 rounded-full text-xs",
               activeTab === "in-progress" ? "bg-white/20" : "bg-amber-100 text-amber-700"
             )}>
-              {sessions.length}
+              {sessions.filter(s => s.status !== "approved" && s.phaseProgress < 100).length}
             </span>
           </button>
         </div>
@@ -175,9 +195,9 @@ export default function LibraryPage() {
         {activeTab === "in-progress" ? (
           /* In Progress Sessions - List Style */
           <div>
-            {sessions.length > 0 ? (
+            {sessions.filter(s => s.status !== "approved" && s.phaseProgress < 100).length > 0 ? (
               <div className="space-y-3">
-                {sessions.map((session) => {
+                {sessions.filter(s => s.status !== "approved" && s.phaseProgress < 100).map((session) => {
                   // Use phaseProgress directly (not overall progress)
                   const progress = session.phaseProgress
                   const isImprove = session.metadata?.mode === "improve"
@@ -358,7 +378,7 @@ export default function LibraryPage() {
                 {viewMode === "list" && (
                   <div className="space-y-3">
                     {filteredSOPs.map((sop) => (
-                      <SOPListItem key={sop.id} sop={sop} onDelete={handleDelete} onArchive={handleArchive} />
+                      <SOPListItem key={sop.id} sop={sop} onDelete={handleDelete} onArchive={handleArchive} onRevise={handleRevise} />
                     ))}
                   </div>
                 )}

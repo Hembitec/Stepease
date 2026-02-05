@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Download, FileText, FileIcon, FileCode, Clipboard, Check, ChevronDown } from "lucide-react"
+import { Download, FileText, FileIcon, FileCode, Clipboard, Check, ChevronDown, Lock, Crown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import {
@@ -11,18 +11,40 @@ import {
   generateMarkdown,
 } from "@/lib/download-utils"
 
+type UserTier = "free" | "starter" | "pro"
+
 interface DownloadMenuProps {
   content: string
   title: string
+  tier?: UserTier
 }
 
-export function DownloadMenu({ content, title }: DownloadMenuProps) {
+export function DownloadMenu({ content, title, tier = "free" }: DownloadMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const [downloading, setDownloading] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [showUpgradeHint, setShowUpgradeHint] = useState<string | null>(null)
+
+  // Define which formats are available per tier
+  const tierAccess = {
+    free: ["markdown"], // Only markdown
+    starter: ["markdown", "pdf", "docx", "html"], // All formats (PDF watermarked)
+    pro: ["markdown", "pdf", "docx", "html"], // All formats (clean)
+  }
+
+  const isFormatLocked = (format: string) => {
+    return !tierAccess[tier].includes(format)
+  }
 
   const handleDownload = async (format: string) => {
+    // Check if format is locked for this tier
+    if (isFormatLocked(format)) {
+      setShowUpgradeHint(format)
+      setTimeout(() => setShowUpgradeHint(null), 3000)
+      return
+    }
+
     setDownloading(format)
     setError(null)
 
@@ -39,7 +61,9 @@ export function DownloadMenu({ content, title }: DownloadMenuProps) {
           break
 
         case "pdf":
-          await generatePDF(content, safeTitle)
+          // Add watermark for Starter tier
+          const addWatermark = tier === "starter"
+          await generatePDF(content, safeTitle, addWatermark)
           break
 
         case "docx":
@@ -68,7 +92,7 @@ export function DownloadMenu({ content, title }: DownloadMenuProps) {
 
   const options = [
     { id: "markdown", label: "Markdown (.md)", icon: FileText },
-    { id: "pdf", label: "PDF Document", icon: FileIcon },
+    { id: "pdf", label: tier === "starter" ? "PDF (watermarked)" : "PDF Document", icon: FileIcon },
     { id: "docx", label: "Word (.docx)", icon: FileText },
     { id: "html", label: "HTML File", icon: FileCode },
   ]
@@ -84,26 +108,41 @@ export function DownloadMenu({ content, title }: DownloadMenuProps) {
       {isOpen && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-          <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-20">
+          <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-20">
             {error && (
               <div className="px-4 py-2 text-xs text-red-600 bg-red-50 border-b border-red-100">
                 {error}
               </div>
             )}
-            {options.map((option) => (
-              <button
-                key={option.id}
-                onClick={() => handleDownload(option.id)}
-                disabled={downloading === option.id}
-                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
-              >
-                <option.icon className="w-4 h-4 text-gray-500" />
-                {option.label}
-                {downloading === option.id && (
-                  <div className="ml-auto w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-                )}
-              </button>
-            ))}
+            {showUpgradeHint && (
+              <div className="px-4 py-2 text-xs text-amber-700 bg-amber-50 border-b border-amber-100 flex items-center gap-2">
+                <Crown className="w-3 h-3" />
+                Upgrade to unlock {showUpgradeHint.toUpperCase()} export
+              </div>
+            )}
+            {options.map((option) => {
+              const locked = isFormatLocked(option.id)
+              return (
+                <button
+                  key={option.id}
+                  onClick={() => handleDownload(option.id)}
+                  disabled={downloading === option.id}
+                  className={cn(
+                    "w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors disabled:opacity-50",
+                    locked
+                      ? "text-gray-400 hover:bg-gray-50 cursor-not-allowed"
+                      : "text-gray-700 hover:bg-gray-50"
+                  )}
+                >
+                  <option.icon className={cn("w-4 h-4", locked ? "text-gray-300" : "text-gray-500")} />
+                  <span className="flex-1 text-left">{option.label}</span>
+                  {locked && <Lock className="w-3 h-3 text-gray-400" />}
+                  {downloading === option.id && (
+                    <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                  )}
+                </button>
+              )
+            })}
             <hr className="my-2 border-gray-100" />
             <button
               onClick={handleCopy}

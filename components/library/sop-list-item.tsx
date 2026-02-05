@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { FileText, MoreVertical, Download, Trash2, Archive, Eye, Pencil } from "lucide-react"
+import { FileText, MoreVertical, Download, Trash2, Archive, Eye, Pencil, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
@@ -11,9 +11,10 @@ interface SOPListItemProps {
   sop: SOP
   onDelete: (id: string) => void
   onArchive: (id: string) => void
+  onRevise?: (sessionId: string) => void
 }
 
-export function SOPListItem({ sop, onDelete, onArchive }: SOPListItemProps) {
+export function SOPListItem({ sop, onDelete, onArchive, onRevise }: SOPListItemProps) {
   const statusColors = {
     draft: "bg-yellow-100 text-yellow-700",
     complete: "bg-green-100 text-green-700",
@@ -93,6 +94,12 @@ export function SOPListItem({ sop, onDelete, onArchive }: SOPListItemProps) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
+            {sop.sessionId && sop.status === "complete" && onRevise && (
+              <DropdownMenuItem onClick={() => onRevise(sop.sessionId!)}>
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Revise
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem onClick={() => onArchive(sop.id)}>
               <Archive className="w-4 h-4 mr-2" />
               Archive

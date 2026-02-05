@@ -10,6 +10,8 @@ import { AnalysisResults } from "@/components/upload/analysis-results"
 import { DashboardLayout } from "@/components/layout/dashboard-layout"
 import { useSOPContext } from "@/lib/sop-context"
 import type { AnalysisResult } from "@/lib/sop-analyzer"
+import { useQuery } from "convex/react"
+import { api } from "@/convex/_generated/api"
 
 type Phase = "upload" | "results"
 
@@ -35,8 +37,18 @@ function ImproveSOPPageContent() {
   const [pastedText, setPastedText] = useState("")
   const [isAnalyzingText, setIsAnalyzingText] = useState(false)
 
-  // Redirect if session param exists (bookmarked URL or stale link)
+  // Limit check - redirect if at limit
+  const canImproveData = useQuery(api.users.checkCanImprove)
   const sessionId = searchParams.get('session')
+
+  // Redirect to dashboard if at limit (only for NEW sessions)
+  useEffect(() => {
+    if (!sessionId && canImproveData && !canImproveData.canImprove) {
+      router.replace('/dashboard')
+    }
+  }, [canImproveData, sessionId, router])
+
+  // Redirect if session param exists (bookmarked URL or stale link)
   useEffect(() => {
     if (sessionId) {
       router.replace(`/create?mode=improve&session=${sessionId}`)

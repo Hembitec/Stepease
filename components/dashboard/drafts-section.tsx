@@ -6,9 +6,17 @@ import { api } from "@/convex/_generated/api"
 import { Clock, ArrowRight, Sparkles, Upload, Play } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { calculateOverallProgress, type ConversationPhase } from "@/lib/types"
+import { DraftsSkeleton } from "@/components/skeletons"
 
 export function DraftsSection() {
-    const sessions = useQuery(api.sessions.list) ?? []
+    const sessionsResult = useQuery(api.sessions.list)
+
+    // Show skeleton while loading
+    if (sessionsResult === undefined) {
+        return <DraftsSkeleton />
+    }
+
+    const sessions = sessionsResult ?? []
 
     if (sessions.length === 0) {
         return null

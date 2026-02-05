@@ -1,12 +1,45 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { DashboardLayout } from "@/components/layout/dashboard-layout"
 import { useSidebar } from "@/components/layout/sidebar-context"
+import { SubscriptionCard, UpgradeModal } from "@/components/pricing"
 import { UserProfile } from "@clerk/nextjs"
 import { Menu } from "lucide-react"
+import { useQuery, useMutation } from "convex/react"
+import { api } from "@/convex/_generated/api"
+import { SettingsSkeleton } from "@/components/skeletons"
 
 export default function SettingsPage() {
   const { toggleMobileMenu } = useSidebar()
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+
+  // Fetch real user data from Convex
+  const userData = useQuery(api.users.getByClerkId)
+  const syncUsage = useMutation(api.users.syncUsageFromSessions)
+
+  // Auto-sync usage on mount if no user record exists
+  useEffect(() => {
+    if (userData === null) {
+      syncUsage().catch(console.error)
+    }
+  }, [userData, syncUsage])
+
+  // Show skeleton while loading (undefined means still fetching)
+  if (userData === undefined) {
+    return (
+      <DashboardLayout>
+        <SettingsSkeleton />
+      </DashboardLayout>
+    )
+  }
+
+  const tier = (userData?.tier ?? "free") as "free" | "starter" | "pro"
+  const sopsCreated = userData?.sopsCreatedThisMonth ?? 0
+  const improvesUsed = userData?.improvesUsedThisMonth ?? 0
+  const sopsLimit = tier === "pro" ? Infinity : tier === "starter" ? 12 : 2
+  const improvesLimit = tier === "pro" ? Infinity : tier === "starter" ? 5 : 0
+
   return (
     <DashboardLayout>
       <div className="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto">
@@ -26,6 +59,21 @@ export default function SettingsPage() {
           <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400">
             Manage your account preferences and application settings.
           </p>
+        </div>
+
+        {/* Subscription Section */}
+        <div className="mb-8">
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">
+            Subscription
+          </h2>
+          <SubscriptionCard
+            tier={tier}
+            sopsCreated={sopsCreated}
+            sopsLimit={sopsLimit}
+            improvesUsed={improvesUsed}
+            improvesLimit={improvesLimit}
+            onUpgrade={() => setShowUpgradeModal(true)}
+          />
         </div>
 
         {/* User Profile Section */}
@@ -60,13 +108,11 @@ export default function SettingsPage() {
                   "border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:border-blue-500 focus:ring-blue-500",
                 headerTitle: "text-slate-900 dark:text-slate-50 font-bold",
                 headerSubtitle: "text-slate-500 dark:text-slate-400",
-                // Mobile menu styling
                 navbarMobileMenuButton:
                   "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700",
                 navbarMobileMenuRow:
                   "hover:bg-slate-100 dark:hover:bg-slate-700/50",
                 navbarMobileMenuRowIcon: "text-blue-600 dark:text-blue-400",
-                // Badge and details
                 badge:
                   "bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800",
                 identityPreview:
@@ -86,6 +132,14 @@ export default function SettingsPage() {
           />
         </div>
       </div>
+
+      {/* Upgrade Modal */}
+      <UpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        triggerReason="manual"
+      />
     </DashboardLayout>
   )
 }
+

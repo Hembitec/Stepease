@@ -28,6 +28,13 @@ export const get = query({
     },
 });
 
+// Plan limits (Free, Starter, Pro) - same as in users.ts
+const PLAN_LIMITS = {
+    free: { creates: 2, improves: 0 },
+    starter: { creates: 12, improves: 5 },
+    pro: { creates: Infinity, improves: Infinity },
+} as const;
+
 // Create a new session
 export const create = mutation({
     args: {
@@ -39,6 +46,33 @@ export const create = mutation({
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) throw new Error("Not authenticated");
 
+        // SERVER-SIDE LIMIT ENFORCEMENT
+        // Get the user record to check their limits
+        const user = await ctx.db
+            .query("users")
+            .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+            .first();
+
+        // Determine the mode from metadata
+        const mode = args.metadata?.mode || "create";
+
+        if (user) {
+            // Check if this is a create or improve session
+            if (mode === "improve") {
+                const limit = PLAN_LIMITS[user.tier].improves;
+                if (limit !== Infinity && user.improvesUsedThisMonth >= limit) {
+                    throw new Error("LIMIT_EXCEEDED: You've reached your monthly Improve limit. Please upgrade to continue.");
+                }
+            } else {
+                const limit = PLAN_LIMITS[user.tier].creates;
+                if (limit !== Infinity && user.sopsCreatedThisMonth >= limit) {
+                    throw new Error("LIMIT_EXCEEDED: You've reached your monthly SOP creation limit. Please upgrade to continue.");
+                }
+            }
+        }
+        // If no user record exists, allow creation (they get free tier defaults)
+        // The increment function will auto-create the user
+
         const now = new Date().toISOString();
         return await ctx.db.insert("sessions", {
             userId: identity.subject,
@@ -49,6 +83,8 @@ export const create = mutation({
             phaseProgress: 0,
             questionsAsked: 0,
             metadata: args.metadata,
+            status: "active",      // Session starts as active
+            revisionCount: 0,      // No revisions yet
             createdAt: now,
             updatedAt: now,
         });
@@ -150,6 +186,58 @@ export const updateTitle = mutation({
 
         await ctx.db.patch(args.sessionId, {
             title: args.title,
+            updatedAt: new Date().toISOString(),
+        });
+    },
+});
+
+// =============================================================================
+// SESSION LIFECYCLE - Archive Instead of Delete
+// =============================================================================
+
+/**
+ * Approve a session (archive it, don't delete)
+ * Called when user approves the generated SOP
+ */
+export const approve = mutation({
+    args: { id: v.id("sessions") },
+    handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) throw new Error("Not authenticated");
+
+        const session = await ctx.db.get(args.id);
+        if (!session) throw new Error("Session not found");
+        if (session.userId !== identity.subject) {
+            throw new Error("Not authorized");
+        }
+
+        await ctx.db.patch(args.id, {
+            status: "approved",
+            approvedAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+        });
+    },
+});
+
+/**
+ * Reopen an approved session for revisions
+ * Called when user wants to revise an approved SOP
+ */
+export const reopen = mutation({
+    args: { id: v.id("sessions") },
+    handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) throw new Error("Not authenticated");
+
+        const session = await ctx.db.get(args.id);
+        if (!session) throw new Error("Session not found");
+        if (session.userId !== identity.subject) {
+            throw new Error("Not authorized");
+        }
+
+        await ctx.db.patch(args.id, {
+            status: "active",
+            revisionCount: (session.revisionCount || 0) + 1,
             updatedAt: new Date().toISOString(),
         });
     },

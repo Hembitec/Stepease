@@ -1,9 +1,11 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { useEffect, useState } from "react"
 import { Navbar } from "@/components/layout/navbar"
 import { Footer } from "@/components/layout/footer"
+import { PricingSection } from "@/components/pricing"
 import { Button } from "@/components/ui/button"
 import {
   Bot,
@@ -185,10 +187,13 @@ export default function LandingPage() {
       <section className="relative pt-32 pb-24 px-4 overflow-hidden">
         {/* Background Image - Option A: Abstract Flow */}
         <div className="absolute inset-0 z-0">
-          <img
+          <Image
             src="/hero-abstract.png"
             alt="Background"
-            className="w-full h-full object-cover opacity-80"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover opacity-80"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-white/50 via-white/80 to-background dark:from-slate-950/50 dark:via-slate-950/80 dark:to-background" />
         </div>
@@ -395,6 +400,11 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Pricing Section */}
+      <section id="pricing" className="py-24 px-4 bg-slate-50">
+        <PricingSection />
+      </section>
+
       {/* FAQ Section */}
       <section id="faq" className="py-24 px-4 bg-white">
         <div className="max-w-3xl mx-auto">
@@ -426,10 +436,12 @@ export default function LandingPage() {
       <section className="relative py-24 px-4 overflow-hidden">
         {/* Background Image - Option C: Tech Data */}
         <div className="absolute inset-0 z-0">
-          <img
+          <Image
             src="/hero-tech.png"
             alt="Background"
-            className="w-full h-full object-cover"
+            fill
+            sizes="100vw"
+            className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-br from-blue-600/95 via-indigo-600/95 to-blue-700/95 mix-blend-multiply" />
         </div>

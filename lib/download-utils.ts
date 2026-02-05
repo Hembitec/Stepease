@@ -222,21 +222,24 @@ function parseInlineFormatting(text: string): TextSegment[] {
 
 /**
  * Renders text with inline formatting (bold, italic, code) to PDF.
- * Returns the final X position after rendering.
+ * Handles automatic word wrapping withinMaxWidth.
+ * Returns the final Y position after rendering.
  */
 function renderFormattedText(
     pdf: jsPDF,
     text: string,
     x: number,
-    y: number,
+    startY: number,
     maxWidth: number,
     fontSize: number,
     baseColor: [number, number, number]
 ): number {
-    const segments = parseInlineFormatting(text);
+    const lineHeight = fontSize * 0.5; // Approximate line height in mm
     let currentX = x;
+    let currentY = startY;
 
-    for (const segment of segments) {
+    // Helper to set font based on segment style
+    const setSegmentFont = (segment: TextSegment) => {
         if (segment.code) {
             pdf.setFont('courier', 'normal');
             pdf.setFontSize(fontSize - 1);
@@ -253,25 +256,49 @@ function renderFormattedText(
             pdf.setFont('helvetica', 'normal');
             pdf.setFontSize(fontSize);
         }
-
         pdf.setTextColor(...baseColor);
-        const textWidth = pdf.getTextWidth(segment.text);
+    };
 
-        // Check if we need to wrap
-        if (currentX + textWidth > x + maxWidth) {
-            // Simple approach: just render what fits, rest gets cut.
-            // For now, render at current position
+    const segments = parseInlineFormatting(text);
+
+    // We need to process word by word to handle wrapping correctly
+    // while maintaining styling.
+
+    for (const segment of segments) {
+        setSegmentFont(segment);
+
+        // Split segment into words, preserving spaces
+        const words = segment.text.split(/(\s+)/);
+
+        for (const word of words) {
+            const wordWidth = pdf.getTextWidth(word);
+
+            // Check if word fits on current line
+            if (currentX + wordWidth > x + maxWidth) {
+                // Determine if we need to wrap
+                // If the word itself is longer than maxWidth (rare), force wrap or just print it?
+                // For now, simple wrap:
+                currentY += lineHeight;
+                currentX = x;
+            }
+
+            // If it's a newline character (though usually handled by block parser), reset
+            if (word.includes('\n')) {
+                currentY += lineHeight;
+                currentX = x;
+                continue; // Don't print the newline char itself
+            }
+
+            pdf.text(word, currentX, currentY);
+            currentX += wordWidth;
         }
-
-        pdf.text(segment.text, currentX, y);
-        currentX += textWidth;
     }
 
     // Reset font
     pdf.setFont('helvetica', 'normal');
     pdf.setFontSize(fontSize);
 
-    return currentX;
+    return currentY;
 }
 
 /**
@@ -280,7 +307,8 @@ function renderFormattedText(
  */
 export async function generatePDF(
     markdown: string,
-    filename: string
+    filename: string,
+    addWatermark: boolean = false
 ): Promise<void> {
     const pdf = new jsPDF('p', 'mm', 'a4');
     const pageWidth = 210;
@@ -319,8 +347,11 @@ export async function generatePDF(
                 pdf.setFont('helvetica', 'bold');
                 pdf.setTextColor(...colors.heading1);
                 const text = stripMarkdown(section.content);
-                pdf.text(text, margin, y);
-                y += 10;
+                // Simple wrap for headings too
+                const lines = pdf.splitTextToSize(text, contentWidth);
+                pdf.text(lines, margin, y);
+                y += lines.length * 8 + 2;
+
                 // Underline
                 pdf.setDrawColor(229, 231, 235);
                 pdf.setLineWidth(0.5);
@@ -336,8 +367,9 @@ export async function generatePDF(
                 pdf.setFont('helvetica', 'bold');
                 pdf.setTextColor(...colors.heading2);
                 const text = stripMarkdown(section.content);
-                pdf.text(text, margin, y);
-                y += 9;
+                const lines = pdf.splitTextToSize(text, contentWidth);
+                pdf.text(lines, margin, y);
+                y += lines.length * 7 + 2;
                 break;
             }
 
@@ -348,15 +380,20 @@ export async function generatePDF(
                 pdf.setFont('helvetica', 'bold');
                 pdf.setTextColor(...colors.heading3);
                 const text = stripMarkdown(section.content);
-                pdf.text(text, margin, y);
-                y += 7;
+                const lines = pdf.splitTextToSize(text, contentWidth);
+                pdf.text(lines, margin, y);
+                y += lines.length * 6 + 1;
                 break;
             }
 
             case 'paragraph': {
-                checkPageBreak(10);
-                renderFormattedText(pdf, section.content, margin, y, contentWidth, 10, colors.text);
-                y += 7;
+                // Estimate height (rough)
+                const textLength = section.content.length;
+                const estLines = Math.ceil(textLength / 80);
+                checkPageBreak(estLines * 5);
+
+                y = renderFormattedText(pdf, section.content, margin, y, contentWidth, 10, colors.text);
+                y += 7; // Spacing after paragraph
                 break;
             }
 
@@ -365,16 +402,24 @@ export async function generatePDF(
                     for (let idx = 0; idx < section.items.length; idx++) {
                         const item = section.items[idx];
                         const prefix = section.isNumbered ? `${idx + 1}. ` : '• ';
-                        checkPageBreak(7);
+
+                        // Estimate height
+                        const textLength = item.length;
+                        const estLines = Math.ceil(textLength / 75);
+                        checkPageBreak(estLines * 5);
+
                         // Render prefix
                         pdf.setFontSize(10);
                         pdf.setFont('helvetica', 'normal');
                         pdf.setTextColor(...colors.text);
                         pdf.text(prefix, margin + 3, y);
+
                         // Render formatted item text
                         const prefixWidth = pdf.getTextWidth(prefix);
-                        renderFormattedText(pdf, item, margin + 3 + prefixWidth, y, contentWidth - 10 - prefixWidth, 10, colors.text);
-                        y += 6;
+                        const listContentWidth = contentWidth - 10 - prefixWidth;
+
+                        const finalY = renderFormattedText(pdf, item, margin + 3 + prefixWidth, y, listContentWidth, 10, colors.text);
+                        y = finalY + 6;
                     }
                     y += 2;
                 }
@@ -453,6 +498,28 @@ export async function generatePDF(
                 y += codeHeight + 6;
                 break;
             }
+        }
+    }
+
+    // Add watermark to all pages if requested (for Starter tier)
+    if (addWatermark) {
+        const totalPages = pdf.getNumberOfPages();
+        for (let i = 1; i <= totalPages; i++) {
+            pdf.setPage(i);
+            pdf.setFontSize(40);
+            // Much lighter gray for watermark
+            pdf.setTextColor(240, 240, 240);
+            pdf.setFont('helvetica', 'bold');
+            // Diagonal watermark across the page
+            pdf.text('STEPEASE', pageWidth / 2, pageHeight / 2, {
+                align: 'center',
+                angle: 45
+            });
+            pdf.setFontSize(12);
+            pdf.text('Upgrade to Pro for clean exports', pageWidth / 2, pageHeight / 2 + 15, {
+                align: 'center',
+                angle: 45
+            });
         }
     }
 

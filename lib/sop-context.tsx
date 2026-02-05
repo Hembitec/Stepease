@@ -100,6 +100,10 @@ export function SOPProvider({ children }: { children: ReactNode }) {
   const updateSessionTitleMutation = useMutation(api.sessions.updateTitle)
   const removeSessionMutation = useMutation(api.sessions.remove)
 
+  // Usage tracking mutations
+  const incrementSopCountMutation = useMutation(api.users.incrementSopCount)
+  const incrementImproveCountMutation = useMutation(api.users.incrementImproveCount)
+
   // Local State (UI-only state)
   const [currentSOP, setCurrentSOP] = useState<SOP | null>(null)
   const [activeSessionId, setActiveSessionId] = useState<Id<"sessions"> | null>(null)
@@ -310,6 +314,9 @@ export function SOPProvider({ children }: { children: ReactNode }) {
     }).then((id) => {
       setActiveSessionId(id)
 
+      // Track usage for Improve feature
+      incrementImproveCountMutation().catch(console.error)
+
       // Add initial notes immediately
       if (improvementNotes.length > 0) {
         addSessionNotesMutation({
@@ -329,7 +336,7 @@ export function SOPProvider({ children }: { children: ReactNode }) {
     }).catch(console.error)
 
     return tempId
-  }, [createSessionMutation, addSessionNotesMutation])
+  }, [createSessionMutation, addSessionNotesMutation, incrementImproveCountMutation])
 
   const updateSession = useCallback((updates: Partial<SessionState>) => {
     if (activeSessionId && updates.phase !== undefined) {
@@ -415,6 +422,9 @@ export function SOPProvider({ children }: { children: ReactNode }) {
         })
         setActiveSessionId(id)
 
+        // Track usage for SOP creation
+        incrementSopCountMutation().catch(console.error)
+
         // NOW add the message to the new session
         await addSessionMessageMutation({
           sessionId: id,
@@ -436,7 +446,7 @@ export function SOPProvider({ children }: { children: ReactNode }) {
         }
         : null
     )
-  }, [activeSessionId, addSessionMessageMutation, createSessionMutation])
+  }, [activeSessionId, addSessionMessageMutation, createSessionMutation, incrementSopCountMutation])
 
   const updateSessionNote = useCallback((noteId: string, updates: Partial<Note>) => {
     // Local update only for now

@@ -1,8 +1,9 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import {
   LayoutDashboard,
   FolderOpen,
@@ -14,10 +15,14 @@ import {
   X,
   SidebarClose,
   SidebarOpen,
+  Crown,
+  Lock,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { useUser, useClerk } from "@clerk/nextjs"
+import { useQuery } from "convex/react"
+import { api } from "@/convex/_generated/api"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,6 +34,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { UpgradeBadge } from "@/components/pricing"
+import { UpgradeModal } from "@/components/pricing/upgrade-modal"
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
@@ -45,8 +52,27 @@ interface SidebarProps {
 
 export function Sidebar({ isCollapsed, onToggle, isMobileOpen, onMobileClose }: SidebarProps) {
   const pathname = usePathname()
+  const router = useRouter()
   const { user } = useUser()
   const { signOut } = useClerk()
+  const userData = useQuery(api.users.getByClerkId)
+  const canCreateData = useQuery(api.users.checkCanCreate)
+
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+
+  const tier = userData?.tier ?? "free"
+  const isPro = tier === "pro"
+  const isStarter = tier === "starter"
+
+  const handleCreateClick = (e: React.MouseEvent) => {
+    if (canCreateData && !canCreateData.canCreate) {
+      e.preventDefault()
+      setShowUpgradeModal(true)
+    } else {
+      onMobileClose?.()
+      router.push("/create")
+    }
+  }
 
   return (
     <>
@@ -134,20 +160,26 @@ export function Sidebar({ isCollapsed, onToggle, isMobileOpen, onMobileClose }: 
 
         {/* Quick Create Button */}
         <div className={cn("transition-all duration-200", isCollapsed && !isMobileOpen ? "py-3 px-0 flex justify-center" : "py-4 px-4")}>
-          <Link
-            href="/create"
-            onClick={onMobileClose}
+          <button
+            onClick={handleCreateClick}
             className={cn(
               "flex items-center justify-center bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white font-medium transition-all duration-200 shadow-lg shadow-blue-600/25 hover:shadow-blue-500/40",
               isCollapsed && !isMobileOpen
                 ? "w-9 h-9 rounded-lg"
-                : "w-full px-4 py-3 rounded-xl gap-3"
+                : "w-full px-4 py-3 rounded-xl gap-3",
+              canCreateData && !canCreateData.canCreate && "opacity-80"
             )}
-            title="Create New SOP"
+            title={canCreateData && !canCreateData.canCreate ? "Upgrade to create more SOPs" : "Create New SOP"}
           >
-            <Plus className={cn("flex-shrink-0", isCollapsed && !isMobileOpen ? "w-5 h-5" : "w-5 h-5")} />
-            {(!isCollapsed || isMobileOpen) && <span>New SOP</span>}
-          </Link>
+            {canCreateData && !canCreateData.canCreate ? (
+              <Lock className={cn("flex-shrink-0", isCollapsed && !isMobileOpen ? "w-5 h-5" : "w-5 h-5")} />
+            ) : (
+              <Plus className={cn("flex-shrink-0", isCollapsed && !isMobileOpen ? "w-5 h-5" : "w-5 h-5")} />
+            )}
+            {(!isCollapsed || isMobileOpen) && (
+              <span>{canCreateData && !canCreateData.canCreate ? "Upgrade" : "New SOP"}</span>
+            )}
+          </button>
         </div>
 
         {/* Navigation */}
@@ -200,6 +232,11 @@ export function Sidebar({ isCollapsed, onToggle, isMobileOpen, onMobileClose }: 
           </ul>
         </nav>
 
+        {/* Upgrade Badge */}
+        <div className="px-3 py-2">
+          <UpgradeBadge isCollapsed={isCollapsed} isMobileOpen={isMobileOpen} />
+        </div>
+
         {/* User Section */}
         <div className="border-t border-slate-800 p-4">
           <div
@@ -216,7 +253,23 @@ export function Sidebar({ isCollapsed, onToggle, isMobileOpen, onMobileClose }: 
             </Avatar>
             {(!isCollapsed || isMobileOpen) && (
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white truncate">{user?.fullName || "User"}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-medium text-white truncate">{user?.fullName || "User"}</p>
+                  {isPro ? (
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
+                      <Crown className="w-2.5 h-2.5" />
+                      Pro
+                    </span>
+                  ) : isStarter ? (
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-600 text-white">
+                      Starter
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-700 text-slate-300">
+                      Free
+                    </span>
+                  )}
+                </div>
                 <p className="text-xs text-slate-500 truncate">{user?.primaryEmailAddress?.emailAddress || ""}</p>
               </div>
             )}
@@ -256,6 +309,13 @@ export function Sidebar({ isCollapsed, onToggle, isMobileOpen, onMobileClose }: 
           </AlertDialog>
         </div>
       </aside>
+
+      {/* Upgrade Modal */}
+      <UpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        triggerReason="create_limit"
+      />
     </>
   )
 }

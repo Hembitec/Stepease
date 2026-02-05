@@ -10,6 +10,8 @@ import { DownloadMenu } from "@/components/sop/download-menu"
 import { SectionEditorModal } from "@/components/sop/section-editor-modal"
 import { useSOPContext } from "@/lib/sop-context"
 import { cn } from "@/lib/utils"
+import { useMutation, useQuery } from "convex/react"
+import { api } from "@/convex/_generated/api"
 
 type ViewMode = "markdown" | "preview"
 
@@ -17,6 +19,13 @@ export default function SOPPreviewPage() {
   const router = useRouter()
   const params = useParams()
   const { sops, updateSOP } = useSOPContext()
+
+  // Convex mutation to approve (archive) session
+  const approveSession = useMutation(api.sessions.approve)
+
+  // Fetch current user for tier info
+  const currentUser = useQuery(api.users.getByClerkId)
+  const userTier = (currentUser?.tier as "free" | "starter" | "pro") || "free"
 
   // Find SOP by ID first, then by sessionId (for improvement mode where Convex generates a new ID)
   const sop = sops.find((s) => s.id === params.id)
@@ -42,14 +51,24 @@ export default function SOPPreviewPage() {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const handleApprove = () => {
+  const handleApprove = async () => {
     setApproving(true)
-    setTimeout(() => {
-      if (sop) {
-        updateSOP(sop.id, { status: "complete", content })
+
+    // Archive the session (don't delete it, so user can revise later)
+    if (sop?.sessionId) {
+      try {
+        await approveSession({ id: sop.sessionId as any })
+      } catch (e) {
+        console.error("Failed to approve session:", e)
       }
-      router.push("/library")
-    }, 1000)
+    }
+
+    // Mark SOP as complete
+    if (sop) {
+      updateSOP(sop.id, { status: "complete", content })
+    }
+
+    router.push("/library")
   }
 
   const handleSectionSave = (newContent: string) => {
@@ -65,12 +84,12 @@ export default function SOPPreviewPage() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-10">
-        <Link href={`/review/${params.id}`} className="text-gray-600 hover:text-gray-900 flex items-center gap-2">
+        <button onClick={() => router.back()} className="text-gray-600 hover:text-gray-900 flex items-center gap-2">
           <ArrowLeft className="w-5 h-5" />
           <span className="hidden sm:inline">Back</span>
-        </Link>
+        </button>
         <h1 className="text-lg font-semibold text-gray-900">Your Generated SOP</h1>
-        <DownloadMenu content={content} title={sop?.title || "SOP"} />
+        <DownloadMenu content={content} title={sop?.title || "SOP"} tier={userTier} />
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-6">

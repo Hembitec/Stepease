@@ -212,10 +212,10 @@ export default function ReviewNotesPage() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-        <Link href="/create" className="text-gray-600 hover:text-gray-900 flex items-center gap-2">
+        <button onClick={() => router.back()} className="text-gray-600 hover:text-gray-900 flex items-center gap-2">
           <ArrowLeft className="w-5 h-5" />
           <span className="hidden sm:inline">Back to Chat</span>
-        </Link>
+        </button>
         <h1 className="text-lg font-semibold text-gray-900">Review & Edit Notes</h1>
         <Button
           onClick={handleGenerate}
@@ -341,14 +341,13 @@ export default function ReviewNotesPage() {
                   ))}
                 </ul>
                 <div className="flex gap-3 mt-4">
-                  <Link href="/create">
-                    <Button
-                      variant="outline"
-                      className="text-yellow-700 border-yellow-300 hover:bg-yellow-100 bg-transparent"
-                    >
-                      Back to Chat to Address
-                    </Button>
-                  </Link>
+                  <Button
+                    variant="outline"
+                    onClick={() => router.back()}
+                    className="text-yellow-700 border-yellow-300 hover:bg-yellow-100 bg-transparent"
+                  >
+                    Back to Chat to Address
+                  </Button>
                   <Button
                     onClick={handleGenerate}
                     disabled={isGenerating}

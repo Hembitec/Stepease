@@ -1,11 +1,15 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { DashboardLayout } from "@/components/layout/dashboard-layout"
 import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { useSOPContext } from "@/lib/sop-context"
 import { useSidebar } from "@/components/layout/sidebar-context"
+import { useUser } from "@clerk/nextjs"
+import { DashboardSkeleton } from "@/components/skeletons"
 import {
   Sparkles,
   Upload,
@@ -17,20 +21,51 @@ import {
   TrendingUp,
   Calendar,
   Menu,
+  Lock,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { DraftsSection } from "@/components/dashboard/drafts-section"
+import { UpgradeModal } from "@/components/pricing/upgrade-modal"
 
 export default function DashboardPage() {
+  const router = useRouter()
   const { sops } = useSOPContext()
   const { toggleMobileMenu } = useSidebar()
+  const { user } = useUser()
+
+  // Usage limit checks
+  const canCreateData = useQuery(api.users.checkCanCreate)
+  const canImproveData = useQuery(api.users.checkCanImprove)
+
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+  const [upgradeReason, setUpgradeReason] = useState<"create" | "improve">("create")
 
   const sessions = useQuery(api.sessions.list) ?? []
   const recentSOPs = sops.slice(0, 5)
 
   const draftCount = sessions.length
   const completeCount = sops.filter((s) => s.status === "complete").length
+
+  // Handler for Create SOP action
+  const handleCreateClick = () => {
+    if (canCreateData && !canCreateData.canCreate) {
+      setUpgradeReason("create")
+      setShowUpgradeModal(true)
+    } else {
+      router.push("/create")
+    }
+  }
+
+  // Handler for Improve SOP action
+  const handleImproveClick = () => {
+    if (canImproveData && !canImproveData.canImprove) {
+      setUpgradeReason("improve")
+      setShowUpgradeModal(true)
+    } else {
+      router.push("/improve")
+    }
+  }
 
   // Get current date for greeting
   const currentHour = new Date().getHours()
@@ -41,6 +76,16 @@ export default function DashboardPage() {
     month: "long",
     day: "numeric",
   })
+
+  // Show skeleton while data is loading
+  const isLoading = sessions === undefined || canCreateData === undefined
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <DashboardSkeleton />
+      </DashboardLayout>
+    )
+  }
 
   return (
     <DashboardLayout>
@@ -61,19 +106,24 @@ export default function DashboardPage() {
                   <Menu className="w-6 h-6" />
                 </button>
                 <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-1">
-                  {greeting}, John 👋
+                  {greeting}, {user?.firstName || "there"} 👋
                 </h1>
               </div>
               <p className="text-slate-500">
                 Pick up where you left off or start something new.
               </p>
             </div>
-            <Link href="/create" className="hidden sm:block">
-              <Button className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all">
+            <Button
+              onClick={handleCreateClick}
+              className="hidden sm:flex bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all"
+            >
+              {canCreateData && !canCreateData.canCreate ? (
+                <Lock className="w-4 h-4 mr-2" />
+              ) : (
                 <Plus className="w-4 h-4 mr-2" />
-                New SOP
-              </Button>
-            </Link>
+              )}
+              New SOP
+            </Button>
           </div>
         </div>
 
@@ -147,49 +197,76 @@ export default function DashboardPage() {
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 lg:mb-10">
           {/* Create New SOP */}
-          <Link href="/create" className="group">
-            <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-600 to-indigo-700 rounded-2xl p-6 text-white shadow-xl shadow-blue-600/25 hover:shadow-2xl hover:shadow-blue-600/30 hover:scale-[1.01] transition-all duration-300">
+          <div onClick={handleCreateClick} className="group cursor-pointer">
+            <div className={cn(
+              "relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-600 to-indigo-700 rounded-2xl p-6 text-white shadow-xl shadow-blue-600/25 hover:shadow-2xl hover:shadow-blue-600/30 hover:scale-[1.01] transition-all duration-300",
+              canCreateData && !canCreateData.canCreate && "opacity-80"
+            )}>
               {/* Glow effect */}
               <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-400/30 rounded-full blur-3xl group-hover:bg-blue-300/40 transition-colors" />
               <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-indigo-400/20 rounded-full blur-3xl" />
 
+
+
               <div className="relative">
                 <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
-                  <Sparkles className="w-7 h-7" />
+                  {canCreateData && !canCreateData.canCreate ? (
+                    <Lock className="w-7 h-7" />
+                  ) : (
+                    <Sparkles className="w-7 h-7" />
+                  )}
                 </div>
                 <h3 className="text-xl font-bold mb-2">Create New SOP</h3>
                 <p className="text-blue-100 mb-5 text-sm leading-relaxed">
-                  Start from scratch with AI-powered assistance to build professional SOPs in minutes.
+                  {canCreateData && !canCreateData.canCreate
+                    ? "You've reached your monthly limit. Upgrade to continue creating."
+                    : "Start from scratch with AI-powered assistance to build professional SOPs in minutes."}
                 </p>
                 <span className="inline-flex items-center gap-2 text-sm font-semibold bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full hover:bg-white/20 transition-colors">
-                  Get started
+                  {canCreateData && !canCreateData.canCreate ? "Upgrade now" : "Get started"}
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </span>
               </div>
             </div>
-          </Link>
+          </div>
 
           {/* Improve Existing */}
-          <Link href="/improve" className="group">
-            <div className="relative overflow-hidden bg-white rounded-2xl p-6 border border-slate-200 shadow-lg hover:shadow-xl hover:border-emerald-200 hover:scale-[1.01] transition-all duration-300">
+          <div onClick={handleImproveClick} className="group cursor-pointer">
+            <div className={cn(
+              "relative overflow-hidden bg-white rounded-2xl p-6 border border-slate-200 shadow-lg hover:shadow-xl hover:border-emerald-200 hover:scale-[1.01] transition-all duration-300",
+              canImproveData && !canImproveData.canImprove && "opacity-80"
+            )}>
               {/* Subtle glow */}
               <div className="absolute -top-24 -right-24 w-48 h-48 bg-emerald-100/50 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
 
+
+
               <div className="relative">
                 <div className="w-14 h-14 bg-gradient-to-br from-emerald-400 to-emerald-500 rounded-2xl flex items-center justify-center mb-5 shadow-lg shadow-emerald-500/25 group-hover:scale-110 transition-transform">
-                  <Upload className="w-7 h-7 text-white" />
+                  {canImproveData && !canImproveData.canImprove ? (
+                    <Lock className="w-7 h-7 text-white" />
+                  ) : (
+                    <Upload className="w-7 h-7 text-white" />
+                  )}
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">Improve Existing</h3>
                 <p className="text-slate-500 mb-5 text-sm leading-relaxed">
-                  Upload your current SOPs and let AI analyze and enhance them automatically.
+                  {canImproveData && !canImproveData.canImprove
+                    ? "You've used your monthly improvement. Upgrade for unlimited access."
+                    : "Upload your current SOPs and let AI analyze and enhance them automatically."}
                 </p>
-                <span className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 bg-emerald-50 px-4 py-2 rounded-full group-hover:bg-emerald-100 transition-colors">
-                  Upload file
+                <span className={cn(
+                  "inline-flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-full transition-colors",
+                  canImproveData && !canImproveData.canImprove
+                    ? "text-amber-600 bg-amber-50 group-hover:bg-amber-100"
+                    : "text-emerald-600 bg-emerald-50 group-hover:bg-emerald-100"
+                )}>
+                  {canImproveData && !canImproveData.canImprove ? "Upgrade now" : "Upload file"}
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </span>
               </div>
             </div>
-          </Link>
+          </div>
         </div>
 
         {/* In Progress Sessions */}
@@ -267,6 +344,13 @@ export default function DashboardPage() {
           )}
         </div>
       </div>
+
+      {/* Upgrade Modal */}
+      <UpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        triggerReason={upgradeReason === "create" ? "create_limit" : "improve_limit"}
+      />
     </DashboardLayout>
   )
 }
