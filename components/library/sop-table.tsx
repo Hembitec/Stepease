@@ -19,7 +19,7 @@ export function SOPTable({ sops, onDelete, onArchive, sortBy, onSort }: SOPTable
   const statusColors = {
     draft: "bg-yellow-100 text-yellow-700",
     complete: "bg-green-100 text-green-700",
-    archived: "bg-gray-100 text-gray-600",
+    archived: "bg-slate-100 text-slate-600",
   }
 
   const formatDate = (dateString: string) => {
@@ -32,15 +32,15 @@ export function SOPTable({ sops, onDelete, onArchive, sortBy, onSort }: SOPTable
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+    <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-gray-50 border-b border-gray-200">
+          <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
               <th className="text-left px-4 py-3">
                 <button
                   onClick={() => onSort("title")}
-                  className="flex items-center gap-1 text-xs font-semibold text-gray-600 uppercase tracking-wider hover:text-gray-900"
+                  className="flex items-center gap-1 text-xs font-semibold text-slate-600 uppercase tracking-wider hover:text-slate-900"
                 >
                   Title
                   <ArrowUpDown className="w-3 h-3" />
@@ -49,7 +49,7 @@ export function SOPTable({ sops, onDelete, onArchive, sortBy, onSort }: SOPTable
               <th className="text-left px-4 py-3">
                 <button
                   onClick={() => onSort("department")}
-                  className="flex items-center gap-1 text-xs font-semibold text-gray-600 uppercase tracking-wider hover:text-gray-900"
+                  className="flex items-center gap-1 text-xs font-semibold text-slate-600 uppercase tracking-wider hover:text-slate-900"
                 >
                   Dept
                   <ArrowUpDown className="w-3 h-3" />
@@ -58,7 +58,7 @@ export function SOPTable({ sops, onDelete, onArchive, sortBy, onSort }: SOPTable
               <th className="text-left px-4 py-3">
                 <button
                   onClick={() => onSort("status")}
-                  className="flex items-center gap-1 text-xs font-semibold text-gray-600 uppercase tracking-wider hover:text-gray-900"
+                  className="flex items-center gap-1 text-xs font-semibold text-slate-600 uppercase tracking-wider hover:text-slate-900"
                 >
                   Status
                   <ArrowUpDown className="w-3 h-3" />
@@ -67,29 +67,29 @@ export function SOPTable({ sops, onDelete, onArchive, sortBy, onSort }: SOPTable
               <th className="text-left px-4 py-3">
                 <button
                   onClick={() => onSort("updatedAt")}
-                  className="flex items-center gap-1 text-xs font-semibold text-gray-600 uppercase tracking-wider hover:text-gray-900"
+                  className="flex items-center gap-1 text-xs font-semibold text-slate-600 uppercase tracking-wider hover:text-slate-900"
                 >
                   Updated
                   <ArrowUpDown className="w-3 h-3" />
                 </button>
               </th>
               <th className="text-right px-4 py-3">
-                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</span>
+                <span className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Actions</span>
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-slate-100">
             {sops.map((sop) => (
-              <tr key={sop.id} className="hover:bg-gray-50 transition-colors">
+              <tr key={sop.id} className="hover:bg-slate-50 transition-colors">
                 <td className="px-4 py-3">
                   <Link
                     href={sop.status === "draft" ? `/create?id=${sop.id}` : `/preview/${sop.id}`}
-                    className="font-medium text-gray-900 hover:text-blue-600"
+                    className="font-medium text-slate-900 hover:text-blue-600"
                   >
                     {sop.title}
                   </Link>
                 </td>
-                <td className="px-4 py-3 text-sm text-gray-600">{sop.department || "General"}</td>
+                <td className="px-4 py-3 text-sm text-slate-600">{sop.department || "General"}</td>
                 <td className="px-4 py-3">
                   <span
                     className={cn("px-2 py-0.5 text-xs font-medium rounded-full capitalize", statusColors[sop.status])}
@@ -97,7 +97,7 @@ export function SOPTable({ sops, onDelete, onArchive, sortBy, onSort }: SOPTable
                     {sop.status}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-sm text-gray-600">{formatDate(sop.updatedAt)}</td>
+                <td className="px-4 py-3 text-sm text-slate-600">{formatDate(sop.updatedAt)}</td>
                 <td className="px-4 py-3 text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

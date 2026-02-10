@@ -5,7 +5,7 @@
 // Global state management with Convex real-time persistence
 // =============================================================================
 
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react"
+import { createContext, useContext, useState, useCallback, useRef, type ReactNode } from "react"
 import { useQuery, useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import type { Id } from "@/convex/_generated/dataModel"
@@ -108,6 +108,14 @@ export function SOPProvider({ children }: { children: ReactNode }) {
   const [currentSOP, setCurrentSOP] = useState<SOP | null>(null)
   const [activeSessionId, setActiveSessionId] = useState<Id<"sessions"> | null>(null)
   const [localSession, setLocalSession] = useState<SessionState | null>(null)
+
+  // Lock to prevent race condition during session creation
+  const sessionCreationPromiseRef = useRef<Promise<Id<"sessions">> | null>(null)
+  // Ref to track session ID synchronously (fixes closure issue with state)
+  const sessionIdRef = useRef<Id<"sessions"> | null>(null)
+
+  // Keep ref in sync with state
+  sessionIdRef.current = activeSessionId
 
   // Transform Convex SOPs to local SOP type (add 'id' field from '_id')
   const sops: SOP[] = convexSops.map((s) => ({
@@ -405,34 +413,59 @@ export function SOPProvider({ children }: { children: ReactNode }) {
   // -------------------------------------------------------------------------
 
   const addSessionMessage = useCallback(async (message: ChatMessage) => {
+    // Use ref for synchronous session ID check (avoids closure issues with state)
+    const currentSessionId = sessionIdRef.current;
+
     // If we have an active session ID, just add the message
-    if (activeSessionId) {
+    if (currentSessionId) {
       await addSessionMessageMutation({
-        sessionId: activeSessionId,
+        sessionId: currentSessionId,
         role: message.role,
         content: message.content,
       })
     } else {
       // Lazy Create: No ID yet? Create the session NOW.
+      // Use a lock to prevent race conditions (e.g., user message + AI response arriving close together)
       try {
-        const id = await createSessionMutation({
-          title: "New SOP",
-          phase: "foundation",
-          metadata: { mode: "create" },
-        })
-        setActiveSessionId(id)
+        let sessionId: Id<"sessions">;
 
-        // Track usage for SOP creation
-        incrementSopCountMutation().catch(console.error)
+        // Check if a session creation is already in progress
+        if (sessionCreationPromiseRef.current) {
+          // Wait for the existing creation to complete
+          sessionId = await sessionCreationPromiseRef.current;
+        } else {
+          // Start a new session creation and store the promise
+          const creationPromise = createSessionMutation({
+            title: "New SOP",
+            phase: "foundation",
+            metadata: { mode: "create" },
+          });
+          sessionCreationPromiseRef.current = creationPromise;
 
-        // NOW add the message to the new session
+          try {
+            sessionId = await creationPromise;
+            // Update BOTH ref and state - ref is synchronous, state triggers re-render
+            sessionIdRef.current = sessionId;
+            setActiveSessionId(sessionId);
+
+            // Track usage for SOP creation (only for the first caller)
+            incrementSopCountMutation().catch(console.error);
+          } finally {
+            // Clear the lock after creation completes (success or failure)
+            sessionCreationPromiseRef.current = null;
+          }
+        }
+
+        // NOW add the message to the session
         await addSessionMessageMutation({
-          sessionId: id,
+          sessionId: sessionId,
           role: message.role,
           content: message.content,
-        })
+        });
       } catch (error) {
-        console.error("Failed to lazily create session:", error)
+        console.error("Failed to lazily create session:", error);
+        // Clear the lock on error
+        sessionCreationPromiseRef.current = null;
       }
     }
 
@@ -445,8 +478,8 @@ export function SOPProvider({ children }: { children: ReactNode }) {
           questionsAsked: message.role === "ai" ? prev.questionsAsked + 1 : prev.questionsAsked,
         }
         : null
-    )
-  }, [activeSessionId, addSessionMessageMutation, createSessionMutation, incrementSopCountMutation])
+    );
+  }, [addSessionMessageMutation, createSessionMutation, incrementSopCountMutation])
 
   const updateSessionNote = useCallback((noteId: string, updates: Partial<Note>) => {
     // Local update only for now

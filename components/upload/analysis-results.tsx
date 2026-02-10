@@ -109,7 +109,7 @@ export function AnalysisResults({
       {/* Structure Grid */}
       <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
         <h4 className="font-semibold text-slate-900 mb-4">Structure Analysis</h4>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
           {Object.entries(analysis.structure)
             .filter(([key]) => key.startsWith("has"))
             .map(([key, value]) => (
@@ -128,8 +128,8 @@ export function AnalysisResults({
       </div>
 
       {/* CTA */}
-      <div className="flex justify-end pt-4">
-        <Button onClick={onStartImprovement} className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 text-lg rounded-xl shadow-lg shadow-blue-600/20 transition-all hover:scale-[1.02]">
+      <div className="flex flex-col sm:flex-row gap-3 sm:justify-end pt-4">
+        <Button onClick={onStartImprovement} className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-8 py-4 sm:py-6 text-base sm:text-lg rounded-xl shadow-lg shadow-blue-600/20 transition-all hover:scale-[1.02]">
           Start Improvement With AI
         </Button>
       </div>
@@ -146,7 +146,7 @@ export function AnalysisResults({
         </Button>
 
         {showFullContent && (
-          <div className="mt-4 bg-slate-50 rounded-xl p-6 font-mono text-sm text-slate-700 overflow-x-auto border border-slate-200">
+          <div className="mt-4 bg-slate-50 rounded-xl p-4 sm:p-6 font-mono text-sm text-slate-700 overflow-x-auto border border-slate-200">
             <pre className="whitespace-pre-wrap">{originalContent}</pre>
           </div>
         )}

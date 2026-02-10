@@ -1,7 +1,6 @@
 "use client"
 
 import { Skeleton } from "@/components/ui/skeleton"
-import { Clock, FileText, Sparkles, Upload } from "lucide-react"
 
 // =============================================================================
 // DASHBOARD SKELETON
@@ -9,38 +8,38 @@ import { Clock, FileText, Sparkles, Upload } from "lucide-react"
 
 export function DashboardSkeleton() {
     return (
-        <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+        <div className="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto">
             {/* Header */}
-            <div className="mb-8 lg:mb-10">
-                <Skeleton className="h-4 w-32 mb-2" />
-                <Skeleton className="h-8 w-64 mb-2" />
-                <Skeleton className="h-4 w-48" />
+            <div className="mb-6 sm:mb-8">
+                <Skeleton className="h-3 w-28 mb-2 rounded" />
+                <Skeleton className="h-7 w-52 mb-1.5 rounded" />
+                <Skeleton className="h-4 w-40 rounded" />
             </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 lg:mb-10">
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
                 <StatCardSkeleton />
                 <StatCardSkeleton />
                 <StatCardSkeleton />
             </div>
 
             {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 lg:mb-10">
-                <QuickActionSkeleton />
-                <QuickActionSkeleton />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
+                <ActionCardSkeleton />
+                <ActionCardSkeleton />
             </div>
 
             {/* Recent Documents */}
             <div>
-                <div className="flex items-center justify-between mb-4">
-                    <Skeleton className="h-6 w-40" />
-                    <Skeleton className="h-4 w-16" />
+                <div className="flex items-center justify-between mb-3">
+                    <Skeleton className="h-3 w-32 rounded" />
+                    <Skeleton className="h-3 w-14 rounded" />
                 </div>
-                <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200/80 shadow-lg overflow-hidden">
+                <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
                     <div className="divide-y divide-slate-100">
-                        <SOPItemSkeleton />
-                        <SOPItemSkeleton />
-                        <SOPItemSkeleton />
+                        <DocItemSkeleton />
+                        <DocItemSkeleton />
+                        <DocItemSkeleton />
                     </div>
                 </div>
             </div>
@@ -50,39 +49,36 @@ export function DashboardSkeleton() {
 
 function StatCardSkeleton() {
     return (
-        <div className="relative bg-white/70 backdrop-blur-md rounded-2xl p-5 border border-white/50 shadow-lg">
-            <div className="flex items-center justify-between mb-4">
-                <Skeleton className="w-12 h-12 rounded-xl" />
-                <Skeleton className="h-4 w-12" />
-            </div>
-            <Skeleton className="h-4 w-20 mb-2" />
-            <Skeleton className="h-8 w-16" />
+        <div className="bg-white rounded-xl p-3.5 sm:p-4 border border-slate-200">
+            <Skeleton className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg mb-3" />
+            <Skeleton className="h-2.5 w-14 mb-1.5 rounded" />
+            <Skeleton className="h-6 w-8 rounded" />
         </div>
     )
 }
 
-function QuickActionSkeleton() {
+function ActionCardSkeleton() {
     return (
-        <div className="relative overflow-hidden bg-white rounded-2xl p-6 border border-slate-200 shadow-lg">
-            <Skeleton className="w-14 h-14 rounded-2xl mb-5" />
-            <Skeleton className="h-6 w-40 mb-2" />
-            <Skeleton className="h-4 w-full mb-2" />
-            <Skeleton className="h-4 w-3/4 mb-5" />
-            <Skeleton className="h-10 w-28 rounded-full" />
+        <div className="bg-white rounded-xl p-5 sm:p-6 border border-slate-200">
+            <Skeleton className="w-10 h-10 rounded-lg mb-4" />
+            <Skeleton className="h-5 w-36 mb-1.5 rounded" />
+            <Skeleton className="h-3 w-full mb-1 rounded" />
+            <Skeleton className="h-3 w-2/3 mb-4 rounded" />
+            <Skeleton className="h-3 w-20 rounded" />
         </div>
     )
 }
 
-function SOPItemSkeleton() {
+function DocItemSkeleton() {
     return (
-        <div className="flex items-center gap-4 p-4">
-            <Skeleton className="w-11 h-11 rounded-xl" />
+        <div className="flex items-center gap-3 sm:gap-4 px-4 py-3">
+            <Skeleton className="w-9 h-9 rounded-lg flex-shrink-0" />
             <div className="flex-1 min-w-0">
-                <Skeleton className="h-5 w-48 mb-2" />
-                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-36 mb-1.5 rounded" />
+                <Skeleton className="h-3 w-20 rounded" />
             </div>
-            <Skeleton className="h-6 w-20 rounded-full" />
-            <Skeleton className="w-5 h-5" />
+            <Skeleton className="h-4 w-14 rounded hidden sm:block" />
+            <Skeleton className="w-4 h-4 rounded flex-shrink-0" />
         </div>
     )
 }
@@ -94,47 +90,46 @@ function SOPItemSkeleton() {
 export function SettingsSkeleton() {
     return (
         <div className="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto">
-            {/* Header */}
             <div className="mb-6 sm:mb-8">
-                <Skeleton className="h-8 w-32 mb-2" />
-                <Skeleton className="h-4 w-64" />
+                <Skeleton className="h-7 w-28 mb-2 rounded" />
+                <Skeleton className="h-4 w-56 rounded" />
             </div>
 
-            {/* Subscription Section */}
+            {/* Subscription */}
             <div className="mb-8">
-                <Skeleton className="h-6 w-28 mb-4" />
-                <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-lg">
+                <Skeleton className="h-4 w-24 mb-4 rounded" />
+                <div className="bg-white rounded-xl border border-slate-200 p-6">
                     <div className="flex items-center justify-between mb-6">
                         <div>
-                            <Skeleton className="h-6 w-32 mb-2" />
-                            <Skeleton className="h-4 w-48" />
+                            <Skeleton className="h-5 w-28 mb-2 rounded" />
+                            <Skeleton className="h-3 w-44 rounded" />
                         </div>
-                        <Skeleton className="h-10 w-24 rounded-lg" />
+                        <Skeleton className="h-9 w-20 rounded-lg" />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="p-4 bg-slate-50 rounded-xl">
-                            <Skeleton className="h-4 w-24 mb-2" />
-                            <Skeleton className="h-6 w-16" />
+                        <div className="p-3 bg-slate-50 rounded-lg">
+                            <Skeleton className="h-3 w-20 mb-2 rounded" />
+                            <Skeleton className="h-5 w-12 rounded" />
                         </div>
-                        <div className="p-4 bg-slate-50 rounded-xl">
-                            <Skeleton className="h-4 w-24 mb-2" />
-                            <Skeleton className="h-6 w-16" />
+                        <div className="p-3 bg-slate-50 rounded-lg">
+                            <Skeleton className="h-3 w-20 mb-2 rounded" />
+                            <Skeleton className="h-5 w-12 rounded" />
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Profile Section Placeholder */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-lg">
-                <Skeleton className="h-6 w-32 mb-6" />
-                <div className="flex items-center gap-4 mb-6">
-                    <Skeleton className="w-16 h-16 rounded-full" />
+            {/* Profile */}
+            <div className="bg-white rounded-xl border border-slate-200 p-6">
+                <Skeleton className="h-5 w-28 mb-5 rounded" />
+                <div className="flex items-center gap-4 mb-5">
+                    <Skeleton className="w-14 h-14 rounded-full" />
                     <div>
-                        <Skeleton className="h-5 w-32 mb-2" />
-                        <Skeleton className="h-4 w-48" />
+                        <Skeleton className="h-4 w-28 mb-2 rounded" />
+                        <Skeleton className="h-3 w-40 rounded" />
                     </div>
                 </div>
-                <Skeleton className="h-10 w-full rounded-lg" />
+                <Skeleton className="h-9 w-full rounded-lg" />
             </div>
         </div>
     )
@@ -146,38 +141,38 @@ export function SettingsSkeleton() {
 
 export function LibrarySkeleton() {
     return (
-        <div className="p-4 sm:p-6 lg:p-8">
+        <div className="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
                 <div>
-                    <Skeleton className="h-8 w-36 mb-2" />
-                    <Skeleton className="h-4 w-64" />
+                    <Skeleton className="h-6 w-28 mb-1.5 rounded" />
+                    <Skeleton className="h-3.5 w-52 rounded" />
                 </div>
-                <Skeleton className="h-10 w-28 rounded-lg" />
+                <Skeleton className="h-9 w-24 rounded-lg" />
             </div>
 
-            {/* Tab Switcher */}
-            <div className="flex gap-2 mb-6">
-                <Skeleton className="h-10 w-36 rounded-xl" />
-                <Skeleton className="h-10 w-32 rounded-xl" />
+            {/* Segmented Tab Control */}
+            <div className="flex gap-1 p-1 bg-slate-100 rounded-lg mb-5 w-fit">
+                <Skeleton className="h-8 w-28 rounded-md bg-white" />
+                <Skeleton className="h-8 w-24 rounded-md" />
             </div>
 
             {/* Filter Bar */}
-            <div className="bg-white border border-gray-200 rounded-xl p-4 mb-6">
-                <Skeleton className="h-10 w-full rounded-lg mb-4" />
-                <div className="flex gap-2">
-                    <Skeleton className="h-8 w-16 rounded-full" />
-                    <Skeleton className="h-8 w-16 rounded-full" />
-                    <Skeleton className="h-8 w-20 rounded-full" />
-                    <Skeleton className="h-8 w-20 rounded-full" />
+            <div className="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 mb-4">
+                <Skeleton className="h-9 w-full rounded-lg mb-3" />
+                <div className="flex gap-1.5">
+                    <Skeleton className="h-6 w-12 rounded-md" />
+                    <Skeleton className="h-6 w-12 rounded-md" />
+                    <Skeleton className="h-6 w-16 rounded-md" />
+                    <Skeleton className="h-6 w-16 rounded-md" />
                 </div>
             </div>
 
-            {/* Results Count */}
-            <Skeleton className="h-4 w-32 mb-4" />
+            {/* Results count */}
+            <Skeleton className="h-3 w-24 mb-3 rounded" />
 
-            {/* List Items */}
-            <div className="space-y-3">
+            {/* List items */}
+            <div className="space-y-2">
                 <LibraryItemSkeleton />
                 <LibraryItemSkeleton />
                 <LibraryItemSkeleton />
@@ -189,14 +184,14 @@ export function LibrarySkeleton() {
 
 function LibraryItemSkeleton() {
     return (
-        <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm flex items-center gap-4">
-            <Skeleton className="w-12 h-12 rounded-xl" />
+        <div className="bg-white rounded-xl px-4 py-3.5 border border-slate-200 flex items-center gap-3 sm:gap-4">
+            <Skeleton className="w-9 h-9 rounded-lg flex-shrink-0" />
             <div className="flex-1 min-w-0">
-                <Skeleton className="h-5 w-48 mb-2" />
-                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-4 w-36 mb-1 rounded" />
+                <Skeleton className="h-3 w-24 rounded" />
             </div>
-            <Skeleton className="w-32 h-2 rounded-full hidden sm:block" />
-            <Skeleton className="h-9 w-24 rounded-lg" />
+            <Skeleton className="w-24 h-1.5 rounded-full hidden sm:block" />
+            <Skeleton className="h-3.5 w-16 rounded" />
         </div>
     )
 }
@@ -207,15 +202,12 @@ function LibraryItemSkeleton() {
 
 export function DraftsSkeleton() {
     return (
-        <div className="mb-8 lg:mb-10">
-            <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-slate-300" />
-                    <Skeleton className="h-6 w-56" />
-                    <Skeleton className="h-5 w-6 rounded-full" />
-                </div>
+        <div className="mb-6 sm:mb-8">
+            <div className="flex items-center gap-2 mb-3">
+                <Skeleton className="h-3 w-44 rounded" />
+                <Skeleton className="h-4 w-5 rounded-full" />
             </div>
-            <div className="space-y-3">
+            <div className="space-y-2">
                 <DraftItemSkeleton />
                 <DraftItemSkeleton />
             </div>
@@ -225,33 +217,33 @@ export function DraftsSkeleton() {
 
 function DraftItemSkeleton() {
     return (
-        <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-slate-200/80 shadow-lg flex items-center gap-4">
-            <Skeleton className="w-12 h-12 rounded-xl" />
+        <div className="bg-white rounded-xl p-3.5 border border-slate-200 flex items-center gap-3 sm:gap-4">
+            <Skeleton className="w-10 h-10 rounded-lg flex-shrink-0" />
             <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                    <Skeleton className="h-5 w-40" />
-                    <Skeleton className="h-5 w-16 rounded-full" />
+                    <Skeleton className="h-4 w-36 rounded" />
+                    <Skeleton className="h-4 w-14 rounded" />
                 </div>
-                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-3 w-20 rounded" />
             </div>
-            <div className="w-32 hidden sm:block">
-                <Skeleton className="h-2 w-full rounded-full" />
+            <div className="w-28 hidden sm:block">
+                <Skeleton className="h-1.5 w-full rounded-full" />
             </div>
-            <Skeleton className="h-9 w-24 rounded-lg" />
+            <Skeleton className="h-8 w-20 rounded-lg" />
         </div>
     )
 }
 
 // =============================================================================
-// GENERIC SKELETONS
+// GENERIC
 // =============================================================================
 
 export function PageLoadingSkeleton() {
     return (
         <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
-                <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                <p className="text-slate-500 text-sm">Loading...</p>
+                <div className="w-7 h-7 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                <p className="text-slate-400 text-sm">Loading...</p>
             </div>
         </div>
     )

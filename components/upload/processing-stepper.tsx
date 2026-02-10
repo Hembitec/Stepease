@@ -13,9 +13,24 @@ interface ProcessingStepperProps {
 }
 
 const steps = [
-    { id: "extracting", label: "Extracting Text", icon: FileText },
-    { id: "analyzing", label: "AI Analysis", icon: Brain },
-    { id: "complete", label: "Complete", icon: CheckCircle2 },
+    {
+        id: "extracting",
+        label: "Extracting Text",
+        description: "Reading and parsing your document content...",
+        icon: FileText,
+    },
+    {
+        id: "analyzing",
+        label: "AI Analysis",
+        description: "Evaluating structure, quality, and completeness...",
+        icon: Brain,
+    },
+    {
+        id: "complete",
+        label: "Analysis Complete",
+        description: "Your document has been fully analyzed.",
+        icon: CheckCircle2,
+    },
 ]
 
 export function ProcessingStepper({ stage, errorStage, errorMessage }: ProcessingStepperProps) {
@@ -26,7 +41,6 @@ export function ProcessingStepper({ stage, errorStage, errorMessage }: Processin
         const currentIndex = stepOrder.indexOf(stage === "error" ? "" : stage)
         const stepIndex = stepOrder.indexOf(stepId)
 
-        // Handle error state
         if (stage === "error") {
             if (errorStage === "extraction" && stepId === "extracting") return "error"
             if (errorStage === "analysis" && stepId === "extracting") return "complete"
@@ -40,85 +54,84 @@ export function ProcessingStepper({ stage, errorStage, errorMessage }: Processin
     }
 
     return (
-        <div className="w-full max-w-2xl mx-auto py-6">
-            {/* Stepper */}
-            <div className="flex items-center justify-center mb-4">
+        <div className="w-full max-w-md mx-auto py-8 px-4">
+            <div className="relative">
                 {steps.map((step, index) => {
                     const status = getStepStatus(step.id)
                     const Icon = step.icon
+                    const isLast = index === steps.length - 1
 
                     return (
-                        <div key={step.id} className="flex items-center flex-1">
-                            {/* Step Circle */}
-                            <div className="flex flex-col items-center">
+                        <div key={step.id} className="relative flex gap-4">
+                            {/* Vertical connector line */}
+                            {!isLast && (
+                                <div className="absolute left-5 top-10 w-0.5 h-[calc(100%-8px)]">
+                                    <div
+                                        className={cn(
+                                            "w-full h-full rounded-full transition-all duration-700",
+                                            status === "complete"
+                                                ? "bg-green-400"
+                                                : "bg-slate-200"
+                                        )}
+                                    />
+                                </div>
+                            )}
+
+                            {/* Step circle */}
+                            <div className="relative z-10 flex-shrink-0">
                                 <div
                                     className={cn(
-                                        "w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300",
-                                        status === "pending" && "bg-muted text-muted-foreground",
-                                        status === "active" && "bg-primary text-primary-foreground animate-pulse",
+                                        "w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500",
+                                        status === "pending" && "bg-slate-100 text-slate-400",
+                                        status === "active" && "bg-blue-600 text-white shadow-lg shadow-blue-600/30",
                                         status === "complete" && "bg-green-500 text-white",
-                                        status === "error" && "bg-destructive text-destructive-foreground"
+                                        status === "error" && "bg-red-500 text-white"
                                     )}
                                 >
                                     {status === "active" ? (
-                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        <Loader2 className="w-4.5 h-4.5 animate-spin" />
                                     ) : status === "error" ? (
-                                        <AlertCircle className="w-5 h-5" />
+                                        <AlertCircle className="w-4.5 h-4.5" />
+                                    ) : status === "complete" ? (
+                                        <CheckCircle2 className="w-4.5 h-4.5" />
                                     ) : (
-                                        <Icon className="w-5 h-5" />
+                                        <Icon className="w-4.5 h-4.5" />
                                     )}
                                 </div>
-                                <span
+                                {/* Pulse ring for active step */}
+                                {status === "active" && (
+                                    <div className="absolute inset-0 rounded-full bg-blue-600/20 animate-ping" />
+                                )}
+                            </div>
+
+                            {/* Step content */}
+                            <div className={cn("pb-8", isLast && "pb-0")}>
+                                <h4
                                     className={cn(
-                                        "mt-2 text-xs font-medium text-center",
-                                        status === "pending" && "text-muted-foreground",
-                                        status === "active" && "text-primary",
-                                        status === "complete" && "text-green-600",
-                                        status === "error" && "text-destructive"
+                                        "text-sm font-semibold leading-tight mt-2.5 transition-colors duration-300",
+                                        status === "pending" && "text-slate-400",
+                                        status === "active" && "text-slate-900",
+                                        status === "complete" && "text-green-700",
+                                        status === "error" && "text-red-700"
                                     )}
                                 >
                                     {step.label}
-                                </span>
-                            </div>
-
-                            {/* Connector Line */}
-                            {index < steps.length - 1 && (
-                                <div
+                                </h4>
+                                <p
                                     className={cn(
-                                        "flex-1 h-1 mx-3 rounded-full transition-all duration-300",
-                                        getStepStatus(steps[index + 1].id) === "pending"
-                                            ? "bg-muted"
-                                            : "bg-green-500"
+                                        "text-xs mt-1 leading-relaxed transition-colors duration-300",
+                                        status === "active" ? "text-slate-500" : "text-slate-400",
+                                        status === "error" && "text-red-500"
                                     )}
-                                />
-                            )}
+                                >
+                                    {status === "error" && errorMessage
+                                        ? errorMessage
+                                        : step.description}
+                                </p>
+                            </div>
                         </div>
                     )
                 })}
-            </div>
-
-            {/* Active Stage Message */}
-            <div className="text-center">
-                {stage === "extracting" && (
-                    <p className="text-sm text-muted-foreground">
-                        Reading and extracting text from your document...
-                    </p>
-                )}
-                {stage === "analyzing" && (
-                    <p className="text-sm text-muted-foreground">
-                        AI is analyzing your SOP structure and quality...
-                    </p>
-                )}
-                {stage === "complete" && (
-                    <p className="text-sm text-green-600 font-medium">
-                        Analysis complete!
-                    </p>
-                )}
-                {stage === "error" && errorMessage && (
-                    <p className="text-sm text-destructive">
-                        {errorMessage}
-                    </p>
-                )}
             </div>
         </div>
     )

@@ -81,51 +81,51 @@ export default function SOPPreviewPage() {
   const sections = content.split(/(?=^## )/m).filter(Boolean)
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-10">
-        <button onClick={() => router.back()} className="text-gray-600 hover:text-gray-900 flex items-center gap-2">
+      <header className="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-10">
+        <button onClick={() => router.back()} className="text-slate-500 hover:text-slate-900 flex items-center gap-2 transition-colors">
           <ArrowLeft className="w-5 h-5" />
-          <span className="hidden sm:inline">Back</span>
+          <span className="hidden sm:inline text-sm font-medium">Back</span>
         </button>
-        <h1 className="text-lg font-semibold text-gray-900">Your Generated SOP</h1>
+        <h1 className="text-lg font-semibold text-slate-900">Your Generated SOP</h1>
         <DownloadMenu content={content} title={sop?.title || "SOP"} tier={userTier} />
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-6">
+      <main className="max-w-4xl mx-auto px-3 sm:px-6 py-4 sm:py-8">
         {/* View Toggle */}
-        <div className="flex items-center gap-2 mb-6 bg-gray-200 rounded-lg p-1 w-fit">
+        <div className="flex gap-1 p-1 bg-slate-100 rounded-lg mb-6 w-fit">
           <button
             onClick={() => setViewMode("markdown")}
             className={cn(
-              "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
-              viewMode === "markdown" ? "bg-white text-gray-900 shadow-sm" : "text-gray-600 hover:text-gray-900",
+              "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all",
+              viewMode === "markdown" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700",
             )}
           >
-            <FileText className="w-4 h-4" />
+            <FileText className="w-3.5 h-3.5" />
             Markdown
           </button>
           <button
             onClick={() => setViewMode("preview")}
             className={cn(
-              "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
-              viewMode === "preview" ? "bg-white text-gray-900 shadow-sm" : "text-gray-600 hover:text-gray-900",
+              "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all",
+              viewMode === "preview" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700",
             )}
           >
-            <Eye className="w-4 h-4" />
+            <Eye className="w-3.5 h-3.5" />
             Formatted Preview
           </button>
         </div>
 
         {/* Content */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
           {viewMode === "markdown" ? (
             <div className="relative">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleCopyMarkdown}
-                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"
               >
                 {copied ? (
                   <>
@@ -139,12 +139,12 @@ export default function SOPPreviewPage() {
                   </>
                 )}
               </Button>
-              <div className="p-6 overflow-x-auto">
-                <pre className="font-mono text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">{content}</pre>
+              <div className="p-4 sm:p-6 overflow-x-auto">
+                <pre className="font-mono text-sm text-slate-800 whitespace-pre-wrap leading-relaxed">{content}</pre>
               </div>
             </div>
           ) : (
-            <div className="p-8">
+            <div className="p-4 sm:p-8">
               {sections.map((section, index) => {
                 const lines = section.trim().split("\n")
                 const title = lines[0]?.replace(/^#+\s*/, "") || `Section ${index + 1}`
@@ -155,7 +155,7 @@ export default function SOPPreviewPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => setEditingSection({ title, content: section })}
-                      className="absolute -right-2 top-0 opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-blue-600"
+                      className="absolute -right-2 top-0 opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-blue-600"
                     >
                       <Pencil className="w-4 h-4" />
                     </Button>

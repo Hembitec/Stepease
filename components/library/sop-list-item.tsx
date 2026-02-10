@@ -18,7 +18,7 @@ export function SOPListItem({ sop, onDelete, onArchive, onRevise }: SOPListItemP
   const statusColors = {
     draft: "bg-yellow-100 text-yellow-700",
     complete: "bg-green-100 text-green-700",
-    archived: "bg-gray-100 text-gray-600",
+    archived: "bg-slate-100 text-slate-600",
   }
 
   const formatDate = (dateString: string) => {
@@ -42,7 +42,7 @@ export function SOPListItem({ sop, onDelete, onArchive, onRevise }: SOPListItemP
 
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md hover:border-gray-300 transition-all flex items-center gap-4">
+    <div className="bg-white border border-slate-200 rounded-xl p-4 hover:shadow-md hover:border-slate-300 transition-all flex items-center gap-4">
       {/* Icon */}
       <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
         <FileText className="w-5 h-5 text-blue-600" />
@@ -50,8 +50,8 @@ export function SOPListItem({ sop, onDelete, onArchive, onRevise }: SOPListItemP
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <h4 className="font-semibold text-gray-900 truncate">{sop.title}</h4>
-        <div className="flex items-center gap-2 text-sm text-gray-500 mt-0.5">
+        <h4 className="font-semibold text-slate-900 truncate">{sop.title}</h4>
+        <div className="flex items-center gap-2 text-sm text-slate-500 mt-0.5">
           <span>{sop.department || "General"}</span>
           <span>&middot;</span>
           <span>Updated {formatDate(sop.updatedAt)}</span>

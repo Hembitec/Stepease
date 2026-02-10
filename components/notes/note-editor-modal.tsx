@@ -62,10 +62,10 @@ export function NoteEditorModal({ note, isOpen, onClose, onSave, isNew }: NoteEd
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">{isNew ? "Add New Note" : "Edit Note"}</h2>
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-xl">
+        <div className="flex items-center justify-between p-4 border-b border-slate-200">
+          <h2 className="text-lg font-semibold text-slate-900">{isNew ? "Add New Note" : "Edit Note"}</h2>
           <Button variant="ghost" size="sm" onClick={onClose} className="h-8 w-8 p-0">
             <X className="w-4 h-4" />
           </Button>
@@ -74,7 +74,7 @@ export function NoteEditorModal({ note, isOpen, onClose, onSave, isNew }: NoteEd
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Category */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Category</label>
             <div className="flex flex-wrap gap-2">
               {categories.map((cat) => {
                 const colors = categoryColors[cat as NoteCategory] || categoryColors.OTHER
@@ -87,7 +87,7 @@ export function NoteEditorModal({ note, isOpen, onClose, onSave, isNew }: NoteEd
                       "px-3 py-1.5 text-xs font-medium rounded-full transition-all",
                       editedNote.category === cat
                         ? `${colors.bg} ${colors.text} ring-2 ring-offset-1 ring-blue-500`
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200",
+                        : "bg-slate-50 text-slate-500 hover:bg-slate-100",
                     )}
                   >
                     {cat.replace(/_/g, " ")}
@@ -99,7 +99,7 @@ export function NoteEditorModal({ note, isOpen, onClose, onSave, isNew }: NoteEd
 
           {/* Priority */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Priority</label>
             <div className="flex gap-2">
               {priorities.map((p) => (
                 <button
@@ -114,7 +114,7 @@ export function NoteEditorModal({ note, isOpen, onClose, onSave, isNew }: NoteEd
                         : p === "medium"
                           ? "bg-yellow-100 text-yellow-700 ring-2 ring-yellow-500"
                           : "bg-green-100 text-green-700 ring-2 ring-green-500"
-                      : "bg-gray-100 text-gray-600 hover:bg-gray-200",
+                      : "bg-slate-50 text-slate-500 hover:bg-slate-100",
                   )}
                 >
                   {p}
@@ -125,37 +125,37 @@ export function NoteEditorModal({ note, isOpen, onClose, onSave, isNew }: NoteEd
 
           {/* Content */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Content</label>
             <textarea
               value={editedNote.content}
               onChange={(e) => setEditedNote({ ...editedNote, content: e.target.value })}
               placeholder="Describe the note content..."
-              className="w-full h-32 p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              className="w-full h-32 p-3 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none placeholder:text-slate-400"
               required
             />
           </div>
 
           {/* Related To */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Related To</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Related To</label>
             <input
               type="text"
               value={editedNote.relatedTo}
               onChange={(e) => setEditedNote({ ...editedNote, relatedTo: e.target.value })}
               placeholder="e.g., Step 3 - Approval Process"
-              className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-slate-400"
             />
           </div>
 
           {/* Action */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Action Required</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Action Required</label>
             <input
               type="text"
               value={editedNote.action}
               onChange={(e) => setEditedNote({ ...editedNote, action: e.target.value })}
               placeholder="e.g., Add approval step with 24hr SLA"
-              className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-slate-400"
             />
           </div>
 

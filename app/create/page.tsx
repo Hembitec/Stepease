@@ -3,6 +3,11 @@
 // =============================================================================
 // Stepease - CREATE SOP PAGE
 // Main interface for AI-powered SOP creation with 5-phase conversation flow
+//
+// Architecture:
+//   CreateSOPPage          → Suspense boundary (export default)
+//   CreateSOPPageContent   → Wrapper: reads URL, manages mountKey for session isolation
+//   CreateSOPInner         → All UI/chat logic, fresh state on each session
 // =============================================================================
 
 import { useState, useRef, useEffect, useCallback, useMemo, Suspense } from "react"
@@ -29,7 +34,7 @@ import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 
 // -----------------------------------------------------------------------------
-// Initial Greeting Message
+// Constants
 // -----------------------------------------------------------------------------
 
 const INITIAL_GREETING =
@@ -57,14 +62,14 @@ function MessageBubble({ role, content }: MessageBubbleProps) {
       <div
         className={cn(
           "max-w-[85%] sm:max-w-[80%] px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl",
-          isAI ? "bg-gray-100 text-gray-900 rounded-tl-sm" : "bg-blue-600 text-white rounded-tr-sm"
+          isAI ? "bg-slate-100 text-slate-900 rounded-tl-sm" : "bg-blue-600 text-white rounded-tr-sm"
         )}
       >
         <p className="text-sm leading-relaxed whitespace-pre-wrap">{content}</p>
       </div>
       {!isAI && (
-        <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center flex-shrink-0">
-          <User className="w-4 h-4 text-gray-600" />
+        <div className="w-8 h-8 bg-slate-300 rounded-full flex items-center justify-center flex-shrink-0">
+          <User className="w-4 h-4 text-slate-600" />
         </div>
       )}
     </div>
@@ -81,47 +86,46 @@ function TypingIndicator() {
       <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
         <Bot className="w-4 h-4 text-white" />
       </div>
-      <div className="bg-gray-100 rounded-2xl rounded-tl-sm px-4 py-3">
+      <div className="bg-slate-100 rounded-2xl rounded-tl-sm px-4 py-3">
         <div className="flex gap-1">
-          <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-          <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-          <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+          <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+          <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+          <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
         </div>
       </div>
     </div>
   )
 }
 
-// -----------------------------------------------------------------------------
-// Main Component
-// -----------------------------------------------------------------------------
+// =============================================================================
+// CreateSOPInner — All UI/Chat Logic
+// This component is KEYED by session ID in the parent wrapper.
+// When the key changes (session switch), React unmounts and remounts this,
+// giving us completely fresh useState hooks — zero stale state.
+// =============================================================================
 
-function CreateSOPPageContent() {
+function CreateSOPInner() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const mode = searchParams.get('mode') ?? 'create'
   const isImprovementMode = mode === 'improve'
-
-  // Limit check - redirect if at limit (unless resuming existing session)
-  const canCreateData = useQuery(api.users.checkCanCreate)
-  const canImproveData = useQuery(api.users.checkCanImprove)
   const sessionIdFromUrl = searchParams.get('session')
 
-  // Redirect to dashboard if at limit (only for NEW sessions, not resuming)
-  useEffect(() => {
-    if (!sessionIdFromUrl) {
-      // New session - check limits
-      if (isImprovementMode && canImproveData && !canImproveData.canImprove) {
-        router.replace('/dashboard')
-      } else if (!isImprovementMode && canCreateData && !canCreateData.canCreate) {
-        router.replace('/dashboard')
-      }
-    }
-  }, [canCreateData, canImproveData, isImprovementMode, sessionIdFromUrl, router])
+  // Context
+  const {
+    addSOP, session, activeSessionId,
+    startNewSession, resumeSession,
+    addSessionMessage, addSessionNotes,
+    setSessionPhase, updateSessionTitle,
+  } = useSOPContext()
 
-  const { addSOP, session, startNewSession, resumeSession, addSessionMessage, addSessionNotes, setSessionPhase, updateSessionTitle } = useSOPContext()
+  // Limit checks
+  const canCreateData = useQuery(api.users.checkCanCreate)
+  const canImproveData = useQuery(api.users.checkCanImprove)
 
-  // Local state
+  // ---------------------------------------------------------------------------
+  // Local UI State (fresh on every mount thanks to parent keying)
+  // ---------------------------------------------------------------------------
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([])
   const [notes, setNotes] = useState<Note[]>([])
   const [currentPhase, setCurrentPhase] = useState<ConversationPhase>("foundation")
@@ -130,57 +134,85 @@ function CreateSOPPageContent() {
   const [inputValue, setInputValue] = useState("")
   const [isNotesCollapsed, setIsNotesCollapsed] = useState(false)
   const [improvementStatus, setImprovementStatus] = useState<Record<string, ImprovementStatus>>({})
-  const [initialMessageShown, setInitialMessageShown] = useState(false)
+  const [dataLoaded, setDataLoaded] = useState(false)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  // Initialize session on mount
+  // ---------------------------------------------------------------------------
+  // EFFECT 1: Limit Check — redirect if at limit (new sessions only)
+  // ---------------------------------------------------------------------------
   useEffect(() => {
-    const sessionId = searchParams.get('session')
-
-    // CASE 1: Resume Existing Session
-    if (sessionId) {
-      // If we don't have a session loaded, OR the loaded session doesn't match the URL, resume it
-      if (!session || session.id !== sessionId) {
-        resumeSession(sessionId)
-      }
+    if (sessionIdFromUrl || activeSessionId) return // resuming — skip limit check
+    if (isImprovementMode && canImproveData && !canImproveData.canImprove) {
+      router.replace('/dashboard')
+    } else if (!isImprovementMode && canCreateData && !canCreateData.canCreate) {
+      router.replace('/dashboard')
     }
-    // CASE 2: New Session (Lazy Create)
-    else if (!session && !isImprovementMode) {
-      startNewSession()
-    }
-  }, [session?.id, isImprovementMode, startNewSession, resumeSession, searchParams])
+  }, [canCreateData, canImproveData, isImprovementMode, sessionIdFromUrl, activeSessionId, router])
 
-  // Load session data when session becomes available (for both create and improve modes)
+  // ---------------------------------------------------------------------------
+  // EFFECT 2: Session Initialization (runs once on mount)
+  //   - If URL has ?session=X → tell Context to resume session X
+  //   - If no URL param → tell Context to start a new local session
+  // ---------------------------------------------------------------------------
   useEffect(() => {
-    if (session && !initialMessageShown) {
-      // Load notes from session
-      if (session.notes && session.notes.length > 0) {
-        setNotes(session.notes)
+    if (sessionIdFromUrl) {
+      // Resume existing session — tell Context which session to load
+      if (!session || session.id !== sessionIdFromUrl) {
+        resumeSession(sessionIdFromUrl)
       }
-
-      // Load chat history from session
-      if (session.messages && session.messages.length > 0) {
-        setChatHistory(session.messages)
+    } else if (!isImprovementMode) {
+      // New session — create a local placeholder (lazy creation on first message)
+      if (!session || activeSessionId) {
+        startNewSession()
       }
-
-      // Load current phase and progress
-      setCurrentPhase(session.phase)
-      setProgress(session.phaseProgress)
-
-      // For improvement mode, initialize status tracking
-      if (isImprovementMode && session.metadata?.analysisResult) {
-        const status = initializeImprovementStatus(session.metadata.analysisResult)
-        setImprovementStatus(status)
-      }
-
-      setInitialMessageShown(true)
     }
-  }, [session, isImprovementMode, initialMessageShown])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // Intentionally empty — runs ONCE on mount. Parent keying handles re-init.
 
-  // -------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  // EFFECT 3: URL Update after Lazy Creation
+  //   When user sends first message → session is created in DB → activeSessionId set
+  //   We update the URL so refresh/bookmark works.
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    if (activeSessionId && !sessionIdFromUrl) {
+      const newUrl = `/create?session=${activeSessionId}${mode !== 'create' ? `&mode=${mode}` : ''}`
+      router.replace(newUrl, { scroll: false })
+    }
+  }, [activeSessionId, sessionIdFromUrl, router, mode])
+
+  // ---------------------------------------------------------------------------
+  // EFFECT 4: Load Session Data into local state
+  //   When Context.session becomes available with the correct data, seed local state.
+  //   Guard: only load if data matches what we expect (URL session ID).
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    if (!session || dataLoaded) return
+
+    // Guard: if URL expects a specific session, only load matching data
+    if (sessionIdFromUrl && session.id !== sessionIdFromUrl) return
+
+    // Seed local state from session
+    if (session.messages && session.messages.length > 0) {
+      setChatHistory(session.messages)
+    }
+    if (session.notes && session.notes.length > 0) {
+      setNotes(session.notes)
+    }
+    setCurrentPhase(session.phase)
+    setProgress(session.phaseProgress)
+
+    if (isImprovementMode && session.metadata?.analysisResult) {
+      setImprovementStatus(initializeImprovementStatus(session.metadata.analysisResult))
+    }
+
+    setDataLoaded(true)
+  }, [session, dataLoaded, sessionIdFromUrl, isImprovementMode])
+
+  // ---------------------------------------------------------------------------
   // Object Streaming Hook
-  // -------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   const { object, submit, isLoading } = useObject({
     api: "/api/chat/sop",
@@ -188,7 +220,6 @@ function CreateSOPPageContent() {
     onFinish: ({ object }) => {
       if (!object) return
 
-      // Add assistant message to history
       const aiMessage: ChatMessage = {
         id: generateId("msg"),
         role: "ai",
@@ -196,11 +227,8 @@ function CreateSOPPageContent() {
         timestamp: new Date().toISOString(),
       }
       setChatHistory((prev) => [...prev, aiMessage])
-
-      // Save AI message to session
       addSessionMessage(aiMessage)
 
-      // Extract and add notes
       if (object.notes && object.notes.length > 0) {
         const newNotes: Note[] = object.notes.map((n) => ({
           id: generateId("note"),
@@ -216,7 +244,6 @@ function CreateSOPPageContent() {
         addSessionNotes(newNotes)
       }
 
-      // Update phase and progress
       if (object.phase) {
         setCurrentPhase(object.phase as ConversationPhase)
         setSessionPhase(object.phase as ConversationPhase, object.progress || 0)
@@ -226,7 +253,6 @@ function CreateSOPPageContent() {
         setProgress(object.progress)
       }
 
-      // Update session title if AI provided one and current title is generic
       if (object.title && session?.title &&
         (session.title === "New SOP" || session.title === "New SOP Draft" || session.title === "SOP Improvement")) {
         updateSessionTitle(object.title)
@@ -234,9 +260,9 @@ function CreateSOPPageContent() {
     },
   })
 
-  // -------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // Scroll to Bottom
-  // -------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -246,17 +272,20 @@ function CreateSOPPageContent() {
     scrollToBottom()
   }, [chatHistory, object, isLoading, scrollToBottom])
 
-  // -------------------------------------------------------------------------
-  // Message Sending
-  // -------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  // Greeting
+  // ---------------------------------------------------------------------------
 
-  // Dynamic initial greeting based on mode
   const initialGreeting = useMemo(() => {
     if (isImprovementMode && session?.metadata?.analysisResult) {
       return generateImprovementGreeting(session.metadata.analysisResult)
     }
     return INITIAL_GREETING
   }, [isImprovementMode, session])
+
+  // ---------------------------------------------------------------------------
+  // Message Sending
+  // ---------------------------------------------------------------------------
 
   const handleSendMessage = useCallback(() => {
     if (!inputValue.trim() || isLoading) return
@@ -272,25 +301,21 @@ function CreateSOPPageContent() {
     setChatHistory(newHistory)
     setInputValue("")
 
-    // Save user message to session
     addSessionMessage(userMessage)
 
-    // Use current mode and messages for the request
     submit({
       messages: newHistory,
       mode: mode,
-      // Pass existing notes so AI knows the context
       existingNotes: notes.length > 0 ? notes.map(n => ({
         category: n.category,
         content: n.content,
         relatedTo: n.relatedTo,
       })) : undefined,
-      // Pass analysis context for improvement mode
       ...(isImprovementMode && session?.metadata?.analysisResult && {
         analysisContext: session.metadata.analysisResult
       })
     })
-  }, [inputValue, isLoading, chatHistory, submit, mode, isImprovementMode, session])
+  }, [inputValue, isLoading, chatHistory, submit, mode, isImprovementMode, session, notes, addSessionMessage])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -302,14 +327,14 @@ function CreateSOPPageContent() {
     [handleSendMessage]
   )
 
-  // -------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // Actions
-  // -------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   const handleSaveDraft = useCallback(() => {
     const newSOP: SOP = {
       id: `sop-${Date.now()}`,
-      title: session?.title || "New SOP Draft", // Use session title
+      title: session?.title || "New SOP Draft",
       department: "General",
       status: "draft",
       createdAt: new Date().toISOString(),
@@ -317,7 +342,7 @@ function CreateSOPPageContent() {
       content: "",
       notes,
       chatHistory,
-      sessionId: session?.id, // Link back to original session
+      sessionId: session?.id,
     }
     addSOP(newSOP)
     router.push("/dashboard")
@@ -327,7 +352,7 @@ function CreateSOPPageContent() {
     const sopId = `sop-${Date.now()}`
     const newSOP: SOP = {
       id: sopId,
-      title: session?.title || "New SOP", // Use session title
+      title: session?.title || "New SOP",
       department: "General",
       status: "draft",
       createdAt: new Date().toISOString(),
@@ -335,7 +360,7 @@ function CreateSOPPageContent() {
       content: "",
       notes,
       chatHistory,
-      sessionId: session?.id, // Link back to original session
+      sessionId: session?.id,
     }
     addSOP(newSOP)
     router.push(`/review/${sopId}`)
@@ -345,14 +370,13 @@ function CreateSOPPageContent() {
     setNotes((prev) => prev.filter((n) => n.id !== id))
   }, [])
 
-  // Track improvement status when notes are added
+  // Track improvement status when notes change
   useEffect(() => {
     if (isImprovementMode && session?.metadata?.analysisResult) {
       const analysis = session.metadata.analysisResult
       const newStatus = { ...improvementStatus }
 
       analysis.improvements.forEach((imp: AnalysisResult['improvements'][0], idx: number) => {
-        // Check if notes relate to this improvement
         const isAddressed = notes.some(note => {
           const noteContent = note.content.toLowerCase()
           const impDesc = imp.description.toLowerCase()
@@ -374,9 +398,9 @@ function CreateSOPPageContent() {
     }
   }, [notes, isImprovementMode, session])
 
-  // -------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
   // Render
-  // -------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
 
   return (
     <DashboardLayout fullHeight>
@@ -399,7 +423,6 @@ function CreateSOPPageContent() {
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Notes Panel Toggle - Desktop only */}
             <Button
               variant="ghost"
               size="icon"
@@ -460,10 +483,11 @@ function CreateSOPPageContent() {
           >
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 lg:p-6">
-              {/* Initial greeting */}
-              <MessageBubble role="assistant" content={initialGreeting} />
+              {/* Initial greeting — only when chat is empty */}
+              {chatHistory.length === 0 && (
+                <MessageBubble role="assistant" content={initialGreeting} />
+              )}
 
-              {/* Chat history */}
               {chatHistory.map((message, index) => (
                 <MessageBubble
                   key={message.id || `msg-${index}`}
@@ -472,41 +496,57 @@ function CreateSOPPageContent() {
                 />
               ))}
 
-              {/* Current streaming message */}
               {isLoading && object && object.message && (
                 <MessageBubble role="assistant" content={object.message} />
               )}
 
-              {/* Loading indicator */}
               {isLoading && !object?.message && <TypingIndicator />}
 
               <div ref={messagesEndRef} />
             </div>
 
             {/* Input */}
-            <div className="border-t border-gray-200 bg-white p-3 sm:p-4 flex-shrink-0">
-              <div className="flex gap-2 sm:gap-3 items-end">
+            <div className="border-t border-slate-200/80 bg-gradient-to-t from-slate-50/80 to-white p-3 sm:p-4 flex-shrink-0">
+              <div className="relative flex items-end gap-2 bg-white border border-slate-200 rounded-2xl shadow-sm focus-within:border-blue-400 focus-within:shadow-[0_0_0_3px_rgba(59,130,246,0.1)] transition-all duration-200">
                 <textarea
                   value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
+                  onChange={(e) => {
+                    setInputValue(e.target.value)
+                    // Auto-resize
+                    const target = e.target
+                    target.style.height = 'auto'
+                    target.style.height = `${Math.min(target.scrollHeight, 150)}px`
+                  }}
                   onKeyDown={handleKeyDown}
-                  placeholder="Type your response here..."
+                  placeholder="Describe your process or answer the question..."
                   disabled={isLoading}
-                  className="flex-1 resize-none border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 min-h-[48px] max-h-[120px]"
+                  className="flex-1 resize-none bg-transparent border-0 px-4 py-3.5 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-0 disabled:opacity-50 min-h-[48px] max-h-[150px] leading-relaxed"
                   rows={1}
                 />
-                <Button
-                  onClick={handleSendMessage}
-                  disabled={!inputValue.trim() || isLoading}
-                  className="bg-blue-600 hover:bg-blue-700 text-white h-12 w-12 rounded-xl p-0"
-                >
-                  <Send className="w-5 h-5" />
-                </Button>
+                <div className="flex items-center gap-1.5 pr-2 pb-2.5">
+                  {!inputValue.trim() && !isLoading && (
+                    <span className="text-[11px] text-slate-300 hidden sm:inline whitespace-nowrap mr-1">
+                      Enter ↵
+                    </span>
+                  )}
+                  <button
+                    onClick={handleSendMessage}
+                    disabled={!inputValue.trim() || isLoading}
+                    className={cn(
+                      "flex items-center justify-center w-9 h-9 rounded-xl transition-all duration-200",
+                      inputValue.trim() && !isLoading
+                        ? "bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/25 hover:shadow-lg hover:shadow-blue-600/30 scale-100 hover:scale-105"
+                        : "bg-slate-100 text-slate-400 cursor-not-allowed"
+                    )}
+                  >
+                    <Send className={cn("w-4 h-4 transition-transform duration-200", inputValue.trim() && !isLoading && "-rotate-45")} />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Notes Panel - Desktop */}
+          {/* Notes Panel — Desktop */}
           <div
             className={cn(
               "hidden lg:flex flex-col transition-all duration-300",
@@ -525,7 +565,7 @@ function CreateSOPPageContent() {
             />
           </div>
 
-          {/* Notes Panel - Mobile */}
+          {/* Notes Panel — Mobile */}
           <div className={cn("flex-1 lg:hidden", activeTab === "chat" ? "hidden" : "flex flex-col")}>
             <NotesPanel
               notes={notes}
@@ -543,6 +583,55 @@ function CreateSOPPageContent() {
     </DashboardLayout>
   )
 }
+
+// =============================================================================
+// CreateSOPPageContent — Wrapper for Session Key Management
+//
+// This component solves the state bleeding problem:
+//   - Reads the session ID from the URL
+//   - Assigns a React `key` to CreateSOPInner based on session ID
+//   - When session ID changes (SOP#1 → SOP#2), key changes → React UNMOUNTS
+//     the old CreateSOPInner and MOUNTS a new one → all useState hooks reset
+//   - EXCEPTION: Lazy creation (null → sessionId123) does NOT change the key,
+//     because we want to preserve the user's in-progress chat state
+// =============================================================================
+
+function CreateSOPPageContent() {
+  const searchParams = useSearchParams()
+  const { session } = useSOPContext()
+
+  const sessionIdFromUrl = searchParams.get('session')
+
+  // mountKey drives React remounting. We track it in state so we can
+  // selectively NOT update it during lazy creation.
+  const [mountKey, setMountKey] = useState<string>(sessionIdFromUrl || "new")
+  const prevUrlRef = useRef<string | null>(sessionIdFromUrl)
+
+  useEffect(() => {
+    const currentUrlId = searchParams.get('session')
+    const prevUrlId = prevUrlRef.current
+
+    if (currentUrlId !== prevUrlId) {
+      // URL changed. Should we remount?
+      // Lazy creation: URL goes from null → ID, AND context.session already matches
+      // (because we just created it). In this case, DON'T remount.
+      const isLazyCreation = prevUrlId === null && currentUrlId !== null && session?.id === currentUrlId
+
+      if (!isLazyCreation) {
+        // Session switch — change key to force remount
+        setMountKey(currentUrlId || `new-${Date.now()}`)
+      }
+
+      prevUrlRef.current = currentUrlId
+    }
+  }, [searchParams, session?.id])
+
+  return <CreateSOPInner key={mountKey} />
+}
+
+// =============================================================================
+// CreateSOPPage — Top-level Export (Suspense boundary)
+// =============================================================================
 
 export default function CreateSOPPage() {
   return (

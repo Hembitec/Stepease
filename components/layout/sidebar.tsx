@@ -140,37 +140,35 @@ export function Sidebar({ isCollapsed, onToggle, isMobileOpen, onMobileClose }: 
         </div>
 
         {/* Quick Create Button */}
-        <div className={cn("transition-all duration-200", isCollapsed && !isMobileOpen ? "py-3 px-0 flex justify-center" : "py-4 px-4")}>
+        <div className={cn("transition-all duration-200", isCollapsed && !isMobileOpen ? "py-3 px-0 flex justify-center" : "py-3 px-4")}>
           <button
             onClick={handleCreateClick}
+            disabled={canCreateData === undefined}
             className={cn(
-              "flex items-center justify-center bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white font-medium transition-all duration-200 shadow-lg shadow-blue-600/25 hover:shadow-blue-500/40",
+              "flex items-center justify-center bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white font-medium transition-all duration-200 shadow-lg shadow-blue-600/25 hover:shadow-blue-500/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900",
               isCollapsed && !isMobileOpen
                 ? "w-9 h-9 rounded-lg"
                 : "w-full px-4 py-3 rounded-xl gap-3",
-              canCreateData && !canCreateData.canCreate && "opacity-80"
+              (canCreateData && !canCreateData.canCreate) || canCreateData === undefined ? "opacity-80" : ""
             )}
-            title={canCreateData && !canCreateData.canCreate ? "Upgrade to create more SOPs" : "Create New SOP"}
+            title={canCreateData === undefined ? "Loading..." : canCreateData && !canCreateData.canCreate ? "Upgrade to create more SOPs" : "Create New SOP"}
           >
-            {canCreateData && !canCreateData.canCreate ? (
+            {canCreateData === undefined ? (
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin flex-shrink-0" />
+            ) : canCreateData && !canCreateData.canCreate ? (
               <Lock className={cn("flex-shrink-0", isCollapsed && !isMobileOpen ? "w-5 h-5" : "w-5 h-5")} />
             ) : (
               <Plus className={cn("flex-shrink-0", isCollapsed && !isMobileOpen ? "w-5 h-5" : "w-5 h-5")} />
             )}
             {(!isCollapsed || isMobileOpen) && (
-              <span>{canCreateData && !canCreateData.canCreate ? "Upgrade" : "New SOP"}</span>
+              <span>{canCreateData === undefined ? "Loading..." : canCreateData && !canCreateData.canCreate ? "Upgrade" : "New SOP"}</span>
             )}
           </button>
         </div>
 
         {/* Navigation */}
         <nav className="flex-1 px-3">
-          {(!isCollapsed || isMobileOpen) && (
-            <div className="text-xs font-medium text-slate-500 uppercase tracking-wider px-3 mb-3">
-              Menu
-            </div>
-          )}
-          <ul className="space-y-1">
+          <ul className="space-y-1.5">
             {menuItems.map((item) => {
               const isActive = pathname === item.href || pathname.startsWith(item.href + "/")
               return (
@@ -179,31 +177,30 @@ export function Sidebar({ isCollapsed, onToggle, isMobileOpen, onMobileClose }: 
                     href={item.href}
                     onClick={onMobileClose}
                     className={cn(
-                      "flex items-center gap-3 rounded-xl transition-all duration-200 group",
+                      "flex items-center gap-3 rounded-xl transition-all duration-200 group relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900",
                       isCollapsed && !isMobileOpen
                         ? "w-9 h-9 justify-center p-0"
-                        : "px-4 py-2.5",
-                      // Only show background when expanded OR on hover
+                        : "px-4 py-3",
                       isCollapsed && !isMobileOpen
                         ? isActive
                           ? "text-white"
                           : "text-slate-400 hover:text-white"
                         : isActive
-                          ? "bg-slate-800 text-white shadow-md"
+                          ? "bg-slate-800 text-white shadow-md border-l-2 border-blue-400"
                           : "hover:bg-slate-800/50 hover:text-white"
                     )}
                     title={isCollapsed && !isMobileOpen ? item.label : undefined}
                   >
                     <item.icon
                       className={cn(
-                        "w-5 h-5 flex-shrink-0 transition-colors duration-200",
-                        isActive ? "text-blue-400" : "text-slate-400 group-hover:text-slate-300"
+                        "w-5 h-5 flex-shrink-0 transition-all duration-200",
+                        isActive ? "text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.5)]" : "text-slate-400 group-hover:text-slate-300"
                       )}
                     />
                     {(!isCollapsed || isMobileOpen) && (
                       <>
                         <span className="flex-1">{item.label}</span>
-                        {isActive && <ChevronRight className="w-4 h-4 text-slate-500" />}
+                        {isActive && <ChevronRight className="w-4 h-4 text-blue-400" />}
                       </>
                     )}
                   </Link>
@@ -219,7 +216,7 @@ export function Sidebar({ isCollapsed, onToggle, isMobileOpen, onMobileClose }: 
         </div>
 
         {/* User Section */}
-        <div className="border-t border-slate-800 p-4">
+        <div className="border-t border-slate-800/50 bg-gradient-to-b from-slate-800/20 to-transparent pt-1 p-4">
           <div
             className={cn(
               "flex items-center gap-3 rounded-xl hover:bg-slate-800/50 transition-colors cursor-pointer",
@@ -234,24 +231,27 @@ export function Sidebar({ isCollapsed, onToggle, isMobileOpen, onMobileClose }: 
             </Avatar>
             {(!isCollapsed || isMobileOpen) && (
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 mb-0.5">
                   <p className="text-sm font-medium text-white truncate">{user?.fullName || "User"}</p>
-                  {isPro ? (
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
+                  {userData === undefined ? (
+                    // Loading Skeleton for Badge
+                    <div className="h-4 w-12 bg-slate-700/50 rounded animate-pulse" />
+                  ) : isPro ? (
+                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-sm shadow-blue-500/30">
                       <Crown className="w-2.5 h-2.5" />
                       Pro
                     </span>
                   ) : isStarter ? (
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-600 text-white">
+                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/30">
                       Starter
                     </span>
                   ) : (
-                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-700 text-slate-300">
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-700/60 text-slate-400 border border-slate-600/50">
                       Free
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-slate-500 truncate">{user?.primaryEmailAddress?.emailAddress || ""}</p>
+                <p className="text-xs text-slate-500 truncate max-w-[180px]">{user?.primaryEmailAddress?.emailAddress || ""}</p>
               </div>
             )}
           </div>
@@ -259,12 +259,12 @@ export function Sidebar({ isCollapsed, onToggle, isMobileOpen, onMobileClose }: 
             <AlertDialogTrigger asChild>
               <button
                 className={cn(
-                  "flex items-center gap-3 w-full mt-2 text-sm text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-xl transition-colors",
+                  "flex items-center gap-3 w-full mt-2 text-sm text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-xl transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 group",
                   isCollapsed && !isMobileOpen ? "justify-center p-3" : "px-4 py-2.5"
                 )}
                 title={isCollapsed && !isMobileOpen ? "Sign out" : undefined}
               >
-                <LogOut className="w-4 h-4 flex-shrink-0" />
+                <LogOut className="w-4 h-4 flex-shrink-0 group-hover:text-red-400 transition-colors" />
                 {(!isCollapsed || isMobileOpen) && <span>Sign out</span>}
               </button>
             </AlertDialogTrigger>

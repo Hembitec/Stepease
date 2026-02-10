@@ -41,11 +41,11 @@ export function SectionEditorModal({ sectionTitle, content, isOpen, onClose, onS
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl w-full max-w-3xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl w-full max-w-3xl max-h-[90vh] overflow-hidden shadow-xl flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Editing: {sectionTitle}</h2>
+        <div className="flex items-center justify-between p-4 border-b border-slate-200">
+          <h2 className="text-lg font-semibold text-slate-900">Editing: {sectionTitle}</h2>
           <Button variant="ghost" size="sm" onClick={onClose} className="h-8 w-8 p-0">
             <X className="w-4 h-4" />
           </Button>
@@ -55,19 +55,19 @@ export function SectionEditorModal({ sectionTitle, content, isOpen, onClose, onS
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Original Content (Read-only) */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Current Content:</label>
-            <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-600 max-h-32 overflow-y-auto">
+            <label className="block text-sm font-medium text-slate-700 mb-2">Current Content:</label>
+            <div className="bg-slate-50 rounded-lg p-4 text-sm text-slate-600 max-h-32 overflow-y-auto">
               <pre className="whitespace-pre-wrap font-mono">{content}</pre>
             </div>
           </div>
 
           {/* Editable Content */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Edit Mode:</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Edit Mode:</label>
             <textarea
               value={editedContent}
               onChange={(e) => setEditedContent(e.target.value)}
-              className="w-full h-48 p-4 border border-gray-300 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              className="w-full h-48 p-4 border border-slate-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
             />
           </div>
 
@@ -104,8 +104,8 @@ export function SectionEditorModal({ sectionTitle, content, isOpen, onClose, onS
         </div>
 
         {/* Footer */}
-        <div className="flex gap-3 p-4 border-t border-gray-200 bg-gray-50">
-          <Button variant="outline" onClick={() => setEditedContent(content)} className="text-gray-600 bg-transparent">
+        <div className="flex gap-3 p-4 border-t border-slate-200 bg-slate-50">
+          <Button variant="outline" onClick={() => setEditedContent(content)} className="text-slate-600 bg-transparent">
             Revert to Original
           </Button>
           <div className="flex-1" />

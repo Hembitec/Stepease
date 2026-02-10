@@ -103,7 +103,7 @@ function ImproveSOPPageContent() {
         <header className="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between">
           <Link href="/dashboard" className="text-slate-600 hover:text-slate-900 flex items-center gap-2 transition-colors">
             <ArrowLeft className="w-5 h-5" />
-            <span className="hidden sm:inline">Back</span>
+            <span className="hidden sm:inline text-sm font-medium">Back</span>
           </Link>
           <h1 className="text-lg font-semibold text-slate-900">Improve Existing SOP</h1>
           <Button variant="ghost" size="sm" className="gap-2 text-slate-500">
@@ -112,12 +112,12 @@ function ImproveSOPPageContent() {
           </Button>
         </header>
 
-        <main className="max-w-4xl mx-auto px-4 py-12">
+        <main className="max-w-4xl mx-auto px-4 py-6 sm:py-12">
           {phase === "upload" && (
-            <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="space-y-8 sm:space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="text-center space-y-2">
-                <h2 className="text-3xl font-bold text-slate-900">Upload Your Current SOP</h2>
-                <p className="text-slate-600 max-w-lg mx-auto">
+                <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">Upload Your Current SOP</h2>
+                <p className="text-sm sm:text-base text-slate-600 max-w-lg mx-auto">
                   Upload your document or paste the text below. Our AI will analyze the structure, identify gaps, and help you improve it.
                 </p>
               </div>
@@ -135,7 +135,7 @@ function ImproveSOPPageContent() {
                 </div>
               </div>
 
-              <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+              <div className="bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm">
                 <div className="flex items-center gap-2 mb-3 text-slate-700 font-medium">
                   <FileText className="w-4 h-4" />
                   <label>Manual Entry</label>
@@ -165,8 +165,8 @@ function ImproveSOPPageContent() {
                 <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
                   <FileText className="w-8 h-8" />
                 </div>
-                <h2 className="text-2xl font-bold text-slate-900 mb-2">Analysis Complete</h2>
-                <p className="text-slate-600">
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">Analysis Complete</h2>
+                <p className="text-sm sm:text-base text-slate-600">
                   We've analyzed your document. Review the findings below.
                 </p>
               </div>

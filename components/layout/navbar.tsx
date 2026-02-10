@@ -36,18 +36,18 @@ export function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            <span className="text-2xl font-bold text-gray-900 font-inter tracking-tight">Step<span className="text-blue-600">[</span>Ease<span className="text-blue-600">]</span></span>
+            <span className="text-2xl font-bold text-slate-900 font-inter tracking-tight">Step<span className="text-blue-600">[</span>Ease<span className="text-blue-600">]</span></span>
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            <Link href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">
+            <Link href="#features" className="text-slate-600 hover:text-slate-900 transition-colors">
               Features
             </Link>
-            <Link href="#how-it-works" className="text-gray-600 hover:text-gray-900 transition-colors">
+            <Link href="#how-it-works" className="text-slate-600 hover:text-slate-900 transition-colors">
               How It Works
             </Link>
-            <Link href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">
+            <Link href="#pricing" className="text-slate-600 hover:text-slate-900 transition-colors">
               Pricing
             </Link>
           </div>
@@ -81,13 +81,13 @@ export function Navbar() {
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white border-t">
           <div className="px-4 py-4 space-y-4">
-            <Link href="#features" className="block text-gray-600 hover:text-gray-900">
+            <Link href="#features" className="block text-slate-600 hover:text-slate-900">
               Features
             </Link>
-            <Link href="#how-it-works" className="block text-gray-600 hover:text-gray-900">
+            <Link href="#how-it-works" className="block text-slate-600 hover:text-slate-900">
               How It Works
             </Link>
-            <Link href="#pricing" className="block text-gray-600 hover:text-gray-900">
+            <Link href="#pricing" className="block text-slate-600 hover:text-slate-900">
               Pricing
             </Link>
             <hr />
@@ -107,7 +107,7 @@ export function Navbar() {
               </Link>
               <div className="flex items-center gap-2 px-3 py-2">
                 <UserButton afterSignOutUrl="/" />
-                <span className="text-gray-600">Account</span>
+                <span className="text-slate-600">Account</span>
               </div>
             </SignedIn>
           </div>

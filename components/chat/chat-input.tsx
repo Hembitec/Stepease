@@ -37,7 +37,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
   }
 
   return (
-    <div className="border-t border-gray-200 bg-white p-4">
+    <div className="border-t border-slate-200 bg-white p-4">
       <div className="flex gap-3 items-end">
         <textarea
           ref={textareaRef}
@@ -46,7 +46,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
           onKeyDown={handleKeyDown}
           placeholder="Type your response here..."
           disabled={disabled}
-          className="flex-1 resize-none border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 min-h-[48px] max-h-[120px]"
+          className="flex-1 resize-none border border-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 min-h-[48px] max-h-[120px]"
           rows={1}
         />
         <Button

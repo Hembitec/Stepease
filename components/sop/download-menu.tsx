@@ -108,7 +108,7 @@ export function DownloadMenu({ content, title, tier = "free" }: DownloadMenuProp
       {isOpen && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-          <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-20">
+          <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-20">
             {error && (
               <div className="px-4 py-2 text-xs text-red-600 bg-red-50 border-b border-red-100">
                 {error}
@@ -130,23 +130,23 @@ export function DownloadMenu({ content, title, tier = "free" }: DownloadMenuProp
                   className={cn(
                     "w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors disabled:opacity-50",
                     locked
-                      ? "text-gray-400 hover:bg-gray-50 cursor-not-allowed"
-                      : "text-gray-700 hover:bg-gray-50"
+                      ? "text-slate-400 hover:bg-slate-50 cursor-not-allowed"
+                      : "text-slate-700 hover:bg-slate-50"
                   )}
                 >
-                  <option.icon className={cn("w-4 h-4", locked ? "text-gray-300" : "text-gray-500")} />
+                  <option.icon className={cn("w-4 h-4", locked ? "text-slate-300" : "text-slate-500")} />
                   <span className="flex-1 text-left">{option.label}</span>
-                  {locked && <Lock className="w-3 h-3 text-gray-400" />}
+                  {locked && <Lock className="w-3 h-3 text-slate-400" />}
                   {downloading === option.id && (
                     <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
                   )}
                 </button>
               )
             })}
-            <hr className="my-2 border-gray-100" />
+            <hr className="my-2 border-slate-100" />
             <button
               onClick={handleCopy}
-              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
             >
               {copied ? (
                 <>
@@ -155,7 +155,7 @@ export function DownloadMenu({ content, title, tier = "free" }: DownloadMenuProp
                 </>
               ) : (
                 <>
-                  <Clipboard className="w-4 h-4 text-gray-500" />
+                  <Clipboard className="w-4 h-4 text-slate-500" />
                   Copy to Clipboard
                 </>
               )}

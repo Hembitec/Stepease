@@ -209,14 +209,14 @@ export default function ReviewNotesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-        <button onClick={() => router.back()} className="text-gray-600 hover:text-gray-900 flex items-center gap-2">
+      <header className="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between">
+        <button onClick={() => router.back()} className="text-slate-500 hover:text-slate-900 flex items-center gap-2 transition-colors">
           <ArrowLeft className="w-5 h-5" />
-          <span className="hidden sm:inline">Back to Chat</span>
+          <span className="hidden sm:inline text-sm font-medium">Back to Chat</span>
         </button>
-        <h1 className="text-lg font-semibold text-gray-900">Review & Edit Notes</h1>
+        <h1 className="text-lg font-semibold text-slate-900">Review & Edit Notes</h1>
         <Button
           onClick={handleGenerate}
           disabled={isGenerating}
@@ -236,34 +236,37 @@ export default function ReviewNotesPage() {
         </Button>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 py-6">
+      <main className="max-w-5xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
         {/* Title & Count */}
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-1">All Conversation Notes ({notes.length} total)</h2>
-          <p className="text-gray-600">Review and edit notes before generating your SOP</p>
+        <div className="mb-4 sm:mb-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-1">All Conversation Notes ({notes.length} total)</h2>
+          <p className="text-sm text-slate-500">Review and edit notes before generating your SOP</p>
         </div>
 
         {/* Filters & Search */}
-        <div className="bg-white border border-gray-200 rounded-xl p-4 mb-6">
+        <div className="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 mb-6">
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Category Filters */}
-            <div className="flex flex-wrap gap-2 flex-1">
+            <div className="flex flex-wrap gap-1.5 flex-1">
               {categories.map((cat) => {
                 const count = categoryCounts[cat] || 0
-                const colors = cat === "All" ? { bg: "bg-gray-100", text: "text-gray-700" } : (categoryColors[cat as NoteCategory] || categoryColors.OTHER)
+                const colors = cat === "All" ? { bg: "bg-slate-100", text: "text-slate-700" } : (categoryColors[cat as NoteCategory] || categoryColors.OTHER)
                 return (
                   <button
                     key={cat}
                     onClick={() => setActiveFilter(cat)}
                     className={cn(
-                      "px-3 py-1.5 text-xs font-medium rounded-full transition-all flex items-center gap-1",
+                      "px-2.5 py-1 text-xs font-medium rounded-md transition-colors flex items-center gap-1",
                       activeFilter === cat
                         ? `${colors?.bg} ${colors?.text} ring-2 ring-blue-500`
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200",
+                        : "bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700",
                     )}
                   >
                     {cat === "All" ? "All" : cat.replace(/_/g, " ")}
-                    <span className="bg-white/50 px-1.5 rounded-full text-xs">{count}</span>
+                    <span className={cn(
+                      "text-[10px] px-1 rounded",
+                      activeFilter === cat ? "bg-white/50" : "bg-slate-100"
+                    )}>{count}</span>
                   </button>
                 )
               })}
@@ -273,7 +276,7 @@ export default function ReviewNotesPage() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {sortOptions.map((opt) => (
                 <option key={opt} value={opt}>
@@ -284,14 +287,14 @@ export default function ReviewNotesPage() {
           </div>
 
           {/* Search */}
-          <div className="relative mt-4">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <div className="relative mt-3">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search notes..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-slate-400"
             />
           </div>
         </div>
@@ -308,8 +311,8 @@ export default function ReviewNotesPage() {
               />
             ))
           ) : (
-            <div className="text-center py-12 bg-white border border-gray-200 rounded-xl">
-              <p className="text-gray-500">No notes match your filters</p>
+            <div className="text-center py-12 bg-white border border-slate-200 rounded-xl">
+              <p className="text-slate-500 text-sm">No notes match your filters</p>
             </div>
           )}
         </div>
@@ -318,7 +321,7 @@ export default function ReviewNotesPage() {
         <Button
           variant="outline"
           onClick={() => setIsAddingNote(true)}
-          className="w-full border-dashed border-gray-300 text-gray-600 hover:border-blue-500 hover:text-blue-600 mb-6 bg-transparent"
+          className="w-full border-dashed border-slate-300 text-slate-500 hover:border-blue-500 hover:text-blue-600 mb-6 bg-transparent"
         >
           <Plus className="w-4 h-4 mr-2" />
           Add Manual Note
@@ -405,17 +408,17 @@ export default function ReviewNotesPage() {
 
       {/* Delete Confirmation */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl p-6 max-w-sm w-full shadow-2xl">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete Note?</h3>
-            <p className="text-gray-600 mb-6">Are you sure? This cannot be undone.</p>
-            <div className="flex gap-3">
-              <Button variant="outline" onClick={() => setShowDeleteConfirm(null)} className="flex-1 bg-transparent">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 max-w-sm w-full shadow-xl">
+            <h3 className="text-base font-semibold text-slate-900 mb-1.5">Delete Note?</h3>
+            <p className="text-sm text-slate-500 mb-5">This action cannot be undone. The note will be permanently removed.</p>
+            <div className="flex gap-2.5">
+              <Button variant="outline" onClick={() => setShowDeleteConfirm(null)} className="flex-1 bg-transparent text-sm">
                 Cancel
               </Button>
               <Button
                 onClick={() => handleDeleteNote(showDeleteConfirm)}
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white text-sm"
               >
                 Delete
               </Button>

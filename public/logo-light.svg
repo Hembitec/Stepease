@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 40" fill="none">
+  <style>
+    .text-main { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-weight: 700; font-size: 28px; }
+    .bracket { fill: #60a5fa; }
+    .word { fill: #ffffff; }
+  </style>
+  <text x="0" y="30" class="text-main">
+    <tspan class="word">Step</tspan><tspan class="bracket">[</tspan><tspan class="word">Ease</tspan><tspan class="bracket">]</tspan>
+  </text>
+</svg>

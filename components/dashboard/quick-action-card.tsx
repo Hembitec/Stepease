@@ -21,7 +21,7 @@ export function QuickActionCard({
   variant = "blue",
 }: QuickActionCardProps) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg hover:border-gray-300 transition-all group">
+    <div className="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-lg hover:border-slate-300 transition-all group">
       <div className="flex items-start gap-4">
         <div
           className={cn(
@@ -32,8 +32,8 @@ export function QuickActionCard({
           <Icon className={cn("w-6 h-6", variant === "blue" ? "text-blue-600" : "text-green-600")} />
         </div>
         <div className="flex-1">
-          <h3 className="text-xl font-semibold text-gray-900 mb-1">{title}</h3>
-          <p className="text-gray-600 mb-4">{description}</p>
+          <h3 className="text-xl font-semibold text-slate-900 mb-1">{title}</h3>
+          <p className="text-slate-600 mb-4">{description}</p>
           <Link
             href={href}
             className={cn(

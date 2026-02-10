@@ -145,10 +145,10 @@ export function FileUploader({ onAnalysisComplete }: FileUploaderProps) {
                     onDrop={handleDrop}
                     onClick={() => !isProcessing && fileInputRef.current?.click()}
                     className={cn(
-                        "border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-all duration-200",
+                        "border-2 border-dashed rounded-xl p-6 sm:p-10 text-center cursor-pointer transition-all duration-200",
                         isDragging
-                            ? "border-primary bg-primary/5"
-                            : "border-border hover:border-primary/50 hover:bg-muted/50",
+                            ? "border-blue-500 bg-blue-50/50"
+                            : "border-slate-300 hover:border-blue-400 hover:bg-slate-50",
                         isProcessing && "pointer-events-none opacity-50"
                     )}
                 >
@@ -160,15 +160,15 @@ export function FileUploader({ onAnalysisComplete }: FileUploaderProps) {
                         onChange={handleFileSelect}
                     />
 
-                    <div className="flex flex-col items-center gap-4">
-                        <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center">
-                            <Upload className="w-8 h-8" />
+                    <div className="flex flex-col items-center gap-3 sm:gap-4">
+                        <div className="w-14 h-14 sm:w-16 sm:h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+                            <Upload className="w-7 h-7 sm:w-8 sm:h-8" />
                         </div>
                         <div>
-                            <p className="text-lg font-semibold text-foreground">
+                            <p className="text-base sm:text-lg font-semibold text-slate-900">
                                 Click to upload or drag and drop
                             </p>
-                            <p className="text-sm text-muted-foreground mt-1">
+                            <p className="text-sm text-slate-500 mt-1">
                                 PDF, Word, or Text (max 10MB)
                             </p>
                         </div>
@@ -178,7 +178,7 @@ export function FileUploader({ onAnalysisComplete }: FileUploaderProps) {
 
             {/* Error without stepper context (validation errors) */}
             {error && processingStage === "idle" && (
-                <div className="mt-4 p-4 bg-destructive/10 text-destructive rounded-lg flex items-center gap-2">
+                <div className="mt-4 p-4 bg-red-50 text-red-700 rounded-lg flex items-center gap-2 border border-red-100">
                     <AlertCircle className="w-5 h-5 flex-shrink-0" />
                     <p className="text-sm">{error}</p>
                 </div>
@@ -189,7 +189,7 @@ export function FileUploader({ onAnalysisComplete }: FileUploaderProps) {
                 <div className="mt-4 text-center">
                     <button
                         onClick={resetState}
-                        className="text-sm text-primary hover:underline font-medium"
+                        className="text-sm text-blue-600 hover:underline font-medium"
                     >
                         Try uploading a different file
                     </button>

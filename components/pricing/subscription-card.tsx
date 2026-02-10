@@ -17,7 +17,7 @@ const tierInfo = {
     free: {
         name: "Free",
         color: "gray",
-        badge: "bg-gray-100 text-gray-700",
+        badge: "bg-slate-100 text-slate-700",
     },
     starter: {
         name: "Starter",
@@ -46,7 +46,7 @@ export function SubscriptionCard({ tier, sopsCreated = 0, sopsLimit = 2, improve
             "rounded-xl p-5 border",
             tier === "pro"
                 ? "bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-200"
-                : "bg-white border-gray-200"
+                : "bg-white border-slate-200"
         )}>
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
@@ -56,7 +56,7 @@ export function SubscriptionCard({ tier, sopsCreated = 0, sopsLimit = 2, improve
                             ? "bg-gradient-to-br from-indigo-500 to-purple-600"
                             : tier === "starter"
                                 ? "bg-blue-500"
-                                : "bg-gray-400"
+                                : "bg-slate-400"
                     )}>
                         <Crown className="w-5 h-5 text-white" />
                     </div>
@@ -64,7 +64,7 @@ export function SubscriptionCard({ tier, sopsCreated = 0, sopsLimit = 2, improve
                         <span className={cn("px-2 py-0.5 rounded-full text-xs font-medium", info.badge)}>
                             {info.name}
                         </span>
-                        <p className="text-sm text-gray-500 mt-1">
+                        <p className="text-sm text-slate-500 mt-1">
                             {isUnlimited ? "Unlimited usage" : `${sopsLimit} SOPs / ${improvesLimit} Improves per month`}
                         </p>
                     </div>
@@ -83,11 +83,11 @@ export function SubscriptionCard({ tier, sopsCreated = 0, sopsLimit = 2, improve
 
             {/* Usage Stats */}
             <div className="grid grid-cols-2 gap-4 mt-4">
-                <div className="p-3 bg-gray-50 rounded-lg">
-                    <p className="text-xs text-gray-500 mb-1">SOPs Created</p>
-                    <p className="text-lg font-semibold text-gray-900">{formatLimit(sopsCreated, sopsLimit)}</p>
+                <div className="p-3 bg-slate-50 rounded-lg">
+                    <p className="text-xs text-slate-500 mb-1">SOPs Created</p>
+                    <p className="text-lg font-semibold text-slate-900">{formatLimit(sopsCreated, sopsLimit)}</p>
                     {!isUnlimited && (
-                        <div className="h-1.5 bg-gray-200 rounded-full mt-2 overflow-hidden">
+                        <div className="h-1.5 bg-slate-200 rounded-full mt-2 overflow-hidden">
                             <div
                                 className="h-full bg-blue-500 rounded-full transition-all"
                                 style={{ width: `${Math.min((sopsCreated / sopsLimit) * 100, 100)}%` }}
@@ -95,11 +95,11 @@ export function SubscriptionCard({ tier, sopsCreated = 0, sopsLimit = 2, improve
                         </div>
                     )}
                 </div>
-                <div className="p-3 bg-gray-50 rounded-lg">
-                    <p className="text-xs text-gray-500 mb-1">Improves Used</p>
-                    <p className="text-lg font-semibold text-gray-900">{formatLimit(improvesUsed, improvesLimit)}</p>
+                <div className="p-3 bg-slate-50 rounded-lg">
+                    <p className="text-xs text-slate-500 mb-1">Improves Used</p>
+                    <p className="text-lg font-semibold text-slate-900">{formatLimit(improvesUsed, improvesLimit)}</p>
                     {!isUnlimited && improvesLimit > 0 && (
-                        <div className="h-1.5 bg-gray-200 rounded-full mt-2 overflow-hidden">
+                        <div className="h-1.5 bg-slate-200 rounded-full mt-2 overflow-hidden">
                             <div
                                 className="h-full bg-emerald-500 rounded-full transition-all"
                                 style={{ width: `${Math.min((improvesUsed / improvesLimit) * 100, 100)}%` }}

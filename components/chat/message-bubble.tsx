@@ -27,7 +27,7 @@ export function MessageBubble({ message, isStreaming }: MessageBubbleProps) {
       <div
         className={cn(
           "max-w-[80%] px-4 py-3 rounded-2xl",
-          isAI ? "bg-gray-100 text-gray-900 rounded-tl-sm" : "bg-blue-600 text-white rounded-tr-sm",
+          isAI ? "bg-slate-100 text-slate-900 rounded-tl-sm" : "bg-blue-600 text-white rounded-tr-sm",
         )}
       >
         {isAI ? (
@@ -50,8 +50,8 @@ export function MessageBubble({ message, isStreaming }: MessageBubbleProps) {
         )}
       </div>
       {!isAI && (
-        <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center flex-shrink-0">
-          <User className="w-4 h-4 text-gray-600" />
+        <div className="w-8 h-8 bg-slate-300 rounded-full flex items-center justify-center flex-shrink-0">
+          <User className="w-4 h-4 text-slate-600" />
         </div>
       )}
     </div>

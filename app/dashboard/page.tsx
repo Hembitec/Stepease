@@ -18,7 +18,6 @@ import {
   Clock,
   CheckCircle2,
   Plus,
-  TrendingUp,
   Calendar,
   Menu,
   Lock,
@@ -47,7 +46,6 @@ export default function DashboardPage() {
   const draftCount = sessions.length
   const completeCount = sops.filter((s) => s.status === "complete").length
 
-  // Handler for Create SOP action
   const handleCreateClick = () => {
     if (canCreateData && !canCreateData.canCreate) {
       setUpgradeReason("create")
@@ -57,7 +55,6 @@ export default function DashboardPage() {
     }
   }
 
-  // Handler for Improve SOP action
   const handleImproveClick = () => {
     if (canImproveData && !canImproveData.canImprove) {
       setUpgradeReason("improve")
@@ -67,7 +64,6 @@ export default function DashboardPage() {
     }
   }
 
-  // Get current date for greeting
   const currentHour = new Date().getHours()
   const greeting =
     currentHour < 12 ? "Good morning" : currentHour < 18 ? "Good afternoon" : "Good evening"
@@ -89,13 +85,13 @@ export default function DashboardPage() {
 
   return (
     <DashboardLayout>
-      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
-        {/* Header Section */}
-        <div className="mb-8 lg:mb-10">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="mb-6 sm:mb-8">
+          <div className="flex items-start sm:items-center justify-between gap-4">
             <div>
-              <p className="text-sm font-medium text-blue-600 mb-1 flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
+              <p className="text-xs font-medium text-slate-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5" />
                 {formattedDate}
               </p>
               <div className="flex items-center gap-3">
@@ -105,126 +101,77 @@ export default function DashboardPage() {
                 >
                   <Menu className="w-6 h-6" />
                 </button>
-                <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-1">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900">
                   {greeting}, {user?.firstName || "there"} 👋
                 </h1>
               </div>
-              <p className="text-slate-500">
+              <p className="text-sm text-slate-500 mt-1">
                 Pick up where you left off or start something new.
               </p>
             </div>
             <Button
               onClick={handleCreateClick}
-              className="hidden sm:flex bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all"
+              className="hidden sm:flex bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all text-sm"
             >
               {canCreateData && !canCreateData.canCreate ? (
-                <Lock className="w-4 h-4 mr-2" />
+                <Lock className="w-4 h-4 mr-1.5" />
               ) : (
-                <Plus className="w-4 h-4 mr-2" />
+                <Plus className="w-4 h-4 mr-1.5" />
               )}
               New SOP
             </Button>
           </div>
         </div>
 
-        {/* Quick Stats - Glassmorphism Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 lg:mb-10">
-          {/* Total SOPs */}
-          <div className="group relative bg-white/70 backdrop-blur-md rounded-2xl p-5 border border-white/50 shadow-lg shadow-slate-200/50 hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent rounded-2xl" />
-            <div className="relative">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
-                  <FileText className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex items-center gap-1 text-emerald-600 text-sm font-medium">
-                  <TrendingUp className="w-4 h-4" />
-                  <span>+12%</span>
-                </div>
-              </div>
-              <p className="text-sm font-medium text-slate-500 mb-1">Total SOPs</p>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-bold text-slate-900">{sops.length}</span>
-                <span className="text-sm text-slate-400">documents</span>
-              </div>
-            </div>
-          </div>
-
-          {/* In Progress */}
-          <div className="group relative bg-white/70 backdrop-blur-md rounded-2xl p-5 border border-white/50 shadow-lg shadow-slate-200/50 hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
-            <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent rounded-2xl" />
-            <div className="relative">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-amber-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/30">
-                  <Clock className="w-6 h-6 text-white" />
-                </div>
-                {draftCount > 0 && (
-                  <span className="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">
-                    Action needed
-                  </span>
-                )}
-              </div>
-              <p className="text-sm font-medium text-slate-500 mb-1">In Progress</p>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-bold text-slate-900">{draftCount}</span>
-                <span className="text-sm text-slate-400">drafts</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Completed */}
-          <div className="group relative bg-white/70 backdrop-blur-md rounded-2xl p-5 border border-white/50 shadow-lg shadow-slate-200/50 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 sm:col-span-2 lg:col-span-1">
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent rounded-2xl" />
-            <div className="relative">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
-                  <CheckCircle2 className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex items-center gap-1 text-emerald-600 text-sm font-medium">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>On track</span>
-                </div>
-              </div>
-              <p className="text-sm font-medium text-slate-500 mb-1">Completed</p>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-bold text-slate-900">{completeCount}</span>
-                <span className="text-sm text-slate-400">published</span>
-              </div>
-            </div>
-          </div>
+        {/* Stat Cards */}
+        <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <StatCard
+            icon={<FileText className="w-5 h-5 text-blue-600" />}
+            label="Total SOPs"
+            value={sops.length}
+            color="blue"
+          />
+          <StatCard
+            icon={<Clock className="w-5 h-5 text-amber-600" />}
+            label="In Progress"
+            value={draftCount}
+            color="amber"
+            badge={draftCount > 0 ? "Active" : undefined}
+          />
+          <StatCard
+            icon={<CheckCircle2 className="w-5 h-5 text-emerald-600" />}
+            label="Completed"
+            value={completeCount}
+            color="emerald"
+          />
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 lg:mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
           {/* Create New SOP */}
           <div onClick={handleCreateClick} className="group cursor-pointer">
             <div className={cn(
-              "relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-600 to-indigo-700 rounded-2xl p-6 text-white shadow-xl shadow-blue-600/25 hover:shadow-2xl hover:shadow-blue-600/30 hover:scale-[1.01] transition-all duration-300",
-              canCreateData && !canCreateData.canCreate && "opacity-80"
+              "relative overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl p-5 sm:p-6 text-white transition-all duration-200 hover:shadow-lg hover:shadow-blue-600/20",
+              canCreateData && !canCreateData.canCreate && "opacity-75"
             )}>
-              {/* Glow effect */}
-              <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-400/30 rounded-full blur-3xl group-hover:bg-blue-300/40 transition-colors" />
-              <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-indigo-400/20 rounded-full blur-3xl" />
-
-
-
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
               <div className="relative">
-                <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+                <div className="w-10 h-10 bg-white/15 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                   {canCreateData && !canCreateData.canCreate ? (
-                    <Lock className="w-7 h-7" />
+                    <Lock className="w-5 h-5" />
                   ) : (
-                    <Sparkles className="w-7 h-7" />
+                    <Sparkles className="w-5 h-5" />
                   )}
                 </div>
-                <h3 className="text-xl font-bold mb-2">Create New SOP</h3>
-                <p className="text-blue-100 mb-5 text-sm leading-relaxed">
+                <h3 className="text-base sm:text-lg font-semibold mb-1">Create New SOP</h3>
+                <p className="text-blue-100 text-xs sm:text-sm leading-relaxed mb-4 line-clamp-2">
                   {canCreateData && !canCreateData.canCreate
-                    ? "You've reached your monthly limit. Upgrade to continue creating."
-                    : "Start from scratch with AI-powered assistance to build professional SOPs in minutes."}
+                    ? "Monthly limit reached. Upgrade to continue."
+                    : "AI-powered SOP creation in minutes."}
                 </p>
-                <span className="inline-flex items-center gap-2 text-sm font-semibold bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full hover:bg-white/20 transition-colors">
-                  {canCreateData && !canCreateData.canCreate ? "Upgrade now" : "Get started"}
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <span className="inline-flex items-center gap-1.5 text-xs font-medium">
+                  {canCreateData && !canCreateData.canCreate ? "Upgrade" : "Get started"}
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                 </span>
               </div>
             </div>
@@ -233,36 +180,32 @@ export default function DashboardPage() {
           {/* Improve Existing */}
           <div onClick={handleImproveClick} className="group cursor-pointer">
             <div className={cn(
-              "relative overflow-hidden bg-white rounded-2xl p-6 border border-slate-200 shadow-lg hover:shadow-xl hover:border-emerald-200 hover:scale-[1.01] transition-all duration-300",
-              canImproveData && !canImproveData.canImprove && "opacity-80"
+              "relative overflow-hidden bg-white rounded-xl p-5 sm:p-6 border border-slate-200 transition-all duration-200 hover:shadow-lg hover:border-emerald-200",
+              canImproveData && !canImproveData.canImprove && "opacity-75"
             )}>
-              {/* Subtle glow */}
-              <div className="absolute -top-24 -right-24 w-48 h-48 bg-emerald-100/50 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
-
-
-
+              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full -translate-y-1/2 translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="relative">
-                <div className="w-14 h-14 bg-gradient-to-br from-emerald-400 to-emerald-500 rounded-2xl flex items-center justify-center mb-5 shadow-lg shadow-emerald-500/25 group-hover:scale-110 transition-transform">
+                <div className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                   {canImproveData && !canImproveData.canImprove ? (
-                    <Lock className="w-7 h-7 text-white" />
+                    <Lock className="w-5 h-5 text-emerald-600" />
                   ) : (
-                    <Upload className="w-7 h-7 text-white" />
+                    <Upload className="w-5 h-5 text-emerald-600" />
                   )}
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2">Improve Existing</h3>
-                <p className="text-slate-500 mb-5 text-sm leading-relaxed">
+                <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-1">Improve Existing</h3>
+                <p className="text-slate-500 text-xs sm:text-sm leading-relaxed mb-4 line-clamp-2">
                   {canImproveData && !canImproveData.canImprove
-                    ? "You've used your monthly improvement. Upgrade for unlimited access."
-                    : "Upload your current SOPs and let AI analyze and enhance them automatically."}
+                    ? "Monthly limit reached. Upgrade for more."
+                    : "Upload SOPs for AI analysis and enhancement."}
                 </p>
                 <span className={cn(
-                  "inline-flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-full transition-colors",
+                  "inline-flex items-center gap-1.5 text-xs font-medium",
                   canImproveData && !canImproveData.canImprove
-                    ? "text-amber-600 bg-amber-50 group-hover:bg-amber-100"
-                    : "text-emerald-600 bg-emerald-50 group-hover:bg-emerald-100"
+                    ? "text-amber-600"
+                    : "text-emerald-600"
                 )}>
-                  {canImproveData && !canImproveData.canImprove ? "Upgrade now" : "Upload file"}
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  {canImproveData && !canImproveData.canImprove ? "Upgrade" : "Upload file"}
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                 </span>
               </div>
             </div>
@@ -274,69 +217,67 @@ export default function DashboardPage() {
 
         {/* Recent SOPs */}
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-slate-900">Recent Documents</h2>
-            <Link
-              href="/library"
-              className="text-blue-600 hover:text-blue-700 text-sm font-semibold inline-flex items-center gap-1 hover:gap-2 transition-all"
-            >
-              View all
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">Recent Documents</h2>
+            {recentSOPs.length > 0 && (
+              <Link
+                href="/library"
+                className="text-blue-600 hover:text-blue-700 text-xs font-medium inline-flex items-center gap-1 hover:gap-1.5 transition-all"
+              >
+                View all
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            )}
           </div>
 
           {recentSOPs.length > 0 ? (
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200/80 shadow-lg overflow-hidden">
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
               <div className="divide-y divide-slate-100">
-                {recentSOPs.map((sop, index) => (
+                {recentSOPs.map((sop) => (
                   <Link
                     key={sop.id}
                     href={sop.status === "draft" ? `/create?id=${sop.id}` : `/preview/${sop.id}`}
-                    className="flex items-center gap-4 p-4 hover:bg-slate-50/80 transition-all group"
+                    className="flex items-center gap-3 sm:gap-4 px-4 py-3 hover:bg-slate-50 transition-colors group"
                   >
-                    <div
-                      className={cn(
-                        "w-11 h-11 rounded-xl flex items-center justify-center shadow-md transition-transform group-hover:scale-105",
-                        sop.status === "complete"
-                          ? "bg-gradient-to-br from-emerald-400 to-emerald-500 shadow-emerald-500/25"
-                          : "bg-gradient-to-br from-amber-400 to-amber-500 shadow-amber-500/25"
-                      )}
-                    >
-                      <FileText className="w-5 h-5 text-white" />
+                    <div className={cn(
+                      "w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0",
+                      sop.status === "complete"
+                        ? "bg-emerald-50 text-emerald-600"
+                        : "bg-amber-50 text-amber-600"
+                    )}>
+                      <FileText className="w-4 h-4" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold text-slate-900 truncate group-hover:text-blue-600 transition-colors">
+                      <h4 className="text-sm font-medium text-slate-900 truncate group-hover:text-blue-600 transition-colors">
                         {sop.title}
                       </h4>
-                      <p className="text-sm text-slate-500">{sop.department}</p>
+                      <p className="text-xs text-slate-400">{sop.department}</p>
                     </div>
-                    <div
-                      className={cn(
-                        "px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm",
-                        sop.status === "complete"
-                          ? "bg-emerald-100 text-emerald-700"
-                          : "bg-amber-100 text-amber-700"
-                      )}
-                    >
+                    <div className={cn(
+                      "px-2 py-0.5 rounded text-[11px] font-medium hidden sm:block",
+                      sop.status === "complete"
+                        ? "bg-emerald-50 text-emerald-700"
+                        : "bg-amber-50 text-amber-700"
+                    )}>
                       {sop.status === "complete" ? "Complete" : "Draft"}
                     </div>
-                    <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" />
+                    <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-blue-500 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                   </Link>
                 ))}
               </div>
             </div>
           ) : (
-            <div className="bg-white/80 backdrop-blur-sm border border-slate-200/80 rounded-2xl p-12 text-center shadow-lg">
-              <div className="w-20 h-20 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center mx-auto mb-5 shadow-inner">
-                <FileText className="w-10 h-10 text-slate-400" />
+            <div className="bg-white border border-slate-200 rounded-xl p-8 sm:p-12 text-center">
+              <div className="w-14 h-14 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <FileText className="w-7 h-7 text-slate-400" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-2">No SOPs yet</h3>
-              <p className="text-slate-500 mb-6 max-w-sm mx-auto">
-                Create your first SOP to streamline your processes and boost team productivity.
+              <h3 className="text-lg font-semibold text-slate-900 mb-1.5">No SOPs yet</h3>
+              <p className="text-sm text-slate-500 mb-5 max-w-xs mx-auto">
+                Create your first SOP to streamline your processes.
               </p>
               <Link href="/create">
-                <Button className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 px-6 py-2.5 transition-all">
-                  <Plus className="w-4 h-4 mr-2" />
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-5">
+                  <Plus className="w-4 h-4 mr-1.5" />
                   Create Your First SOP
                 </Button>
               </Link>
@@ -352,5 +293,43 @@ export default function DashboardPage() {
         triggerReason={upgradeReason === "create" ? "create_limit" : "improve_limit"}
       />
     </DashboardLayout>
+  )
+}
+
+// -----------------------------------------------------------------------------
+// Stat Card Component
+// -----------------------------------------------------------------------------
+
+interface StatCardProps {
+  icon: React.ReactNode
+  label: string
+  value: number
+  color: "blue" | "amber" | "emerald"
+  badge?: string
+}
+
+function StatCard({ icon, label, value, color, badge }: StatCardProps) {
+  const bgMap = { blue: "bg-blue-50", amber: "bg-amber-50", emerald: "bg-emerald-50" }
+  const badgeMap = {
+    blue: "bg-blue-100 text-blue-700",
+    amber: "bg-amber-100 text-amber-700",
+    emerald: "bg-emerald-100 text-emerald-700",
+  }
+
+  return (
+    <div className="bg-white rounded-xl p-3.5 sm:p-4 border border-slate-200 hover:border-slate-300 transition-colors">
+      <div className="flex items-center justify-between mb-3">
+        <div className={cn("w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center", bgMap[color])}>
+          {icon}
+        </div>
+        {badge && (
+          <span className={cn("text-[10px] sm:text-[11px] font-medium px-1.5 py-0.5 rounded", badgeMap[color])}>
+            {badge}
+          </span>
+        )}
+      </div>
+      <p className="text-[11px] sm:text-xs font-medium text-slate-400 uppercase tracking-wider mb-0.5">{label}</p>
+      <span className="text-xl sm:text-2xl font-bold text-slate-900">{value}</span>
+    </div>
   )
 }

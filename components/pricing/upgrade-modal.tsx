@@ -66,15 +66,15 @@ export function UpgradeModal({ isOpen, onClose, currentTier = "free" }: UpgradeM
                             <Crown className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold text-gray-900">Upgrade Your Plan</h2>
-                            <p className="text-sm text-gray-500">Unlock more features and power</p>
+                            <h2 className="text-xl font-bold text-slate-900">Upgrade Your Plan</h2>
+                            <p className="text-sm text-slate-500">Unlock more features and power</p>
                         </div>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                        className="p-2 hover:bg-slate-100 rounded-full transition-colors"
                     >
-                        <X className="w-5 h-5 text-gray-500" />
+                        <X className="w-5 h-5 text-slate-500" />
                     </button>
                 </div>
 
@@ -91,7 +91,7 @@ export function UpgradeModal({ isOpen, onClose, currentTier = "free" }: UpgradeM
                                     "relative rounded-xl p-6 border-2 transition-all",
                                     plan.popular
                                         ? "border-blue-500 bg-blue-50/50"
-                                        : "border-gray-200 hover:border-gray-300"
+                                        : "border-slate-200 hover:border-slate-300"
                                 )}
                             >
                                 {plan.popular && (
@@ -104,16 +104,16 @@ export function UpgradeModal({ isOpen, onClose, currentTier = "free" }: UpgradeM
                                 )}
 
                                 <div className="mb-4">
-                                    <h3 className="text-lg font-bold text-gray-900">{plan.name}</h3>
+                                    <h3 className="text-lg font-bold text-slate-900">{plan.name}</h3>
                                     <div className="flex items-baseline gap-1 mt-2">
-                                        <span className="text-3xl font-bold text-gray-900">${plan.price}</span>
-                                        <span className="text-gray-500">/month</span>
+                                        <span className="text-3xl font-bold text-slate-900">${plan.price}</span>
+                                        <span className="text-slate-500">/month</span>
                                     </div>
                                 </div>
 
                                 <ul className="space-y-3 mb-6">
                                     {plan.features.map((feature, idx) => (
-                                        <li key={idx} className="flex items-start gap-2 text-sm text-gray-600">
+                                        <li key={idx} className="flex items-start gap-2 text-sm text-slate-600">
                                             <Check className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
                                             {feature}
                                         </li>
@@ -127,7 +127,7 @@ export function UpgradeModal({ isOpen, onClose, currentTier = "free" }: UpgradeM
                                         "w-full",
                                         plan.popular
                                             ? "bg-blue-600 hover:bg-blue-700"
-                                            : "bg-gray-900 hover:bg-gray-800"
+                                            : "bg-slate-900 hover:bg-slate-800"
                                     )}
                                 >
                                     {loading === plan.key ? (
@@ -144,7 +144,7 @@ export function UpgradeModal({ isOpen, onClose, currentTier = "free" }: UpgradeM
                 </div>
 
                 {/* Footer */}
-                <div className="px-6 pb-6 text-center text-sm text-gray-500">
+                <div className="px-6 pb-6 text-center text-sm text-slate-500">
                     Cancel anytime. No questions asked.
                 </div>
             </div>

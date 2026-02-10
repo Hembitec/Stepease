@@ -82,7 +82,7 @@ export function DragDropZone({
         onClick={handleClick}
         className={cn(
           "relative border-2 border-dashed rounded-xl p-12 text-center cursor-pointer transition-all",
-          isDragOver ? "border-blue-500 bg-blue-50 scale-105" : "border-gray-300 bg-gray-50 hover:border-gray-400",
+          isDragOver ? "border-blue-500 bg-blue-50 scale-105" : "border-slate-300 bg-slate-50 hover:border-slate-400",
           selectedFile && "border-green-500 bg-green-50",
         )}
       >
@@ -97,8 +97,8 @@ export function DragDropZone({
         {selectedFile ? (
           <div className="flex flex-col items-center">
             <FileText className="w-12 h-12 text-green-600 mb-4" />
-            <p className="text-lg font-medium text-gray-900 mb-1">{selectedFile.name}</p>
-            <p className="text-sm text-gray-500">{(selectedFile.size / 1024).toFixed(1)} KB</p>
+            <p className="text-lg font-medium text-slate-900 mb-1">{selectedFile.name}</p>
+            <p className="text-sm text-slate-500">{(selectedFile.size / 1024).toFixed(1)} KB</p>
             <Button
               variant="outline"
               onClick={(e) => {
@@ -112,11 +112,11 @@ export function DragDropZone({
           </div>
         ) : (
           <div className="flex flex-col items-center">
-            <Upload className={cn("w-12 h-12 mb-4", isDragOver ? "text-blue-600" : "text-gray-400")} />
-            <p className="text-lg font-medium text-gray-900 mb-1">Drag & Drop File Here</p>
-            <p className="text-gray-500 mb-4">or</p>
+            <Upload className={cn("w-12 h-12 mb-4", isDragOver ? "text-blue-600" : "text-slate-400")} />
+            <p className="text-lg font-medium text-slate-900 mb-1">Drag & Drop File Here</p>
+            <p className="text-slate-500 mb-4">or</p>
             <Button className="bg-blue-600 hover:bg-blue-700 text-white">Browse Files</Button>
-            <p className="text-sm text-gray-400 mt-4">
+            <p className="text-sm text-slate-400 mt-4">
               Supported: {acceptedTypes.join(", ")} | Max: {Math.round(maxSize / 1024 / 1024)}MB
             </p>
           </div>
