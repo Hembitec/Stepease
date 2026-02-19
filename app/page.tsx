@@ -28,6 +28,7 @@ import {
   Quote,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { DemoShowcase } from "@/components/landing/demo-showcase"
 
 const features = [
   {
@@ -180,7 +181,7 @@ export default function LandingPage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       <Navbar />
 
       {/* Hero Section - Premium with animated gradients */}
@@ -296,6 +297,26 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Interactive Demo Section */}
+      <section id="demo" className="py-24 px-4 bg-gradient-to-b from-background via-slate-50/50 to-slate-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12 sm:mb-16">
+            <p className="text-blue-600 dark:text-blue-400 font-semibold mb-4 tracking-wide uppercase text-sm">
+              See It In Action
+            </p>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-6">
+              From Conversation to SOP in Minutes
+            </h2>
+            <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
+              Watch our AI interview you about your process and generate a professional,
+              structured SOP — automatically.
+            </p>
+          </div>
+
+          <DemoShowcase />
         </div>
       </section>
 
