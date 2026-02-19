@@ -1,59 +1,60 @@
-import { flwRequest } from "./auth";
-import { PLANS, PlanId } from "./plans";
 import { flwConfig } from "./config";
+import { PLANS, type PlanId } from "./plans";
 
-interface CheckoutParams {
+/**
+ * Create a Flutterwave hosted checkout session
+ * Returns the checkout URL to redirect the user to
+ */
+export async function createCheckoutSession(params: {
     planId: PlanId;
     customerEmail: string;
     customerId: string;
     redirectUrl: string;
-}
-
-interface CheckoutResponse {
-    status: string;
-    message: string;
-    data: {
-        link: string;
-    };
-}
-
-/**
- * Create a hosted checkout session for subscription
- */
-export async function createCheckoutSession(
-    params: CheckoutParams
-): Promise<string> {
+}): Promise<string> {
     const plan = PLANS[params.planId];
 
     if (!plan || plan.price === 0) {
-        throw new Error("Cannot create checkout for free plan");
+        throw new Error("Invalid plan for checkout");
     }
 
+    // Generate unique transaction reference
     const txRef = `sub_${params.customerId}_${Date.now()}`;
 
-    const response = await flwRequest<CheckoutResponse>("/payments", {
+    const payload = {
+        tx_ref: txRef,
+        amount: plan.price,
+        currency: "USD",
+        redirect_url: params.redirectUrl,
+        payment_options: "card,ussd,banktransfer",
+        customer: {
+            email: params.customerEmail,
+            name: params.customerEmail.split("@")[0],
+        },
+        customizations: {
+            title: `${plan.name} Plan Subscription`,
+            description: `Monthly subscription to StepEase ${plan.name} plan`,
+            logo: "https://ease.070351.xyz/logo.png",
+        },
+        meta: {
+            plan_id: params.planId,
+            customer_id: params.customerId,
+        },
+    };
+
+    const response = await fetch(`${flwConfig.baseUrl}/payments`, {
         method: "POST",
-        body: JSON.stringify({
-            tx_ref: txRef,
-            amount: plan.price,
-            currency: "USD",
-            redirect_url: params.redirectUrl,
-            payment_options: "card", // Card only
-            customer: {
-                email: params.customerEmail,
-            },
-            payment_plan: plan.id,
-            customizations: {
-                title: "StepEase Subscription",
-                description: `${plan.name} Plan - $${plan.price}/month`,
-                logo: `${process.env.NEXT_PUBLIC_APP_URL}/icon.png`,
-            },
-        }),
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${flwConfig.secretKey}`,
+        },
+        body: JSON.stringify(payload),
     });
 
-    if (response.status !== "success") {
-        throw new Error(`Checkout creation failed: ${response.message}`);
+    if (!response.ok) {
+        const error = await response.text();
+        throw new Error(`Failed to create checkout: ${error}`);
     }
 
-    return response.data.link;
+    const data = await response.json();
+    return data.data.link;
 }

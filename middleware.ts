@@ -6,6 +6,7 @@ const isPublicRoute = createRouteMatcher([
     '/manifest.json',
     '/robots.txt',
     '/llms.txt',
+    '/api/flutterwave/webhook',
 ])
 
 export default clerkMiddleware(async (auth, req) => {

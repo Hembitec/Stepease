@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
     verifyWebhookSignature,
-    parseWebhookPayload,
     verifyTransaction,
     getPlanByAmount
 } from "@/lib/flutterwave";
@@ -10,78 +9,170 @@ import { fetchMutation } from "convex/nextjs";
 
 /**
  * Flutterwave Webhook Handler
- * 
- * Security measures:
- * 1. HMAC-SHA256 signature verification
- * 2. Transaction re-verification via API
- * 3. Idempotent processing
+ *
+ * ACTUAL Flutterwave payload structure (discovered via testing):
+ * The payload is FLAT — no event/data wrapper:
+ * {
+ *   id: 10017759,
+ *   txRef: "sub_user_xxx_timestamp",    // camelCase, not tx_ref
+ *   status: "successful",
+ *   amount: 29,
+ *   customer: { id: 3468076, email: "..." },
+ *   "event.type": "CARD_TRANSACTION"    // dotted key, not nested
+ * }
+ *
+ * The verify API response IS wrapped: { data: { id, tx_ref, status, ... } }
  */
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+interface FlwWebhookPayload {
+    id: number;
+    txRef?: string;
+    tx_ref?: string;
+    flwRef?: string;
+    status: string;
+    amount: number;
+    charged_amount?: number;
+    currency?: string;
+    customer: {
+        id: number;
+        email: string;
+        fullName?: string;
+        phone?: string | null;
+    };
+    "event.type"?: string;
+    // Some webhook events use nested structure
+    event?: string;
+    data?: {
+        id: number;
+        status: string;
+        tx_ref?: string;
+        amount?: number;
+        customer: {
+            id: number;
+            email: string;
+        };
+    };
+}
+
 export async function POST(req: NextRequest) {
     try {
         // 1. Get raw body for signature verification
         const rawBody = await req.text();
-        const signature = req.headers.get("flutterwave-signature");
 
-        // 2. Verify webhook signature
-        if (!verifyWebhookSignature(rawBody, signature)) {
-            console.error("[Webhook] Invalid signature");
+        // 2. Verify webhook via verif-hash header
+        const verifHash = req.headers.get("verif-hash");
+        console.log("[Webhook] Request received. verif-hash:", verifHash ? "present" : "missing");
+
+        if (!verifyWebhookSignature(verifHash)) {
+            console.error("[Webhook] Signature verification failed");
             return NextResponse.json(
                 { error: "Invalid signature" },
                 { status: 401 }
             );
         }
 
-        // 3. Parse payload
-        const payload = parseWebhookPayload(rawBody);
-        console.log("[Webhook] Event received:", payload.event);
+        console.log("[Webhook] Signature verified ✓");
 
-        // 4. Only process successful charge events
-        if (payload.event !== "charge.completed") {
+        // 3. Parse payload
+        const payload: FlwWebhookPayload = JSON.parse(rawBody);
+
+        // Determine the transaction ID and txRef
+        // Flutterwave can send flat OR nested payloads depending on event type
+        const txnId = payload.data?.id ?? payload.id;
+        const txRef = payload.data?.tx_ref ?? payload.txRef ?? payload.tx_ref ?? "";
+        const status = payload.data?.status ?? payload.status;
+        const amount = payload.data?.amount ?? payload.amount;
+        const customerId = payload.data?.customer?.id ?? payload.customer?.id;
+        const eventType = payload.event ?? payload["event.type"] ?? "unknown";
+
+        console.log("[Webhook] Event:", eventType);
+        console.log("[Webhook] Transaction:", { txnId, txRef, status, amount });
+
+        // 4. Handle cancellation events
+        if (
+            eventType === "subscription.cancelled" ||
+            eventType === "SUBSCRIPTION_CANCELLED"
+        ) {
+            const email = payload.data?.customer?.email ?? payload.customer?.email;
+            if (!email) {
+                return NextResponse.json(
+                    { error: "No email in cancellation payload" },
+                    { status: 400 }
+                );
+            }
+
+            console.log("[Webhook] Processing cancellation for:", email);
+
+            const webhookSecret = process.env.CONVEX_WEBHOOK_SECRET;
+            if (!webhookSecret) throw new Error("CONVEX_WEBHOOK_SECRET not configured");
+
+            const flwCustomerId = String(customerId);
+
+            await fetchMutation(api.users.cancelSubscription, {
+                webhookSecret,
+                flwCustomerId,
+            });
+
+            console.log("[Webhook] Subscription cancelled for customer:", flwCustomerId);
+            return NextResponse.json({ status: "ok" });
+        }
+
+        // 5. Only process successful transactions
+        if (status !== "successful") {
+            console.log("[Webhook] Ignoring non-successful status:", status);
             return NextResponse.json({ status: "ignored" });
         }
 
-        // 5. Re-verify transaction with Flutterwave API
-        const verification = await verifyTransaction(payload.data.id);
+        // 6. Re-verify transaction with Flutterwave API (critical security step)
+        console.log("[Webhook] Re-verifying transaction:", txnId);
+        const verification = await verifyTransaction(txnId);
 
         if (verification.data.status !== "successful") {
-            console.error("[Webhook] Transaction not successful:", verification.data.status);
+            console.error("[Webhook] Verification failed:", verification.data.status);
             return NextResponse.json(
                 { error: "Transaction not successful" },
                 { status: 400 }
             );
         }
 
-        // 6. Extract user ID from tx_ref (format: sub_<clerkId>_<timestamp>)
-        const txRef = verification.data.tx_ref;
-        const clerkId = txRef.split("_")[1];
+        // 7. Extract user ID from tx_ref
+        // Format: sub_user_xxxxx_timestamp → we need "user_xxxxx"
+        const verifiedTxRef = verification.data.tx_ref || txRef;
+        const parts = verifiedTxRef.split("_");
+        // Skip "sub_" prefix and "_timestamp" suffix
+        const clerkId = parts.slice(1, -1).join("_");
 
         if (!clerkId) {
-            console.error("[Webhook] Invalid tx_ref format:", txRef);
+            console.error("[Webhook] Invalid tx_ref format:", verifiedTxRef);
             return NextResponse.json(
                 { error: "Invalid transaction reference" },
                 { status: 400 }
             );
         }
 
-        // 7. Determine tier from amount
-        const tier = getPlanByAmount(verification.data.amount);
+        // 8. Determine tier from amount
+        const verifiedAmount = verification.data.amount || amount;
+        const tier = getPlanByAmount(verifiedAmount);
 
-        // 8. Update user subscription in Convex
+        // 9. Update user subscription in Convex
         const webhookSecret = process.env.CONVEX_WEBHOOK_SECRET;
         if (!webhookSecret) {
             throw new Error("CONVEX_WEBHOOK_SECRET not configured");
         }
+
+        console.log("[Webhook] Updating subscription:", { clerkId, tier, amount: verifiedAmount });
 
         await fetchMutation(api.users.updateSubscription, {
             webhookSecret,
             clerkId,
             tier,
             status: "active",
-            flwCustomerId: String(verification.data.customer.id),
+            flwCustomerId: String(verification.data.customer?.id ?? customerId),
             flwSubscriptionId: String(verification.data.id),
         });
 
-        console.log("[Webhook] Subscription updated:", { clerkId, tier });
+        console.log("[Webhook] ✅ Subscription updated successfully:", { clerkId, tier });
 
         return NextResponse.json({ status: "ok" });
     } catch (error) {
@@ -92,10 +183,3 @@ export async function POST(req: NextRequest) {
         );
     }
 }
-
-// Disable body parsing for raw body access
-export const config = {
-    api: {
-        bodyParser: false,
-    },
-};

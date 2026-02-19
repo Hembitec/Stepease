@@ -5,6 +5,9 @@ import { X, Crown, Check, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { PLANS } from "@/lib/flutterwave/plans"
+import { upgradeSubscription } from "@/app/actions/payment"
+import { toast } from "sonner"
+import { useUser } from "@clerk/nextjs"
 
 interface UpgradeModalProps {
     isOpen: boolean
@@ -15,21 +18,32 @@ interface UpgradeModalProps {
 
 export function UpgradeModal({ isOpen, onClose, currentTier = "free" }: UpgradeModalProps) {
     const [loading, setLoading] = useState<string | null>(null)
+    const { user } = useUser()
 
     if (!isOpen) return null
 
     const handleUpgrade = async (planKey: "starter" | "pro") => {
-        setLoading(planKey)
-        // In production, this would redirect to Flutterwave checkout
-        const plan = PLANS[planKey]
-        console.log(`Upgrading to ${plan.name} at $${plan.price}/month`)
+        try {
+            setLoading(planKey)
+            const plan = PLANS[planKey]
+            const email = user?.emailAddresses[0]?.emailAddress
+            if (!email) {
+                toast.error("Could not find your email address. Please try again.")
+                setLoading(null)
+                return
+            }
+            console.log(`Upgrading to ${plan.name} at $${plan.price}/month`)
 
-        // Simulate redirect delay
-        setTimeout(() => {
-            // window.location.href = `/api/checkout?plan=${planKey}`
+            // Call server action to get checkout URL
+            const checkoutUrl = await upgradeSubscription(planKey, email)
+
+            // Redirect to Flutterwave checkout
+            window.location.href = checkoutUrl
+        } catch (error) {
+            console.error("Upgrade error:", error)
+            toast.error("Failed to start upgrade. Please try again.")
             setLoading(null)
-            alert(`Upgrade to ${plan.name} coming soon!`)
-        }, 1000)
+        }
     }
 
     const plans = [

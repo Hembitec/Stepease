@@ -1,8 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+import { useSearchParams, useRouter } from "next/navigation"
 import { DashboardLayout } from "@/components/layout/dashboard-layout"
 import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
@@ -38,7 +39,30 @@ export default function DashboardPage() {
   const canImproveData = useQuery(api.users.checkCanImprove)
 
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
-  const [upgradeReason, setUpgradeReason] = useState<"create" | "improve">("create")
+  const [upgradeReason, setUpgradeReason] = useState<"create" | "improve" | "manual">("create")
+
+  const searchParams = useSearchParams()
+  const hasShownToast = useRef(false)
+
+  useEffect(() => {
+    // Handle payment success — only show toast once
+    if (searchParams.get("payment") === "success" && !hasShownToast.current) {
+      hasShownToast.current = true
+      toast.success("Subscription upgraded successfully!", {
+        description: "You now have access to all premium features.",
+        duration: 5000,
+      })
+      // Clean up URL
+      router.replace("/dashboard")
+    }
+
+    // Handle upgrade triggers from landing page
+    const upgradeParam = searchParams.get("upgrade")
+    if (upgradeParam === "starter" || upgradeParam === "pro") {
+      setShowUpgradeModal(true)
+      setUpgradeReason("manual")
+    }
+  }, [searchParams, router])
 
   const sessions = useQuery(api.sessions.list) ?? []
   const recentSOPs = sops.slice(0, 5)

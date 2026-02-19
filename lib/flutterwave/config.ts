@@ -1,30 +1,31 @@
 /**
- * Flutterwave v3 API Configuration (Standard)
+ * Flutterwave V3 API Configuration
  */
+
 export const flwConfig = {
-    // Try to use Secret Key first (Standard), fallback to Client Secret if being used as Secret Key
-    secretKey: process.env.FLW_SECRET_KEY || process.env.FLW_CLIENT_SECRET!,
-    webhookSecretHash: process.env.FLW_WEBHOOK_SECRET_HASH!,
-    publicKey: process.env.NEXT_PUBLIC_FLW_PUBLIC_KEY!,
+    secretKey: process.env.FLW_SECRET_KEY || "",
+    publicKey: process.env.NEXT_PUBLIC_FLW_PUBLIC_KEY || "",
+    webhookSecretHash: process.env.FLW_WEBHOOK_SECRET_HASH || "",
     baseUrl: "https://api.flutterwave.com/v3",
-} as const;
+    planIds: {
+        starter: process.env.FLW_PLAN_STARTER_ID || "",
+        pro: process.env.FLW_PLAN_PRO_ID || "",
+    },
+};
 
 /**
- * Validate required environment variables
+ * Validate that all required config values are set
  */
 export function validateConfig() {
-    const required: string[] = [];
+    const missing: string[] = [];
 
-    // Check if we have a secret key (either variable works)
-    if (!process.env.FLW_SECRET_KEY && !process.env.FLW_CLIENT_SECRET) {
-        throw new Error("Missing Flutterwave Secret Key (FLW_SECRET_KEY)");
-    }
-
-    const missing = required.filter((key) => !process.env[key]);
-
-
+    if (!flwConfig.secretKey) missing.push("FLW_SECRET_KEY");
+    if (!flwConfig.publicKey) missing.push("NEXT_PUBLIC_FLW_PUBLIC_KEY");
+    if (!flwConfig.webhookSecretHash) missing.push("FLW_WEBHOOK_SECRET_HASH");
 
     if (missing.length > 0) {
-        throw new Error(`Missing Flutterwave environment variables: ${missing.join(", ")}`);
+        throw new Error(
+            `Missing Flutterwave configuration: ${missing.join(", ")}`
+        );
     }
 }

@@ -4,11 +4,14 @@ import { useState, useEffect } from "react"
 import { DashboardLayout } from "@/components/layout/dashboard-layout"
 import { useSidebar } from "@/components/layout/sidebar-context"
 import { SubscriptionCard, UpgradeModal } from "@/components/pricing"
-import { UserProfile } from "@clerk/nextjs"
+import { UserProfile, useUser } from "@clerk/nextjs"
 import { Menu } from "lucide-react"
 import { useQuery, useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { SettingsSkeleton } from "@/components/skeletons"
+import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
+import { cancelSubscriptionAction } from "@/app/actions/payment"
 
 export default function SettingsPage() {
   const { toggleMobileMenu } = useSidebar()
@@ -75,6 +78,31 @@ export default function SettingsPage() {
             onUpgrade={() => setShowUpgradeModal(true)}
           />
         </div>
+
+        {/* Billing Section (Only for paid tiers) */}
+        {tier !== "free" && (
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold text-slate-900 mb-4">
+              Billing & Payment
+            </h2>
+            <div className="bg-white rounded-xl border border-slate-200 p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-medium text-slate-900">Current Plan</h3>
+                  <p className="text-sm text-slate-500 mt-1">
+                    You are currently on the <span className="font-semibold capitalize">{tier}</span> plan.
+                  </p>
+                  {userData?.usageResetAt && (
+                    <p className="text-xs text-slate-400 mt-2">
+                      Next billing cycle starts on {new Date(userData.usageResetAt).toLocaleDateString()}.
+                    </p>
+                  )}
+                </div>
+                <CancelSubscriptionButton />
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* User Profile Section */}
         <div className="flex justify-center">
@@ -143,3 +171,66 @@ export default function SettingsPage() {
   )
 }
 
+// -----------------------------------------------------------------------------
+// HELPER COMPONENTS
+// -----------------------------------------------------------------------------
+
+function CancelSubscriptionButton() {
+  const [loading, setLoading] = useState(false)
+  const [open, setOpen] = useState(false)
+  const { user } = useUser()
+
+  const handleCancel = async () => {
+    setLoading(true)
+    try {
+      const email = user?.emailAddresses[0]?.emailAddress || ""
+      const result = await cancelSubscriptionAction(email)
+      if (result.success) {
+        toast.success(result.message)
+        setOpen(false)
+        // Ideally refresh data
+        window.location.reload()
+      } else {
+        toast.error(result.message)
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (!open) {
+    return (
+      <Button
+        variant="outline"
+        className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+        onClick={() => setOpen(true)}
+      >
+        Cancel Subscription
+      </Button>
+    )
+  }
+
+  return (
+    <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-4 duration-200">
+      <span className="text-sm text-slate-600 mr-2">Are you sure?</span>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setOpen(false)}
+        disabled={loading}
+      >
+        Keep it
+      </Button>
+      <Button
+        variant="destructive"
+        size="sm"
+        onClick={handleCancel}
+        disabled={loading}
+      >
+        {loading ? "Cancelling..." : "Yes, Cancel"}
+      </Button>
+    </div>
+  )
+}

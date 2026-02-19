@@ -9,7 +9,7 @@ import {
   generateDOCX,
   generateHTML,
   generateMarkdown,
-} from "@/lib/download-utils"
+} from "@/lib/download"
 
 type UserTier = "free" | "starter" | "pro"
 

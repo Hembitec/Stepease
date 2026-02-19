@@ -244,11 +244,55 @@ export const updateSubscription = mutation({
             throw new Error(`User not found: ${args.clerkId}`);
         }
 
+        // Calculate next billing date (1 month from now)
+        const now = new Date();
+        const nextMonth = new Date(now);
+        nextMonth.setMonth(now.getMonth() + 1);
+
         await ctx.db.patch(user._id, {
             tier: args.tier,
             status: args.status,
+            // Reset usage on upgrade/payment
+            sopsCreatedThisMonth: 0,
+            improvesUsedThisMonth: 0,
+            usageResetAt: nextMonth.toISOString(),
             ...(args.flwCustomerId && { flwCustomerId: args.flwCustomerId }),
             ...(args.flwSubscriptionId && { flwSubscriptionId: args.flwSubscriptionId }),
+        });
+    },
+});
+
+/**
+ * Cancel subscription (called from webhook)
+ * Downgrades user to free tier when subscription is cancelled
+ */
+export const cancelSubscription = mutation({
+    args: {
+        webhookSecret: v.string(),
+        flwCustomerId: v.string(),
+    },
+    handler: async (ctx, args) => {
+        // Validate webhook secret
+        const expectedSecret = process.env.CONVEX_WEBHOOK_SECRET;
+        if (!expectedSecret || args.webhookSecret !== expectedSecret) {
+            throw new Error("Unauthorized: Invalid webhook secret");
+        }
+
+        const user = await ctx.db
+            .query("users")
+            .withIndex("by_flw_customer", (q) => q.eq("flwCustomerId", args.flwCustomerId))
+            .first();
+
+        if (!user) {
+            console.warn(`[Cancel] User not found for FLW Customer ID: ${args.flwCustomerId}`);
+            return; // Idempotent success
+        }
+
+        // Downgrade to free
+        await ctx.db.patch(user._id, {
+            tier: "free",
+            status: "canceled",
+            flwSubscriptionId: undefined, // Clear subscription ID
         });
     },
 });
@@ -265,7 +309,11 @@ export const resetMonthlyUsage = internalMutation({
         for (const user of users) {
             const resetDate = new Date(user.usageResetAt);
             if (now >= resetDate) {
-                const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+                // Determine next reset date (same day next month)
+                // Use resetDate as base to preserve the day of month (e.g. 14th)
+                const nextMonth = new Date(resetDate);
+                nextMonth.setMonth(nextMonth.getMonth() + 1);
+
                 await ctx.db.patch(user._id, {
                     sopsCreatedThisMonth: 0,
                     improvesUsedThisMonth: 0,
