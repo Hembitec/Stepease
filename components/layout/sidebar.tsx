@@ -145,10 +145,10 @@ export function Sidebar({ isCollapsed, onToggle, isMobileOpen, onMobileClose }: 
             onClick={handleCreateClick}
             disabled={canCreateData === undefined}
             className={cn(
-              "flex items-center justify-center bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white font-medium transition-all duration-200 shadow-lg shadow-blue-600/25 hover:shadow-blue-500/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900",
+              "flex items-center justify-center bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900",
               isCollapsed && !isMobileOpen
                 ? "w-9 h-9 rounded-lg"
-                : "w-full px-4 py-3 rounded-xl gap-3",
+                : "w-full px-4 py-2.5 rounded-lg gap-2.5",
               (canCreateData && !canCreateData.canCreate) || canCreateData === undefined ? "opacity-80" : ""
             )}
             title={canCreateData === undefined ? "Loading..." : canCreateData && !canCreateData.canCreate ? "Upgrade to create more SOPs" : "Create New SOP"}
@@ -177,24 +177,20 @@ export function Sidebar({ isCollapsed, onToggle, isMobileOpen, onMobileClose }: 
                     href={item.href}
                     onClick={onMobileClose}
                     className={cn(
-                      "flex items-center gap-3 rounded-xl transition-all duration-200 group relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900",
+                      "flex items-center gap-3 rounded-lg transition-colors group relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900",
                       isCollapsed && !isMobileOpen
                         ? "w-9 h-9 justify-center p-0"
-                        : "px-4 py-3",
-                      isCollapsed && !isMobileOpen
-                        ? isActive
-                          ? "text-white"
-                          : "text-slate-400 hover:text-white"
-                        : isActive
-                          ? "bg-slate-800 text-white shadow-md border-l-2 border-blue-400"
-                          : "hover:bg-slate-800/50 hover:text-white"
+                        : "px-3 py-2.5",
+                      isActive
+                        ? "bg-slate-800 text-white"
+                        : "text-slate-400 hover:bg-slate-800/50 hover:text-white"
                     )}
                     title={isCollapsed && !isMobileOpen ? item.label : undefined}
                   >
                     <item.icon
                       className={cn(
-                        "w-5 h-5 flex-shrink-0 transition-all duration-200",
-                        isActive ? "text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.5)]" : "text-slate-400 group-hover:text-slate-300"
+                        "w-5 h-5 flex-shrink-0 transition-colors",
+                        isActive ? "text-blue-400" : "text-slate-400 group-hover:text-slate-300"
                       )}
                     />
                     {(!isCollapsed || isMobileOpen) && (
@@ -211,21 +207,23 @@ export function Sidebar({ isCollapsed, onToggle, isMobileOpen, onMobileClose }: 
         </nav>
 
         {/* Upgrade Badge */}
-        <div className="px-3 py-2">
-          <UpgradeBadge isCollapsed={isCollapsed} isMobileOpen={isMobileOpen} />
-        </div>
+        {tier === "free" && (
+          <div className="px-3 py-2">
+            <UpgradeBadge isCollapsed={isCollapsed} isMobileOpen={isMobileOpen} />
+          </div>
+        )}
 
         {/* User Section */}
         <div className="border-t border-slate-800/50 bg-gradient-to-b from-slate-800/20 to-transparent pt-1 p-4">
           <div
             className={cn(
-              "flex items-center gap-3 rounded-xl hover:bg-slate-800/50 transition-colors cursor-pointer",
+              "flex items-center gap-3 rounded-lg hover:bg-slate-800/50 transition-colors cursor-pointer",
               isCollapsed && !isMobileOpen ? "justify-center p-2" : "px-2 py-2"
             )}
             title={isCollapsed && !isMobileOpen ? user?.fullName || "User" : undefined}
           >
-            <Avatar className="w-9 h-9 bg-gradient-to-br from-blue-500 to-indigo-600 flex-shrink-0 shadow-lg shadow-blue-500/25">
-              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-sm font-medium">
+            <Avatar className="w-9 h-9 bg-blue-600 flex-shrink-0">
+              <AvatarFallback className="bg-blue-600 text-white text-sm font-medium">
                 {user?.firstName?.charAt(0) || user?.emailAddresses[0]?.emailAddress?.charAt(0) || "U"}
               </AvatarFallback>
             </Avatar>
@@ -259,8 +257,8 @@ export function Sidebar({ isCollapsed, onToggle, isMobileOpen, onMobileClose }: 
             <AlertDialogTrigger asChild>
               <button
                 className={cn(
-                  "flex items-center gap-3 w-full mt-2 text-sm text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-xl transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 group",
-                  isCollapsed && !isMobileOpen ? "justify-center p-3" : "px-4 py-2.5"
+                  "flex items-center gap-3 w-full mt-2 text-sm text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 group",
+                  isCollapsed && !isMobileOpen ? "justify-center p-2.5" : "px-3 py-2"
                 )}
                 title={isCollapsed && !isMobileOpen ? "Sign out" : undefined}
               >
