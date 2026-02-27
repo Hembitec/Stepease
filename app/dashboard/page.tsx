@@ -5,10 +5,12 @@ import Link from "next/link"
 import { toast } from "sonner"
 import { useSearchParams, useRouter } from "next/navigation"
 import { DashboardLayout } from "@/components/layout/dashboard-layout"
+import { useSidebar } from "@/components/layout/sidebar-context"
+import { ActivityTimeline } from "@/components/activity/activity-timeline"
 import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { useSOPContext } from "@/lib/sop-context"
-import { useSidebar } from "@/components/layout/sidebar-context"
+import { formatRelativeDate } from "@/lib/format-date"
 import { useUser } from "@clerk/nextjs"
 import { DashboardSkeleton } from "@/components/skeletons"
 import {
@@ -275,7 +277,11 @@ export default function DashboardPage() {
                       <h4 className="text-sm font-medium text-slate-900 truncate group-hover:text-blue-600 transition-colors">
                         {sop.title}
                       </h4>
-                      <p className="text-xs text-slate-400">{sop.department}</p>
+                      <p className="text-xs text-slate-400">
+                        {sop.department}
+                        <span className="mx-1">&middot;</span>
+                        {formatRelativeDate(sop.updatedAt)}
+                      </p>
                     </div>
                     <div className={cn(
                       "px-2 py-0.5 rounded text-[11px] font-medium hidden sm:block",
@@ -307,6 +313,14 @@ export default function DashboardPage() {
               </Link>
             </div>
           )}
+        </div>
+
+        {/* Recent Activity */}
+        <div>
+          <h2 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-3">Recent Activity</h2>
+          <div className="bg-white rounded-xl border border-slate-200 p-4">
+            <ActivityTimeline limit={10} compact />
+          </div>
         </div>
       </div>
 

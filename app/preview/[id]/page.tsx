@@ -3,11 +3,14 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter, useParams } from "next/navigation"
-import { ArrowLeft, FileText, Eye, Pencil, CheckCircle, Copy, Check } from "lucide-react"
+import { ArrowLeft, FileText, Eye, Pencil, CheckCircle, Copy, Check, Clock, ChevronDown, History } from "lucide-react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { MarkdownRenderer } from "@/components/sop/markdown-renderer"
 import { DownloadMenu } from "@/components/sop/download-menu"
+import { SharePopover } from "@/components/sop/share-popover"
 import { SectionEditorModal } from "@/components/sop/section-editor-modal"
+import { ActivityTimeline } from "@/components/activity/activity-timeline"
 import { useSOPContext } from "@/lib/sop-context"
 import { cn } from "@/lib/utils"
 import { useMutation, useQuery } from "convex/react"
@@ -32,11 +35,21 @@ export default function SOPPreviewPage() {
     || sops.find((s) => s.sessionId === params.id)
     || sops[0]
 
+  // Fetch version history
+  const versionHistory = useQuery(
+    api.sops.getVersionHistory,
+    sop?.id ? { sopId: sop.id as any } : "skip"
+  )
+
   const [content, setContent] = useState(sop?.content || "")
   const [viewMode, setViewMode] = useState<ViewMode>("preview")
   const [editingSection, setEditingSection] = useState<{ title: string; content: string } | null>(null)
   const [copied, setCopied] = useState(false)
   const [approving, setApproving] = useState(false)
+  const [showActivity, setShowActivity] = useState(false)
+  const [showVersions, setShowVersions] = useState(false)
+
+  const hasVersions = versionHistory && versionHistory.length > 1
 
   // Update content when SOP loads/changes (handles async Convex data)
   useEffect(() => {
@@ -48,6 +61,7 @@ export default function SOPPreviewPage() {
   const handleCopyMarkdown = async () => {
     await navigator.clipboard.writeText(content)
     setCopied(true)
+    toast.success("Copied to clipboard")
     setTimeout(() => setCopied(false), 2000)
   }
 
@@ -68,6 +82,7 @@ export default function SOPPreviewPage() {
       updateSOP(sop.id, { status: "complete", content })
     }
 
+    toast.success("SOP approved & saved to Library")
     router.push("/library")
   }
 
@@ -88,8 +103,18 @@ export default function SOPPreviewPage() {
           <ArrowLeft className="w-5 h-5" />
           <span className="hidden sm:inline text-sm font-medium">Back</span>
         </button>
-        <h1 className="text-lg font-semibold text-slate-900">Your Generated SOP</h1>
-        <DownloadMenu content={content} title={sop?.title || "SOP"} tier={userTier} />
+        <div className="flex items-center gap-2">
+          <h1 className="text-lg font-semibold text-slate-900">Your Generated SOP</h1>
+          {sop?.version && (
+            <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-slate-100 text-slate-600 border border-slate-200 uppercase">
+              v{sop.version}
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <SharePopover sopId={sop?.id || ""} existingToken={sop?.shareToken} />
+          <DownloadMenu content={content} title={sop?.title || "SOP"} tier={userTier} sopId={sop?.id} />
+        </div>
       </header>
 
       <main className="max-w-4xl mx-auto px-3 sm:px-6 py-4 sm:py-8">
@@ -194,6 +219,81 @@ export default function SOPPreviewPage() {
               </>
             )}
           </Button>
+        </div>
+
+        {/* Version History Section */}
+        {hasVersions && (
+          <div className="mt-6 bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+            <button
+              onClick={() => setShowVersions(!showVersions)}
+              className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-slate-50 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <History className="w-4 h-4 text-slate-500" />
+                <span className="text-sm font-medium text-slate-700">Version History</span>
+                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500">
+                  {versionHistory!.length}
+                </span>
+              </div>
+              <ChevronDown className={cn("w-4 h-4 text-slate-400 transition-transform", showVersions && "rotate-180")} />
+            </button>
+            {showVersions && (
+              <div className="border-t border-slate-100 divide-y divide-slate-50">
+                {versionHistory!.map((v: any) => {
+                  const isCurrent = String(v._id) === sop?.id
+                  return (
+                    <Link
+                      key={String(v._id)}
+                      href={`/preview/${String(v._id)}`}
+                      className={cn(
+                        "flex items-center justify-between px-5 py-3 text-sm transition-colors",
+                        isCurrent
+                          ? "bg-blue-50/50 border-l-2 border-blue-500"
+                          : "hover:bg-slate-50"
+                      )}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <span className={cn(
+                          "px-1.5 py-0.5 text-[10px] font-bold rounded uppercase",
+                          isCurrent ? "bg-blue-100 text-blue-700" : "bg-slate-100 text-slate-500"
+                        )}>
+                          v{v.version ?? 1}
+                        </span>
+                        <span className={cn("font-medium", isCurrent ? "text-blue-700" : "text-slate-700")}>
+                          {v.title}
+                        </span>
+                        {isCurrent && (
+                          <span className="text-[10px] text-blue-500 font-medium">Current</span>
+                        )}
+                      </div>
+                      <span className="text-xs text-slate-400">
+                        {new Date(v.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                      </span>
+                    </Link>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Activity Section */}
+        <div className="mt-6 bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+          <button
+            onClick={() => setShowActivity(!showActivity)}
+            className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-slate-50 transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-slate-500" />
+              <span className="text-sm font-medium text-slate-700">Activity</span>
+            </div>
+            <ChevronDown className={cn("w-4 h-4 text-slate-400 transition-transform", showActivity && "rotate-180")} />
+          </button>
+          {showActivity && (
+            <div className="px-5 pb-4 border-t border-slate-100 pt-3">
+              <ActivityTimeline limit={15} compact />
+            </div>
+          )}
         </div>
       </main>
 

@@ -112,44 +112,47 @@ function renderFormattedText(
 // -----------------------------------------------------------------------------
 
 /**
- * Applies a very subtle watermark on the first page only.
+ * Applies a custom watermark on the first page only.
  * Uses an extremely transparent color so it never obscures content.
- * Includes a small footer upsell line.
+ * Includes a small footer line.
  */
-function applyWatermark(pdf: jsPDF): void {
-    // Only apply to the first page
-    pdf.setPage(1);
+function applyWatermark(pdf: jsPDF, watermarkText: string): void {
+    const pageCount = pdf.getNumberOfPages();
 
-    // --- Tiled watermark pattern (very transparent) ---
-    const tileSpacingX = 70;
-    const tileSpacingY = 50;
-
-    pdf.setFontSize(22);
-    pdf.setTextColor(242, 242, 242); // Extremely faint — won't obscure content
-    pdf.setFont('helvetica', 'bold');
+    // --- Tiled watermark pattern (extremely transparent) ---
+    const tileSpacingX = 90;
+    const tileSpacingY = 70;
 
     const cols = Math.ceil(PAGE_WIDTH / tileSpacingX) + 2;
     const rows = Math.ceil(PAGE_HEIGHT / tileSpacingY) + 2;
 
-    for (let row = -1; row < rows; row++) {
-        for (let col = -1; col < cols; col++) {
-            const offsetX = (row % 2) * (tileSpacingX / 2);
-            const px = col * tileSpacingX + offsetX;
-            const py = row * tileSpacingY;
-            pdf.text('STEPEASE', px, py, { angle: -35 });
-        }
-    }
+    for (let page = 1; page <= pageCount; page++) {
+        pdf.setPage(page);
 
-    // --- Subtle footer upsell ---
-    pdf.setFontSize(7);
-    pdf.setTextColor(195, 195, 195);
-    pdf.setFont('helvetica', 'normal');
-    pdf.text(
-        'Generated with StepEase \u00B7 Upgrade to Pro for clean exports \u00B7 stepease.pro',
-        PAGE_WIDTH / 2,
-        PAGE_HEIGHT - 8,
-        { align: 'center' }
-    );
+        pdf.setFontSize(14);
+        pdf.setTextColor(248, 248, 248); // Extremely faint
+        pdf.setFont('helvetica', 'normal');
+
+        for (let row = -1; row < rows; row++) {
+            for (let col = -1; col < cols; col++) {
+                const offsetX = (row % 2) * (tileSpacingX / 2);
+                const px = col * tileSpacingX + offsetX;
+                const py = row * tileSpacingY;
+                pdf.text(watermarkText.toUpperCase(), px, py, { angle: -35 });
+            }
+        }
+
+        // --- Subtle footer ---
+        pdf.setFontSize(7);
+        pdf.setTextColor(210, 210, 210);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(
+            `Generated with StepEase · Custom branded by ${watermarkText} · stepease.pro`,
+            PAGE_WIDTH / 2,
+            PAGE_HEIGHT - 8,
+            { align: 'center' }
+        );
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -369,7 +372,7 @@ function renderCodeBlock(
 export async function generatePDF(
     markdown: string,
     filename: string,
-    addWatermark: boolean = false
+    watermarkText?: string
 ): Promise<void> {
     const pdf = new jsPDF('p', 'mm', 'a4');
     let y = MARGIN;
@@ -381,6 +384,11 @@ export async function generatePDF(
             y = MARGIN;
         }
     };
+
+    // Apply watermark FIRST so it renders behind content
+    if (watermarkText) {
+        applyWatermark(pdf, watermarkText);
+    }
 
     for (const section of sections) {
         switch (section.type) {
@@ -411,11 +419,5 @@ export async function generatePDF(
                 break;
         }
     }
-
-    // Apply watermark after all content is rendered (Starter tier)
-    if (addWatermark) {
-        applyWatermark(pdf);
-    }
-
     pdf.save(`${filename}.pdf`);
 }

@@ -173,6 +173,9 @@ export interface SOP {
     notes: Note[]
     chatHistory: ChatMessage[]
     sessionId?: string // Link back to original session for draft SOPs
+    version?: number          // 1, 2, 3...
+    parentSopId?: string      // Points to root (v1) SOP ID
+    shareToken?: string       // Random token for public share link
 }
 
 // -----------------------------------------------------------------------------

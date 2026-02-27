@@ -4,12 +4,15 @@ import { useState } from "react"
 import { Download, FileText, FileIcon, FileCode, Clipboard, Check, ChevronDown, Lock, Crown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { toast } from "sonner"
 import {
   generatePDF,
   generateDOCX,
   generateHTML,
   generateMarkdown,
 } from "@/lib/download"
+import { useQuery, useMutation } from "convex/react"
+import { api } from "@/convex/_generated/api"
 
 type UserTier = "free" | "starter" | "pro"
 
@@ -17,14 +20,19 @@ interface DownloadMenuProps {
   content: string
   title: string
   tier?: UserTier
+  sopId?: string
 }
 
-export function DownloadMenu({ content, title, tier = "free" }: DownloadMenuProps) {
+export function DownloadMenu({ content, title, tier = "free", sopId }: DownloadMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const [downloading, setDownloading] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [showUpgradeHint, setShowUpgradeHint] = useState<string | null>(null)
+
+  // Fetch watermark settings for Pro users
+  const watermarkSettings = useQuery(api.users.getWatermarkSettings)
+  const logActivity = useMutation(api.activity.log)
 
   // Define which formats are available per tier
   const tierAccess = {
@@ -61,9 +69,11 @@ export function DownloadMenu({ content, title, tier = "free" }: DownloadMenuProp
           break
 
         case "pdf":
-          // Add watermark for Starter tier
-          const addWatermark = tier === "starter"
-          await generatePDF(content, safeTitle, addWatermark)
+          // Pro users with watermark enabled get custom watermark text
+          const watermarkText = (tier === "pro" && watermarkSettings?.watermarkEnabled && watermarkSettings?.customWatermark)
+            ? watermarkSettings.customWatermark
+            : undefined
+          await generatePDF(content, safeTitle, watermarkText)
           break
 
         case "docx":
@@ -75,6 +85,15 @@ export function DownloadMenu({ content, title, tier = "free" }: DownloadMenuProp
       }
 
       setIsOpen(false)
+      toast.success(`${format.toUpperCase()} downloaded successfully`)
+
+      // Log export activity
+      logActivity({
+        action: "exported",
+        sopId: sopId,
+        sopTitle: title,
+        details: `Exported as ${format.toUpperCase()}`,
+      }).catch(console.error)
     } catch (err) {
       console.error(`Download failed for ${format}:`, err)
       setError(`Failed to generate ${format.toUpperCase()}. Please try again.`)
@@ -92,7 +111,7 @@ export function DownloadMenu({ content, title, tier = "free" }: DownloadMenuProp
 
   const options = [
     { id: "markdown", label: "Markdown (.md)", icon: FileText },
-    { id: "pdf", label: tier === "starter" ? "PDF (watermarked)" : "PDF Document", icon: FileIcon },
+    { id: "pdf", label: "PDF Document", icon: FileIcon },
     { id: "docx", label: "Word (.docx)", icon: FileText },
     { id: "html", label: "HTML File", icon: FileCode },
   ]

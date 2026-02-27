@@ -216,6 +216,15 @@ export const approve = mutation({
             approvedAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
         });
+
+        // Log activity
+        await ctx.db.insert("activity_log", {
+            userId: identity.subject,
+            action: "approved",
+            sopTitle: session.title,
+            details: "Approved SOP",
+            timestamp: new Date().toISOString(),
+        });
     },
 });
 
@@ -239,6 +248,15 @@ export const reopen = mutation({
             status: "active",
             revisionCount: (session.revisionCount || 0) + 1,
             updatedAt: new Date().toISOString(),
+        });
+
+        // Log activity
+        await ctx.db.insert("activity_log", {
+            userId: identity.subject,
+            action: "revised",
+            sopTitle: session.title,
+            details: `Revision #${(session.revisionCount || 0) + 1}`,
+            timestamp: new Date().toISOString(),
         });
     },
 });

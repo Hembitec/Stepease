@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as activity from "../activity.js";
 import type * as cleanup from "../cleanup.js";
 import type * as migrations from "../migrations.js";
 import type * as sessions from "../sessions.js";
@@ -21,6 +22,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  activity: typeof activity;
   cleanup: typeof cleanup;
   migrations: typeof migrations;
   sessions: typeof sessions;

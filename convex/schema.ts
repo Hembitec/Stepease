@@ -43,6 +43,10 @@ export default defineSchema({
         sopsCreatedThisMonth: v.number(),
         improvesUsedThisMonth: v.number(),
         usageResetAt: v.string(), // ISO date for monthly reset
+
+        // PDF Branding (Pro tier)
+        customWatermark: v.optional(v.string()),
+        watermarkEnabled: v.optional(v.boolean()),
     })
         .index("by_clerk_id", ["clerkId"])
         .index("by_flw_customer", ["flwCustomerId"]),
@@ -59,7 +63,17 @@ export default defineSchema({
         sessionId: v.optional(v.string()), // Link back to original session for draft SOPs
         updatedAt: v.string(),
         createdAt: v.string(),
-    }).index("by_user", ["userId"]),
+
+        // Version History
+        version: v.optional(v.number()),        // 1, 2, 3...
+        parentSopId: v.optional(v.string()),     // Points to root (v1) SOP ID
+
+        // Sharing
+        shareToken: v.optional(v.string()),      // Random token for public read-only link
+    })
+        .index("by_user", ["userId"])
+        .index("by_parent", ["parentSopId"])
+        .index("by_share_token", ["shareToken"]),
 
     // Table for Active Sessions (Drafts / AI Workflows)
     sessions: defineTable({
@@ -80,4 +94,16 @@ export default defineSchema({
         updatedAt: v.string(),
         createdAt: v.string(),
     }).index("by_user", ["userId"]),
+
+    // Activity/Audit Log — tracks user actions across the app
+    activity_log: defineTable({
+        userId: v.string(),
+        action: v.string(),         // 'created' | 'approved' | 'revised' | 'exported' | 'shared' | 'archived' | 'deleted'
+        sopId: v.optional(v.string()),
+        sopTitle: v.optional(v.string()),
+        details: v.optional(v.string()), // Extra context, e.g. "Exported as PDF"
+        timestamp: v.string(),
+    })
+        .index("by_user", ["userId"])
+        .index("by_sop", ["sopId"]),
 });

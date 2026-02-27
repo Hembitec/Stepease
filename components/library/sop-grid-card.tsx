@@ -48,6 +48,11 @@ export function SOPGridCard({ sop }: SOPGridCardProps) {
         <span className={cn("px-2 py-0.5 text-xs font-medium rounded-full capitalize", statusColors[sop.status])}>
           {sop.status}
         </span>
+        {sop.version && sop.version > 1 && (
+          <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-slate-100 text-slate-600 border border-slate-200 uppercase">
+            v{sop.version}
+          </span>
+        )}
       </div>
       <p className="text-xs text-slate-400 mb-4">Updated {formatDate(sop.updatedAt)}</p>
 

@@ -1,10 +1,11 @@
 "use client"
 
 import Link from "next/link"
-import { FileText, MoreVertical, Download, Trash2, Archive, Eye, Pencil, RefreshCw } from "lucide-react"
+import { FileText, MoreVertical, Download, Trash2, Archive, ArchiveRestore, Eye, Pencil, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
+import { formatRelativeDate } from "@/lib/format-date"
 import type { SOP } from "@/lib/types"
 
 interface SOPListItemProps {
@@ -12,53 +13,73 @@ interface SOPListItemProps {
   onDelete: (id: string) => void
   onArchive: (id: string) => void
   onRevise?: (sessionId: string) => void
+  isHistory?: boolean
+  hasHistory?: boolean
+  isHistoryExpanded?: boolean
+  onToggleHistory?: () => void
 }
 
-export function SOPListItem({ sop, onDelete, onArchive, onRevise }: SOPListItemProps) {
+export function SOPListItem({
+  sop, onDelete, onArchive, onRevise,
+  isHistory, hasHistory, isHistoryExpanded, onToggleHistory
+}: SOPListItemProps) {
   const statusColors = {
     draft: "bg-yellow-100 text-yellow-700",
     complete: "bg-green-100 text-green-700",
     archived: "bg-slate-100 text-slate-600",
   }
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffMs = now.getTime() - date.getTime()
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-
-    if (diffHours < 1) return "Just now"
-    if (diffHours < 24) return `${diffHours}h ago`
-    if (diffDays === 1) return "Yesterday"
-    if (diffDays < 7) return `${diffDays}d ago`
-    // Use explicit locale to prevent hydration mismatch
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    }).format(date)
-  }
-
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-4 hover:shadow-md hover:border-slate-300 transition-all flex items-center gap-4">
+    <div className={cn(
+      "bg-white border p-4 transition-all flex items-center gap-4",
+      isHistory
+        ? "border-slate-100 rounded-lg bg-slate-50/50 shadow-none ml-12 hover:bg-slate-50 relative before:absolute before:left-[-24px] before:top-1/2 before:w-4 before:h-px before:bg-slate-200 after:absolute after:left-[-24px] after:top-[-100%] after:h-[150%] after:w-px after:bg-slate-200 first:after:top-[-20px] first:after:h-[calc(50%+20px)]"
+        : "border-slate-200 rounded-xl hover:shadow-md hover:border-slate-300 relative z-10"
+    )}>
       {/* Icon */}
-      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-        <FileText className="w-5 h-5 text-blue-600" />
+      <div className={cn(
+        "bg-blue-100 flex items-center justify-center flex-shrink-0",
+        isHistory ? "w-8 h-8 rounded shrink-0" : "w-10 h-10 rounded-lg"
+      )}>
+        <FileText className={cn("text-blue-600", isHistory ? "w-4 h-4" : "w-5 h-5")} />
       </div>
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <h4 className="font-semibold text-slate-900 truncate">{sop.title}</h4>
+        <div className="flex items-center gap-2">
+          <h4 className={cn("font-semibold text-slate-900 truncate", isHistory && "text-sm")}>{sop.title}</h4>
+          {hasHistory && (
+            <button
+              onClick={onToggleHistory}
+              className="flex justify-center items-center w-5 h-5 rounded-full hover:bg-slate-100 text-slate-400 transition-colors"
+              title="View version history"
+            >
+              <svg
+                className={cn("w-3.5 h-3.5 transition-transform", isHistoryExpanded && "rotate-180")}
+                fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          )}
+        </div>
         <div className="flex items-center gap-2 text-sm text-slate-500 mt-0.5">
           <span>{sop.department || "General"}</span>
           <span>&middot;</span>
-          <span>Updated {formatDate(sop.updatedAt)}</span>
+          <span>Updated {formatRelativeDate(sop.updatedAt)}</span>
           <span>&middot;</span>
           <span className={cn("px-2 py-0.5 text-xs font-medium rounded-full capitalize", statusColors[sop.status])}>
             {sop.status}
           </span>
+          {sop.version && (
+            <>
+              <span>&middot;</span>
+              <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-slate-100 text-slate-600 border border-slate-200 uppercase">
+                v{sop.version}
+              </span>
+            </>
+          )}
         </div>
       </div>
 
@@ -70,7 +91,7 @@ export function SOPListItem({ sop, onDelete, onArchive, onRevise }: SOPListItemP
             : `/preview/${sop.id}`
         }>
           <Button variant="outline" size="sm" className="gap-1.5 bg-transparent">
-            {sop.status === "draft" ? (
+            {sop.status === "draft" && !isHistory ? (
               <>
                 <Pencil className="w-4 h-4" />
                 Continue
@@ -101,8 +122,11 @@ export function SOPListItem({ sop, onDelete, onArchive, onRevise }: SOPListItemP
               </DropdownMenuItem>
             )}
             <DropdownMenuItem onClick={() => onArchive(sop.id)}>
-              <Archive className="w-4 h-4 mr-2" />
-              Archive
+              {sop.status === "archived" ? (
+                <><ArchiveRestore className="w-4 h-4 mr-2" />Unarchive</>
+              ) : (
+                <><Archive className="w-4 h-4 mr-2" />Archive</>
+              )}
             </DropdownMenuItem>
             <DropdownMenuItem className="text-red-600" onClick={() => onDelete(sop.id)}>
               <Trash2 className="w-4 h-4 mr-2" />

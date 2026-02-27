@@ -421,3 +421,57 @@ const getOrCreateUserForIncrement = async (ctx: any, identity: any) => {
     return user;
 };
 
+// =============================================================================
+// PDF Branding (Pro Tier)
+// =============================================================================
+
+/**
+ * Get watermark settings for the current user
+ */
+export const getWatermarkSettings = query({
+    args: {},
+    handler: async (ctx) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) return null;
+
+        const user = await ctx.db
+            .query("users")
+            .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+            .first();
+
+        if (!user) return null;
+
+        return {
+            customWatermark: user.customWatermark ?? "",
+            watermarkEnabled: user.watermarkEnabled ?? false,
+            tier: user.tier,
+        };
+    },
+});
+
+/**
+ * Update watermark settings (Pro tier only)
+ */
+export const updateWatermarkSettings = mutation({
+    args: {
+        customWatermark: v.string(),
+        watermarkEnabled: v.boolean(),
+    },
+    handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) throw new Error("Not authenticated");
+
+        const user = await ctx.db
+            .query("users")
+            .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+            .first();
+
+        if (!user) throw new Error("User not found");
+        if (user.tier !== "pro") throw new Error("Watermark branding is a Pro feature");
+
+        await ctx.db.patch(user._id, {
+            customWatermark: args.customWatermark,
+            watermarkEnabled: args.watermarkEnabled,
+        });
+    },
+});

@@ -13,7 +13,10 @@
 import { useState, useRef, useEffect, useCallback, useMemo, Suspense } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
+import { toast } from "sonner"
 import { experimental_useObject as useObject } from "@ai-sdk/react"
+import { TemplatePicker } from "@/components/sop/template-picker"
+import type { SOPTemplate } from "@/lib/sop-templates"
 import { ArrowLeft, Save, FileEdit, MessageSquare, Bot, User, Send, PanelRightClose, PanelRightOpen, Lock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { NotesPanel } from "@/components/notes/notes-panel"
@@ -113,7 +116,7 @@ function CreateSOPInner() {
 
   // Context
   const {
-    addSOP, session, activeSessionId,
+    addSOP, sops, session, activeSessionId,
     startNewSession, resumeSession,
     addSessionMessage, addSessionNotes,
     setSessionPhase, updateSessionTitle,
@@ -135,6 +138,9 @@ function CreateSOPInner() {
   const [isNotesCollapsed, setIsNotesCollapsed] = useState(false)
   const [improvementStatus, setImprovementStatus] = useState<Record<string, ImprovementStatus>>({})
   const [dataLoaded, setDataLoaded] = useState(false)
+  const [showTemplatePicker, setShowTemplatePicker] = useState(
+    !sessionIdFromUrl && !isImprovementMode
+  )
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -332,9 +338,18 @@ function CreateSOPInner() {
   // ---------------------------------------------------------------------------
 
   const handleSaveDraft = useCallback(() => {
+    // Check if this is a revision — find existing SOP with same sessionId
+    const existingSop = sops.find(s => s.sessionId === session?.id && s.status === 'complete')
+    const parentId = existingSop?.parentSopId || existingSop?.id
+    const currentMaxVersion = parentId
+      ? Math.max(...sops.filter(s => s.parentSopId === parentId || s.id === parentId).map(s => s.version ?? 1))
+      : 0
+    const nextVersion = parentId ? currentMaxVersion + 1 : 1
+    const titleBase = (session?.title || "New SOP Draft").replace(/\s*—\s*v\d+$/, '')
+
     const newSOP: SOP = {
       id: `sop-${Date.now()}`,
-      title: session?.title || "New SOP Draft",
+      title: nextVersion > 1 ? `${titleBase} — v${nextVersion}` : titleBase,
       department: "General",
       status: "draft",
       createdAt: new Date().toISOString(),
@@ -343,16 +358,28 @@ function CreateSOPInner() {
       notes,
       chatHistory,
       sessionId: session?.id,
+      version: nextVersion,
+      parentSopId: parentId,
     }
     addSOP(newSOP)
+    toast.success("Draft saved successfully")
     router.push("/dashboard")
-  }, [notes, chatHistory, addSOP, router, session?.id, session?.title])
+  }, [notes, chatHistory, addSOP, router, session?.id, session?.title, sops])
 
   const handleReview = useCallback(() => {
+    // Check if this is a revision — find existing SOP with same sessionId
+    const existingSop = sops.find(s => s.sessionId === session?.id && s.status === 'complete')
+    const parentId = existingSop?.parentSopId || existingSop?.id
+    const currentMaxVersion = parentId
+      ? Math.max(...sops.filter(s => s.parentSopId === parentId || s.id === parentId).map(s => s.version ?? 1))
+      : 0
+    const nextVersion = parentId ? currentMaxVersion + 1 : 1
+    const titleBase = (session?.title || "New SOP").replace(/\s*—\s*v\d+$/, '')
+
     const sopId = `sop-${Date.now()}`
     const newSOP: SOP = {
       id: sopId,
-      title: session?.title || "New SOP",
+      title: nextVersion > 1 ? `${titleBase} — v${nextVersion}` : titleBase,
       department: "General",
       status: "draft",
       createdAt: new Date().toISOString(),
@@ -361,13 +388,45 @@ function CreateSOPInner() {
       notes,
       chatHistory,
       sessionId: session?.id,
+      version: nextVersion,
+      parentSopId: parentId,
     }
     addSOP(newSOP)
+    toast.success("SOP ready for review")
     router.push(`/review/${sopId}`)
-  }, [notes, chatHistory, addSOP, router, session?.id, session?.title])
+  }, [notes, chatHistory, addSOP, router, session?.id, session?.title, sops])
 
   const handleDeleteNote = useCallback((id: string) => {
     setNotes((prev) => prev.filter((n) => n.id !== id))
+  }, [])
+
+  // Template selection handler
+  const handleTemplateSelect = useCallback(async (template: SOPTemplate) => {
+    setShowTemplatePicker(false)
+    // Set the session title to the suggested title
+    if (template.suggestedTitle) {
+      updateSessionTitle(template.suggestedTitle)
+    }
+    // Add a template-specific AI greeting so it persists in chatHistory
+    const greetingMessage: ChatMessage = {
+      id: generateId("msg"),
+      role: "ai",
+      content: `Great choice! I'll help you create a ${template.title}. Let me guide you through the key sections.\n\nTo get started, I'll need some details about your specific process. Let's begin!`,
+      timestamp: new Date().toISOString(),
+    }
+    setChatHistory([greetingMessage])
+    addSessionMessage(greetingMessage)
+    // Auto-send the starter prompt as the user's first message
+    setInputValue(template.starterPrompt)
+    // Small delay to let state settle, then trigger send  
+    setTimeout(() => {
+      const submitBtn = document.getElementById('chat-send-btn')
+      if (submitBtn) submitBtn.click()
+    }, 200)
+  }, [updateSessionTitle, addSessionMessage])
+
+  const handleTemplateSkip = useCallback(() => {
+    setShowTemplatePicker(false)
   }, [])
 
   // Track improvement status when notes change
@@ -405,180 +464,190 @@ function CreateSOPInner() {
   return (
     <DashboardLayout fullHeight>
       <div className="h-full flex flex-col">
-        {/* Header */}
-        <header className="bg-white border-b border-slate-200 px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between flex-shrink-0">
-          <div className="flex items-center gap-4">
-            <Link
-              href="/dashboard"
-              className="text-slate-500 hover:text-slate-700 flex items-center gap-2 transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span className="hidden sm:inline">Back to Dashboard</span>
-            </Link>
+        {/* Template Picker (shown only for new sessions) */}
+        {showTemplatePicker ? (
+          <div className="flex-1 overflow-y-auto">
+            <TemplatePicker onSelect={handleTemplateSelect} onSkip={handleTemplateSkip} />
           </div>
+        ) : (
+          <>
+            {/* Header */}
+            <header className="bg-white border-b border-slate-200 px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between flex-shrink-0">
+              <div className="flex items-center gap-4">
+                <Link
+                  href="/dashboard"
+                  className="text-slate-500 hover:text-slate-700 flex items-center gap-2 transition-colors"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                  <span className="hidden sm:inline">Back to Dashboard</span>
+                </Link>
+              </div>
 
-          <div className="flex items-center gap-3">
-            <h1 className="text-lg font-semibold text-slate-900 hidden sm:block">Creating New SOP</h1>
-            <PhaseBadge phase={currentPhase} progress={progress} />
-          </div>
+              <div className="flex items-center gap-3">
+                <h1 className="text-lg font-semibold text-slate-900 hidden sm:block">Creating New SOP</h1>
+                <PhaseBadge phase={currentPhase} progress={progress} />
+              </div>
 
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsNotesCollapsed(!isNotesCollapsed)}
-              className="hidden lg:flex"
-              title={isNotesCollapsed ? "Show Notes Panel" : "Hide Notes Panel"}
-            >
-              {isNotesCollapsed ? (
-                <PanelRightOpen className="w-5 h-5" />
-              ) : (
-                <PanelRightClose className="w-5 h-5" />
-              )}
-            </Button>
-            <Button variant="outline" onClick={handleSaveDraft} className="gap-2 bg-white">
-              <Save className="w-4 h-4" />
-              <span className="hidden sm:inline">Save Draft</span>
-            </Button>
-          </div>
-        </header>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsNotesCollapsed(!isNotesCollapsed)}
+                  className="hidden lg:flex"
+                  title={isNotesCollapsed ? "Show Notes Panel" : "Hide Notes Panel"}
+                >
+                  {isNotesCollapsed ? (
+                    <PanelRightOpen className="w-5 h-5" />
+                  ) : (
+                    <PanelRightClose className="w-5 h-5" />
+                  )}
+                </Button>
+                <Button variant="outline" onClick={handleSaveDraft} className="gap-2 bg-white">
+                  <Save className="w-4 h-4" />
+                  <span className="hidden sm:inline">Save Draft</span>
+                </Button>
+              </div>
+            </header>
 
-        {/* Mobile Tab Navigation */}
-        <div className="lg:hidden flex border-b border-slate-200 bg-white flex-shrink-0">
-          <button
-            onClick={() => setActiveTab("chat")}
-            className={cn(
-              "flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 transition-colors",
-              activeTab === "chat"
-                ? "text-blue-600 border-b-2 border-blue-600"
-                : "text-slate-500 hover:text-slate-700"
-            )}
-          >
-            <MessageSquare className="w-4 h-4" />
-            Chat
-          </button>
-          <button
-            onClick={() => setActiveTab("notes")}
-            className={cn(
-              "flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 transition-colors",
-              activeTab === "notes"
-                ? "text-blue-600 border-b-2 border-blue-600"
-                : "text-slate-500 hover:text-slate-700"
-            )}
-          >
-            <FileEdit className="w-4 h-4" />
-            Notes ({notes.length})
-          </button>
-        </div>
-
-        {/* Main Content */}
-        <div className="flex-1 flex overflow-hidden">
-          {/* Chat Area */}
-          <div
-            className={cn(
-              "flex-1 flex flex-col bg-white",
-              activeTab === "notes" ? "hidden lg:flex" : "flex",
-              !isNotesCollapsed && "lg:border-r border-slate-200"
-            )}
-          >
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 lg:p-6">
-              {/* Initial greeting — only when chat is empty */}
-              {chatHistory.length === 0 && (
-                <MessageBubble role="assistant" content={initialGreeting} />
-              )}
-
-              {chatHistory.map((message, index) => (
-                <MessageBubble
-                  key={message.id || `msg-${index}`}
-                  role={message.role === "ai" ? "assistant" : "user"}
-                  content={message.content}
-                />
-              ))}
-
-              {isLoading && object && object.message && (
-                <MessageBubble role="assistant" content={object.message} />
-              )}
-
-              {isLoading && !object?.message && <TypingIndicator />}
-
-              <div ref={messagesEndRef} />
+            {/* Mobile Tab Navigation */}
+            <div className="lg:hidden flex border-b border-slate-200 bg-white flex-shrink-0">
+              <button
+                onClick={() => setActiveTab("chat")}
+                className={cn(
+                  "flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 transition-colors",
+                  activeTab === "chat"
+                    ? "text-blue-600 border-b-2 border-blue-600"
+                    : "text-slate-500 hover:text-slate-700"
+                )}
+              >
+                <MessageSquare className="w-4 h-4" />
+                Chat
+              </button>
+              <button
+                onClick={() => setActiveTab("notes")}
+                className={cn(
+                  "flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 transition-colors",
+                  activeTab === "notes"
+                    ? "text-blue-600 border-b-2 border-blue-600"
+                    : "text-slate-500 hover:text-slate-700"
+                )}
+              >
+                <FileEdit className="w-4 h-4" />
+                Notes ({notes.length})
+              </button>
             </div>
 
-            {/* Input */}
-            <div className="border-t border-slate-200/80 bg-gradient-to-t from-slate-50/80 to-white p-3 sm:p-4 flex-shrink-0">
-              <div className="relative flex items-end gap-2 bg-white border border-slate-200 rounded-2xl shadow-sm focus-within:border-blue-400 focus-within:shadow-[0_0_0_3px_rgba(59,130,246,0.1)] transition-all duration-200">
-                <textarea
-                  value={inputValue}
-                  onChange={(e) => {
-                    setInputValue(e.target.value)
-                    // Auto-resize
-                    const target = e.target
-                    target.style.height = 'auto'
-                    target.style.height = `${Math.min(target.scrollHeight, 150)}px`
-                  }}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Describe your process or answer the question..."
-                  disabled={isLoading}
-                  className="flex-1 resize-none bg-transparent border-0 px-4 py-3.5 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-0 disabled:opacity-50 min-h-[48px] max-h-[150px] leading-relaxed"
-                  rows={1}
-                />
-                <div className="flex items-center gap-1.5 pr-2 pb-2.5">
-                  {!inputValue.trim() && !isLoading && (
-                    <span className="text-[11px] text-slate-300 hidden sm:inline whitespace-nowrap mr-1">
-                      Enter ↵
-                    </span>
+            {/* Main Content */}
+            <div className="flex-1 flex overflow-hidden">
+              {/* Chat Area */}
+              <div
+                className={cn(
+                  "flex-1 flex flex-col bg-white",
+                  activeTab === "notes" ? "hidden lg:flex" : "flex",
+                  !isNotesCollapsed && "lg:border-r border-slate-200"
+                )}
+              >
+                {/* Messages */}
+                <div className="flex-1 overflow-y-auto p-4 lg:p-6">
+                  {/* Initial greeting — only when chat is empty */}
+                  {chatHistory.length === 0 && (
+                    <MessageBubble role="assistant" content={initialGreeting} />
                   )}
-                  <button
-                    onClick={handleSendMessage}
-                    disabled={!inputValue.trim() || isLoading}
-                    className={cn(
-                      "flex items-center justify-center w-9 h-9 rounded-xl transition-all duration-200",
-                      inputValue.trim() && !isLoading
-                        ? "bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/25 hover:shadow-lg hover:shadow-blue-600/30 scale-100 hover:scale-105"
-                        : "bg-slate-100 text-slate-400 cursor-not-allowed"
-                    )}
-                  >
-                    <Send className={cn("w-4 h-4 transition-transform duration-200", inputValue.trim() && !isLoading && "-rotate-45")} />
-                  </button>
+
+                  {chatHistory.map((message, index) => (
+                    <MessageBubble
+                      key={message.id || `msg-${index}`}
+                      role={message.role === "ai" ? "assistant" : "user"}
+                      content={message.content}
+                    />
+                  ))}
+
+                  {isLoading && object && object.message && (
+                    <MessageBubble role="assistant" content={object.message} />
+                  )}
+
+                  {isLoading && !object?.message && <TypingIndicator />}
+
+                  <div ref={messagesEndRef} />
+                </div>
+
+                {/* Input */}
+                <div className="border-t border-slate-200/80 bg-gradient-to-t from-slate-50/80 to-white p-3 sm:p-4 flex-shrink-0">
+                  <div className="relative flex items-end gap-2 bg-white border border-slate-200 rounded-2xl shadow-sm focus-within:border-blue-400 focus-within:shadow-[0_0_0_3px_rgba(59,130,246,0.1)] transition-all duration-200">
+                    <textarea
+                      value={inputValue}
+                      onChange={(e) => {
+                        setInputValue(e.target.value)
+                        // Auto-resize
+                        const target = e.target
+                        target.style.height = 'auto'
+                        target.style.height = `${Math.min(target.scrollHeight, 150)}px`
+                      }}
+                      onKeyDown={handleKeyDown}
+                      placeholder="Describe your process or answer the question..."
+                      disabled={isLoading}
+                      className="flex-1 resize-none bg-transparent border-0 px-4 py-3.5 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-0 disabled:opacity-50 min-h-[48px] max-h-[150px] leading-relaxed"
+                      rows={1}
+                    />
+                    <div className="flex items-center gap-1.5 pr-2 pb-2.5">
+                      {!inputValue.trim() && !isLoading && (
+                        <span className="text-[11px] text-slate-300 hidden sm:inline whitespace-nowrap mr-1">
+                          Enter ↵
+                        </span>
+                      )}
+                      <button
+                        id="chat-send-btn"
+                        onClick={handleSendMessage}
+                        disabled={!inputValue.trim() || isLoading}
+                        className={cn(
+                          "flex items-center justify-center w-9 h-9 rounded-xl transition-all duration-200",
+                          inputValue.trim() && !isLoading
+                            ? "bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/25 hover:shadow-lg hover:shadow-blue-600/30 scale-100 hover:scale-105"
+                            : "bg-slate-100 text-slate-400 cursor-not-allowed"
+                        )}
+                      >
+                        <Send className={cn("w-4 h-4 transition-transform duration-200", inputValue.trim() && !isLoading && "-rotate-45")} />
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
+
+              {/* Notes Panel — Desktop */}
+              <div
+                className={cn(
+                  "hidden lg:flex flex-col transition-all duration-300",
+                  isNotesCollapsed ? "w-0 overflow-hidden" : "w-96"
+                )}
+              >
+                <NotesPanel
+                  notes={notes}
+                  onDeleteNote={handleDeleteNote}
+                  onReview={handleReview}
+                  progress={progress}
+                  phase={currentPhase}
+                  isImprovementMode={isImprovementMode}
+                  analysisResult={session?.metadata?.analysisResult}
+                  improvementStatus={improvementStatus}
+                />
+              </div>
+
+              {/* Notes Panel — Mobile */}
+              <div className={cn("flex-1 lg:hidden", activeTab === "chat" ? "hidden" : "flex flex-col")}>
+                <NotesPanel
+                  notes={notes}
+                  onDeleteNote={handleDeleteNote}
+                  onReview={handleReview}
+                  progress={progress}
+                  phase={currentPhase}
+                  isImprovementMode={isImprovementMode}
+                  analysisResult={session?.metadata?.analysisResult}
+                  improvementStatus={improvementStatus}
+                />
+              </div>
             </div>
-          </div>
-
-          {/* Notes Panel — Desktop */}
-          <div
-            className={cn(
-              "hidden lg:flex flex-col transition-all duration-300",
-              isNotesCollapsed ? "w-0 overflow-hidden" : "w-96"
-            )}
-          >
-            <NotesPanel
-              notes={notes}
-              onDeleteNote={handleDeleteNote}
-              onReview={handleReview}
-              progress={progress}
-              phase={currentPhase}
-              isImprovementMode={isImprovementMode}
-              analysisResult={session?.metadata?.analysisResult}
-              improvementStatus={improvementStatus}
-            />
-          </div>
-
-          {/* Notes Panel — Mobile */}
-          <div className={cn("flex-1 lg:hidden", activeTab === "chat" ? "hidden" : "flex flex-col")}>
-            <NotesPanel
-              notes={notes}
-              onDeleteNote={handleDeleteNote}
-              onReview={handleReview}
-              progress={progress}
-              phase={currentPhase}
-              isImprovementMode={isImprovementMode}
-              analysisResult={session?.metadata?.analysisResult}
-              improvementStatus={improvementStatus}
-            />
-          </div>
-        </div>
+          </>
+        )}
       </div>
     </DashboardLayout>
   )

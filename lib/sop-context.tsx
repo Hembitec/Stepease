@@ -129,6 +129,9 @@ export function SOPProvider({ children }: { children: ReactNode }) {
     notes: s.notes as Note[],
     chatHistory: s.chatHistory as ChatMessage[],
     sessionId: s.sessionId, // Link back to original session
+    version: s.version,
+    parentSopId: s.parentSopId,
+    shareToken: s.shareToken,
   }))
 
   // Get current session from Convex if we have an activeSessionId
@@ -157,6 +160,8 @@ export function SOPProvider({ children }: { children: ReactNode }) {
         status: sop.status,
         content: sop.content,
         sessionId: sop.sessionId, // Link back to original session
+        version: sop.version,
+        parentSopId: sop.parentSopId,
         notes: sop.notes.map(n => ({
           id: n.id,
           category: n.category,

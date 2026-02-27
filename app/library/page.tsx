@@ -12,9 +12,11 @@ import { SOPTable } from "@/components/library/sop-table"
 import { useSOPContext } from "@/lib/sop-context"
 import { useSidebar } from "@/components/layout/sidebar-context"
 import { Search, Plus, List, LayoutGrid, Table, FileText, Clock, Sparkles, Upload, ArrowRight, Play, Menu } from "lucide-react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { LibrarySkeleton } from "@/components/skeletons"
+import type { SOP } from "@/lib/types"
 
 type ViewMode = "list" | "grid" | "table"
 type StatusFilter = "all" | "draft" | "complete" | "archived"
@@ -95,10 +97,20 @@ export default function LibraryPage() {
     if (showDeleteConfirm) {
       deleteSOP(showDeleteConfirm)
       setShowDeleteConfirm(null)
+      toast.success("SOP deleted")
     }
   }
 
-  const handleArchive = (id: string) => updateSOP(id, { status: "archived" })
+  const handleArchive = (id: string) => {
+    const sop = sops.find(s => s.id === id)
+    if (sop?.status === "archived") {
+      updateSOP(id, { status: "complete" })
+      toast.success("SOP restored")
+    } else {
+      updateSOP(id, { status: "archived" })
+      toast.success("SOP archived")
+    }
+  }
 
   const handleTableSort = (column: string) => {
     if (column === "title") setSortBy(sortBy === "a-z" ? "z-a" : "a-z")
@@ -109,6 +121,7 @@ export default function LibraryPage() {
   const handleRevise = async (sessionId: string) => {
     try {
       await reopenSession({ id: sessionId as any })
+      toast.info("Revision session started")
       router.push(`/create?session=${sessionId}`)
     } catch (e) {
       console.error("Failed to reopen session:", e)
@@ -344,6 +357,62 @@ interface CompletedViewProps {
   onTableSort: (col: string) => void
 }
 
+// =============================================================================
+// Version Group Component
+// =============================================================================
+
+function SOPVersionGroup({
+  sops,
+  onDelete,
+  onArchive,
+  onRevise,
+}: {
+  sops: SOP[]
+  onDelete: (id: string) => void
+  onArchive: (id: string) => void
+  onRevise?: (sessionId: string) => void
+}) {
+  const [isExpanded, setIsExpanded] = useState(false)
+
+  // Sort by version descending to get latest first
+  const sortedSops = [...sops].sort((a, b) => (b.version ?? 1) - (a.version ?? 1))
+  const latestSop = sortedSops[0]
+  const olderVersions = sortedSops.slice(1)
+  const hasHistory = olderVersions.length > 0
+
+  return (
+    <div className="space-y-1.5">
+      <SOPListItem
+        sop={latestSop}
+        onDelete={onDelete}
+        onArchive={onArchive}
+        onRevise={onRevise}
+        hasHistory={hasHistory}
+        isHistoryExpanded={isExpanded}
+        onToggleHistory={() => setIsExpanded(!isExpanded)}
+      />
+      {isExpanded && hasHistory && (
+        <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
+          {olderVersions.map((sop) => (
+            <SOPListItem
+              key={sop.id}
+              sop={sop}
+              onDelete={onDelete}
+              onArchive={onArchive}
+              onRevise={onRevise}
+              isHistory={true}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// =============================================================================
+// Completed View
+// =============================================================================
+
 function CompletedView({
   filteredSOPs, sops, statusCounts,
   searchQuery, setSearchQuery,
@@ -352,6 +421,39 @@ function CompletedView({
   viewMode, setViewMode,
   onDelete, onArchive, onRevise, onTableSort,
 }: CompletedViewProps) {
+  // Group SOPs by parentSopId
+  const groupedSOPs = useMemo(() => {
+    const parentMap = new Map<string, SOP[]>()
+
+    filteredSOPs.forEach(sop => {
+      const rootId = sop.parentSopId || sop.id
+      if (!parentMap.has(rootId)) {
+        parentMap.set(rootId, [])
+      }
+      parentMap.get(rootId)!.push(sop)
+    })
+
+    // Sort the groups based on the latest version in each group
+    const groups = Array.from(parentMap.values())
+
+    groups.sort((groupA, groupB) => {
+      const latestA = [...groupA].sort((a, b) => (b.version ?? 1) - (a.version ?? 1))[0]
+      const latestB = [...groupB].sort((a, b) => (b.version ?? 1) - (a.version ?? 1))[0]
+
+      if (sortBy === "recent") {
+        return new Date(latestB.updatedAt).getTime() - new Date(latestA.updatedAt).getTime()
+      }
+      if (sortBy === "a-z") return latestA.title.localeCompare(latestB.title)
+      if (sortBy === "z-a") return latestB.title.localeCompare(latestA.title)
+      if (sortBy === "department") {
+        return (latestA.department || "General").localeCompare(latestB.department || "General")
+      }
+      return 0
+    })
+
+    return groups
+  }, [filteredSOPs, sortBy])
+
   return (
     <>
       {/* Search & Filters */}
@@ -431,17 +533,26 @@ function CompletedView({
 
       {/* Results Count */}
       <p className="text-xs text-slate-400 mb-3">
-        Showing {filteredSOPs.length} of {sops.length} SOPs
+        Showing {groupedSOPs.length} documents ({filteredSOPs.length} total versions)
       </p>
 
       {/* Content */}
       {filteredSOPs.length > 0 ? (
         <>
           {viewMode === "list" && (
-            <div className="space-y-2">
-              {filteredSOPs.map((sop) => (
-                <SOPListItem key={sop.id} sop={sop} onDelete={onDelete} onArchive={onArchive} onRevise={onRevise} />
-              ))}
+            <div className="space-y-3">
+              {groupedSOPs.map((group) => {
+                const rootId = group[0].parentSopId || group[0].id
+                return (
+                  <SOPVersionGroup
+                    key={rootId}
+                    sops={group}
+                    onDelete={onDelete}
+                    onArchive={onArchive}
+                    onRevise={onRevise}
+                  />
+                )
+              })}
             </div>
           )}
 

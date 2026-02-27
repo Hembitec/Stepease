@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Familjen_Grotesk, Inter } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { ClerkProvider } from "@clerk/nextjs"
+import { Toaster } from "sonner"
 import { SOPProvider } from "@/lib/sop-context"
 import { SidebarProvider } from "@/components/layout/sidebar-context"
 import ConvexClientProvider from "@/components/ConvexClientProvider"
@@ -89,6 +90,7 @@ export default function RootLayout({
               </SidebarProvider>
             </SOPProvider>
             <Analytics />
+            <Toaster richColors position="top-right" />
           </ConvexClientProvider>
         </body>
       </html>

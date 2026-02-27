@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { MoreVertical, Download, Trash2, Archive, ArrowUpDown } from "lucide-react"
+import { MoreVertical, Download, Trash2, Archive, ArchiveRestore, ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
@@ -73,6 +73,9 @@ export function SOPTable({ sops, onDelete, onArchive, sortBy, onSort }: SOPTable
                   <ArrowUpDown className="w-3 h-3" />
                 </button>
               </th>
+              <th className="text-left px-4 py-3">
+                <span className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Version</span>
+              </th>
               <th className="text-right px-4 py-3">
                 <span className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Actions</span>
               </th>
@@ -98,6 +101,11 @@ export function SOPTable({ sops, onDelete, onArchive, sortBy, onSort }: SOPTable
                   </span>
                 </td>
                 <td className="px-4 py-3 text-sm text-slate-600">{formatDate(sop.updatedAt)}</td>
+                <td className="px-4 py-3">
+                  <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-slate-100 text-slate-600 border border-slate-200 uppercase">
+                    v{sop.version ?? 1}
+                  </span>
+                </td>
                 <td className="px-4 py-3 text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -111,8 +119,11 @@ export function SOPTable({ sops, onDelete, onArchive, sortBy, onSort }: SOPTable
                         Download
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => onArchive(sop.id)}>
-                        <Archive className="w-4 h-4 mr-2" />
-                        Archive
+                        {sop.status === "archived" ? (
+                          <><ArchiveRestore className="w-4 h-4 mr-2" />Unarchive</>
+                        ) : (
+                          <><Archive className="w-4 h-4 mr-2" />Archive</>
+                        )}
                       </DropdownMenuItem>
                       <DropdownMenuItem className="text-red-600" onClick={() => onDelete(sop.id)}>
                         <Trash2 className="w-4 h-4 mr-2" />

@@ -3,6 +3,7 @@ import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 // Public routes - landing page and static files
 const isPublicRoute = createRouteMatcher([
     '/',
+    '/share/:path*',
     '/manifest.json',
     '/robots.txt',
     '/llms.txt',
