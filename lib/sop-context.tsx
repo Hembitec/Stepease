@@ -566,6 +566,12 @@ export function SOPProvider({ children }: { children: ReactNode }) {
   const finalizeSession = useCallback((title?: string, department?: string): SOP | null => {
     if (!session) return null
 
+    // Check if this is a revision (session metadata has version info from reopen)
+    const metadata = (activeConvexSession?.metadata as Record<string, unknown>) || {}
+    const isRevision = !!metadata.revisionOf
+    const nextVersion = isRevision ? ((metadata.revisionFromVersion as number) ?? 1) + 1 : 1
+    const parentSopId = isRevision ? (metadata.parentSopId as string) : undefined
+
     const newSOP: SOP = {
       id: session.id.replace("session", "sop"),
       title: title || session.title || "Untitled SOP",
@@ -576,6 +582,8 @@ export function SOPProvider({ children }: { children: ReactNode }) {
       notes: session.notes,
       chatHistory: session.messages,
       content: "",
+      version: nextVersion,
+      parentSopId,
     }
 
     addSOP(newSOP)
@@ -583,7 +591,7 @@ export function SOPProvider({ children }: { children: ReactNode }) {
     endSession()
 
     return newSOP
-  }, [session, addSOP, endSession])
+  }, [session, activeConvexSession, addSOP, endSession])
 
   // -------------------------------------------------------------------------
   // Utility Functions

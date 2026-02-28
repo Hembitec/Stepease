@@ -233,7 +233,13 @@ export const approve = mutation({
  * Called when user wants to revise an approved SOP
  */
 export const reopen = mutation({
-    args: { id: v.id("sessions") },
+    args: {
+        id: v.id("sessions"),
+        sopId: v.optional(v.string()),
+        sopVersion: v.optional(v.number()),
+        parentSopId: v.optional(v.string()),
+        revisionReason: v.optional(v.string()),
+    },
     handler: async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) throw new Error("Not authenticated");
@@ -244,18 +250,32 @@ export const reopen = mutation({
             throw new Error("Not authorized");
         }
 
+        // Merge revision context into existing metadata
+        const existingMetadata = (session.metadata as Record<string, unknown>) || {};
+        const updatedMetadata = {
+            ...existingMetadata,
+            // Store version info so finalizeSession can create a proper v2/v3
+            revisionOf: args.sopId,
+            revisionFromVersion: args.sopVersion ?? 1,
+            parentSopId: args.parentSopId || args.sopId,
+            revisionReason: args.revisionReason,
+        };
+
         await ctx.db.patch(args.id, {
             status: "active",
             revisionCount: (session.revisionCount || 0) + 1,
+            metadata: updatedMetadata,
             updatedAt: new Date().toISOString(),
         });
 
         // Log activity
+        const reason = args.revisionReason ? ` — ${args.revisionReason}` : "";
         await ctx.db.insert("activity_log", {
             userId: identity.subject,
             action: "revised",
+            sopId: args.sopId,
             sopTitle: session.title,
-            details: `Revision #${(session.revisionCount || 0) + 1}`,
+            details: `Revision #${(session.revisionCount || 0) + 1}${reason}`,
             timestamp: new Date().toISOString(),
         });
     },

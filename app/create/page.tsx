@@ -319,6 +319,13 @@ function CreateSOPInner() {
       })) : undefined,
       ...(isImprovementMode && session?.metadata?.analysisResult && {
         analysisContext: session.metadata.analysisResult
+      }),
+      ...(isImprovementMode && session?.metadata?.revisionOf && {
+        revisionContext: {
+          sopTitle: session.title || "Untitled SOP",
+          currentVersion: (session.metadata.revisionFromVersion as number) ?? 1,
+          reason: session.metadata.revisionReason as string | undefined,
+        }
       })
     })
   }, [inputValue, isLoading, chatHistory, submit, mode, isImprovementMode, session, notes, addSessionMessage])

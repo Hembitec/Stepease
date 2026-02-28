@@ -50,18 +50,18 @@ const features = [
   },
   {
     icon: FileText,
-    title: "Smart Structure Detection",
-    description: "AI automatically ensures you have all 12 essential SOP sections, from Scope to Troubleshooting.",
+    title: "Activity & Version Control",
+    description: "Every action is logged. Revise an approved SOP, provide a reason, and auto-generate linked versions seamlessly.",
   },
   {
     icon: GitBranch,
-    title: "Logic Mapping",
-    description: "AI identifies and structures complex decision points so no conditional step is missed.",
+    title: "Chat-Based Revisions",
+    description: "Don't rewrite documents manually. Reopen an approved SOP, tell the AI what changed, and let it update the exact steps for you.",
   },
   {
     icon: Shield,
-    title: "Compliance Assistant",
-    description: "The AI proactively asks about safety risks and quality checks to ensure your SOP is robust.",
+    title: "Public Viewing & Sharing",
+    description: "Generate secure, read-only links to share your final procedures with team members instantly.",
   },
 ]
 
@@ -151,7 +151,7 @@ const useCases = [
 const faqs = [
   {
     q: "How does the AI understand my specific industry?",
-    a: "Our AI is trained on thousands of SOPs across industries including healthcare, manufacturing, finance, and tech. It adapts its suggestions based on your context and compliance needs.",
+    a: "Our system leverages advanced LLM capabilities constrained by strict system prompts. This forces the AI to focus purely on extracting structured, step-by-step procedures from your explanations without making wild assumptions.",
   },
   {
     q: "Can I import my existing SOPs?",
@@ -159,7 +159,7 @@ const faqs = [
   },
   {
     q: "Is my data secure?",
-    a: "Absolutely. We use enterprise-grade encryption, are SOC2 compliant, and never train on your proprietary data. Your SOPs remain yours.",
+    a: "Yes. Your data is securely stored with industry-standard encryption using our backend providers. Authentication is handled safely, and your documents remain entirely private to your workspace.",
   },
   {
     q: "What formats can I export to?",

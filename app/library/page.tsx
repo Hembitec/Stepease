@@ -36,6 +36,8 @@ export default function LibraryPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all")
   const [sortBy, setSortBy] = useState<SortOption>("recent")
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null)
+  const [revisionTarget, setRevisionTarget] = useState<{ sessionId: string; sopId: string; version: number; parentSopId?: string } | null>(null)
+  const [revisionReason, setRevisionReason] = useState("")
 
   const sessions = sessionsResult ?? []
   const inProgressSessions = sessions.filter(s => s.status !== "approved" && s.phaseProgress < 100)
@@ -119,10 +121,42 @@ export default function LibraryPage() {
   }
 
   const handleRevise = async (sessionId: string) => {
+    // Find the SOP linked to this session to get version info
+    const sop = sops.find(s => s.sessionId === sessionId)
+    if (!sop) {
+      // Fallback: just open without version context
+      try {
+        await reopenSession({ id: sessionId as any })
+        toast.info("Revision session started")
+        router.push(`/create?session=${sessionId}`)
+      } catch (e) {
+        console.error("Failed to reopen session:", e)
+      }
+      return
+    }
+    // Show the revision reason modal
+    setRevisionTarget({
+      sessionId,
+      sopId: sop.id,
+      version: sop.version ?? 1,
+      parentSopId: sop.parentSopId,
+    })
+    setRevisionReason("")
+  }
+
+  const confirmRevise = async () => {
+    if (!revisionTarget) return
     try {
-      await reopenSession({ id: sessionId as any })
+      await reopenSession({
+        id: revisionTarget.sessionId as any,
+        sopId: revisionTarget.sopId,
+        sopVersion: revisionTarget.version,
+        parentSopId: revisionTarget.parentSopId || revisionTarget.sopId,
+        revisionReason: revisionReason.trim() || undefined,
+      })
       toast.info("Revision session started")
-      router.push(`/create?session=${sessionId}`)
+      setRevisionTarget(null)
+      router.push(`/create?session=${revisionTarget.sessionId}`)
     } catch (e) {
       console.error("Failed to reopen session:", e)
     }
@@ -230,6 +264,35 @@ export default function LibraryPage() {
               </Button>
               <Button onClick={confirmDelete} className="flex-1 bg-red-600 hover:bg-red-700 text-white text-sm">
                 Delete
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Revision Reason Modal */}
+      {revisionTarget && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 max-w-sm w-full shadow-xl">
+            <h3 className="text-base font-semibold text-slate-900 mb-1.5">Start Revision</h3>
+            <p className="text-sm text-slate-500 mb-4">
+              What's the reason for this revision? <span className="text-slate-400">(optional)</span>
+            </p>
+            <input
+              type="text"
+              value={revisionReason}
+              onChange={(e) => setRevisionReason(e.target.value)}
+              placeholder="e.g. Compliance update, process change..."
+              className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-4"
+              autoFocus
+              onKeyDown={(e) => e.key === "Enter" && confirmRevise()}
+            />
+            <div className="flex gap-2.5">
+              <Button variant="outline" onClick={() => setRevisionTarget(null)} className="flex-1 bg-transparent text-sm">
+                Cancel
+              </Button>
+              <Button onClick={confirmRevise} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm">
+                Start Revision
               </Button>
             </div>
           </div>

@@ -29,7 +29,7 @@ const plans = [
             { text: "12 SOP creations per month", included: true },
             { text: "5 Improve workflows per month", included: true },
             { text: "All export formats", included: true },
-            { text: "PDF with StepEase branding", included: true },
+            { text: "Clean PDF & Word Export", included: true },
             { text: "Email support", included: true },
         ],
         cta: "Start with Starter",
@@ -43,7 +43,7 @@ const plans = [
         features: [
             { text: "Unlimited SOP creations", included: true },
             { text: "Unlimited Improve workflows", included: true },
-            { text: "All export formats (clean PDF)", included: true },
+            { text: "Custom Brand Colors & Logos", included: true },
             { text: "Priority support", included: true },
             { text: "Version history", included: true },
         ],

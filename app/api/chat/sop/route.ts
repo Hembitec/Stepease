@@ -36,6 +36,11 @@ interface RequestBody {
       overall: number;
     };
   };
+  revisionContext?: {
+    sopTitle: string;
+    currentVersion: number;
+    reason?: string;
+  };
 }
 
 function buildContextPrefix(body: RequestBody): string {
@@ -65,6 +70,19 @@ ${body.analysisContext.improvements.map((imp, i) =>
     ).join('\n')}
 
 Continue helping the user address these improvements one by one, starting with HIGH priority.
+
+`;
+  }
+
+  if (body.revisionContext) {
+    const rc = body.revisionContext;
+    contextPrefix += `
+REVISION CONTEXT:
+- This is a REVISION of an existing SOP: "${rc.sopTitle}"
+- The user is working on version ${rc.currentVersion + 1} (revising from v${rc.currentVersion})
+${rc.reason ? `- Reason for revision: ${rc.reason}` : '- No specific reason provided'}
+
+This is NOT a new SOP. The user wants to improve or update their existing document. Ask what specific changes they want to make. Be focused and efficient — they already have a working SOP.
 
 `;
   }
