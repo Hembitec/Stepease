@@ -17,7 +17,7 @@ export function DashboardSkeleton() {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
+            <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6 sm:mb-8">
                 <StatCardSkeleton />
                 <StatCardSkeleton />
                 <StatCardSkeleton />
@@ -158,7 +158,7 @@ export function LibrarySkeleton() {
             </div>
 
             {/* Filter Bar */}
-            <div className="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 mb-4">
+            <div className="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 mb-4 overflow-hidden">
                 <Skeleton className="h-9 w-full rounded-lg mb-3" />
                 <div className="flex gap-1.5">
                     <Skeleton className="h-6 w-12 rounded-md" />
@@ -217,8 +217,8 @@ export function DraftsSkeleton() {
 
 function DraftItemSkeleton() {
     return (
-        <div className="bg-white rounded-xl p-3.5 border border-slate-200 flex items-center gap-3 sm:gap-4">
-            <Skeleton className="w-10 h-10 rounded-lg flex-shrink-0" />
+        <div className="bg-white rounded-xl p-3 sm:p-4 border border-slate-200 flex items-center gap-3 sm:gap-4">
+            <Skeleton className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex-shrink-0" />
             <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                     <Skeleton className="h-4 w-36 rounded" />

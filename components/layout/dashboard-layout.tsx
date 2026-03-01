@@ -15,7 +15,7 @@ export function DashboardLayout({ children, fullHeight = false }: DashboardLayou
 
   return (
     <div className={cn(
-      "bg-gradient-to-br from-slate-50 via-slate-100 to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/30",
+      "bg-gradient-to-br from-slate-50 via-slate-100 to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/30 overflow-x-hidden",
       fullHeight ? "h-screen overflow-hidden" : "min-h-screen"
     )}>
       <Sidebar
@@ -27,7 +27,7 @@ export function DashboardLayout({ children, fullHeight = false }: DashboardLayou
 
       <main
         className={cn(
-          "transition-all duration-300 ease-in-out",
+          "transition-all duration-300 ease-in-out overflow-x-hidden",
           fullHeight ? "h-screen overflow-hidden" : "min-h-screen",
           // Mobile: no top padding needed now as we removed the header
           isMobile ? "ml-0" : isCollapsed ? "ml-20" : "ml-64"

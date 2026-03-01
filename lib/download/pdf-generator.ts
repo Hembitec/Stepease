@@ -112,22 +112,25 @@ function renderFormattedText(
 // -----------------------------------------------------------------------------
 
 /**
- * Applies a custom watermark on the first page only.
- * Uses an extremely transparent color so it never obscures content.
- * Includes a small footer line.
+ * Applies a custom watermark to the CURRENT page only.
+ * Call this immediately after adding a new page (or on the first page).
  */
-function applyWatermark(pdf: jsPDF, watermarkText: string): void {
-    const pageCount = pdf.getNumberOfPages();
+function applyWatermarkToCurrentPage(pdf: jsPDF, watermarkText: string | undefined): void {
+    // Basic Stepease footer
+    pdf.setFontSize(7);
+    pdf.setTextColor(210, 210, 210);
+    pdf.setFont('helvetica', 'normal');
 
-    // --- Tiled watermark pattern (extremely transparent) ---
-    const tileSpacingX = 90;
-    const tileSpacingY = 70;
+    let footerText = 'Generated with StepEase · stepease.pro';
 
-    const cols = Math.ceil(PAGE_WIDTH / tileSpacingX) + 2;
-    const rows = Math.ceil(PAGE_HEIGHT / tileSpacingY) + 2;
+    // Tiled watermark pattern if requested
+    if (watermarkText) {
+        footerText = `Generated with StepEase · Custom branded by ${watermarkText} · stepease.pro`;
+        const tileSpacingX = 90;
+        const tileSpacingY = 70;
 
-    for (let page = 1; page <= pageCount; page++) {
-        pdf.setPage(page);
+        const cols = Math.ceil(PAGE_WIDTH / tileSpacingX) + 2;
+        const rows = Math.ceil(PAGE_HEIGHT / tileSpacingY) + 2;
 
         pdf.setFontSize(14);
         pdf.setTextColor(248, 248, 248); // Extremely faint
@@ -141,23 +144,25 @@ function applyWatermark(pdf: jsPDF, watermarkText: string): void {
                 pdf.text(watermarkText.toUpperCase(), px, py, { angle: -35 });
             }
         }
-
-        // --- Subtle footer ---
-        pdf.setFontSize(7);
-        pdf.setTextColor(210, 210, 210);
-        pdf.setFont('helvetica', 'normal');
-        pdf.text(
-            `Generated with StepEase · Custom branded by ${watermarkText} · stepease.pro`,
-            PAGE_WIDTH / 2,
-            PAGE_HEIGHT - 8,
-            { align: 'center' }
-        );
     }
+
+    // Always draw footer
+    pdf.setFontSize(7);
+    pdf.setTextColor(210, 210, 210);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text(
+        footerText,
+        PAGE_WIDTH / 2,
+        PAGE_HEIGHT - 8,
+        { align: 'center' }
+    );
 }
 
 // -----------------------------------------------------------------------------
 // Section Renderers
 // -----------------------------------------------------------------------------
+
+type CheckPageBreakFn = (y: number, neededHeight: number) => number;
 
 /**
  * Renders a heading1 section and returns updated Y position.
@@ -166,9 +171,9 @@ function renderHeading1(
     pdf: jsPDF,
     content: string,
     y: number,
-    checkPageBreak: (h: number) => void
+    checkPageBreak: CheckPageBreakFn
 ): number {
-    checkPageBreak(15);
+    y = checkPageBreak(y, 15);
     pdf.setFontSize(20);
     pdf.setFont('helvetica', 'bold');
     pdf.setTextColor(...COLORS.heading1);
@@ -192,9 +197,9 @@ function renderHeading2(
     pdf: jsPDF,
     content: string,
     y: number,
-    checkPageBreak: (h: number) => void
+    checkPageBreak: CheckPageBreakFn
 ): number {
-    checkPageBreak(12);
+    y = checkPageBreak(y, 12);
     y += 4;
     pdf.setFontSize(16);
     pdf.setFont('helvetica', 'bold');
@@ -213,9 +218,9 @@ function renderHeading3(
     pdf: jsPDF,
     content: string,
     y: number,
-    checkPageBreak: (h: number) => void
+    checkPageBreak: CheckPageBreakFn
 ): number {
-    checkPageBreak(10);
+    y = checkPageBreak(y, 10);
     y += 2;
     pdf.setFontSize(13);
     pdf.setFont('helvetica', 'bold');
@@ -234,10 +239,10 @@ function renderParagraph(
     pdf: jsPDF,
     content: string,
     y: number,
-    checkPageBreak: (h: number) => void
+    checkPageBreak: CheckPageBreakFn
 ): number {
     const estLines = Math.ceil(content.length / 80);
-    checkPageBreak(estLines * 5);
+    y = checkPageBreak(y, estLines * 5);
     y = renderFormattedText(pdf, content, MARGIN, y, CONTENT_WIDTH, 10, COLORS.text);
     y += 7;
     return y;
@@ -251,14 +256,14 @@ function renderList(
     items: string[],
     isNumbered: boolean,
     y: number,
-    checkPageBreak: (h: number) => void
+    checkPageBreak: CheckPageBreakFn
 ): number {
     for (let idx = 0; idx < items.length; idx++) {
         const item = items[idx];
         const prefix = isNumbered ? `${idx + 1}. ` : '• ';
 
         const estLines = Math.ceil(item.length / 75);
-        checkPageBreak(estLines * 5);
+        y = checkPageBreak(y, estLines * 5);
 
         pdf.setFontSize(10);
         pdf.setFont('helvetica', 'normal');
@@ -282,9 +287,9 @@ function renderTable(
     pdf: jsPDF,
     rows: string[][],
     y: number,
-    checkPageBreak: (h: number) => void
+    checkPageBreak: CheckPageBreakFn
 ): number {
-    checkPageBreak(30);
+    y = checkPageBreak(y, 30); // Need some initial space for headers
 
     const head = [rows[0]];
     const body = rows.slice(1);
@@ -324,7 +329,7 @@ function renderCodeBlock(
     pdf: jsPDF,
     content: string,
     y: number,
-    checkPageBreak: (h: number) => void
+    checkPageBreak: CheckPageBreakFn
 ): number {
     pdf.setFontSize(8);
     pdf.setFont('courier', 'normal');
@@ -341,7 +346,7 @@ function renderCodeBlock(
     const padding = 4;
     const codeHeight = wrappedLines.length * lineHeight + padding * 2;
 
-    checkPageBreak(codeHeight + 4);
+    y = checkPageBreak(y, codeHeight + 4);
 
     // Draw background rectangle
     pdf.setFillColor(...COLORS.codeBg);
@@ -378,17 +383,17 @@ export async function generatePDF(
     let y = MARGIN;
     const sections = parseMarkdownSections(markdown);
 
-    const checkPageBreak = (neededHeight: number) => {
-        if (y + neededHeight > PAGE_HEIGHT - MARGIN) {
+    const checkPageBreak = (currentY: number, neededHeight: number) => {
+        if (currentY + neededHeight > PAGE_HEIGHT - MARGIN) {
             pdf.addPage();
-            y = MARGIN;
+            applyWatermarkToCurrentPage(pdf, watermarkText);
+            return MARGIN;
         }
+        return currentY;
     };
 
-    // Apply watermark FIRST so it renders behind content
-    if (watermarkText) {
-        applyWatermark(pdf, watermarkText);
-    }
+    // Apply watermark to the first page before drawing content
+    applyWatermarkToCurrentPage(pdf, watermarkText);
 
     for (const section of sections) {
         switch (section.type) {
@@ -421,3 +426,4 @@ export async function generatePDF(
     }
     pdf.save(`${filename}.pdf`);
 }
+

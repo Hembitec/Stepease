@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, Suspense } from "react"
 import Link from "next/link"
 import { toast } from "sonner"
 import { useSearchParams, useRouter } from "next/navigation"
@@ -31,6 +31,14 @@ import { DraftsSection } from "@/components/dashboard/drafts-section"
 import { UpgradeModal } from "@/components/pricing/upgrade-modal"
 
 export default function DashboardPage() {
+  return (
+    <Suspense fallback={<DashboardLayout><DashboardSkeleton /></DashboardLayout>}>
+      <DashboardPageContent />
+    </Suspense>
+  )
+}
+
+function DashboardPageContent() {
   const router = useRouter()
   const { sops } = useSOPContext()
   const { toggleMobileMenu } = useSidebar()
@@ -150,7 +158,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Stat Cards */}
-        <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
+        <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6 sm:mb-8">
           <StatCard
             icon={<FileText className="w-5 h-5 text-blue-600" />}
             label="Total SOPs"

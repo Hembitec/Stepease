@@ -209,7 +209,7 @@ export default function ReviewNotesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 overflow-x-hidden">
       {/* Header */}
       <header className="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between">
         <button onClick={() => router.back()} className="text-slate-500 hover:text-slate-900 flex items-center gap-2 transition-colors">
@@ -343,7 +343,7 @@ export default function ReviewNotesPage() {
                     </li>
                   ))}
                 </ul>
-                <div className="flex gap-3 mt-4">
+                <div className="flex flex-wrap gap-3 mt-4">
                   <Button
                     variant="outline"
                     onClick={() => router.back()}

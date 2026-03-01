@@ -69,10 +69,13 @@ export function DownloadMenu({ content, title, tier = "free", sopId }: DownloadM
           break
 
         case "pdf":
-          // Pro users with watermark enabled get custom watermark text
-          const watermarkText = (tier === "pro" && watermarkSettings?.watermarkEnabled && watermarkSettings?.customWatermark)
-            ? watermarkSettings.customWatermark
-            : undefined
+          // Starter tier gets default watermark; Pro users get custom (if enabled) or none.
+          let watermarkText: string | undefined = undefined;
+          if (tier === "starter") {
+            watermarkText = "STEPEASE";
+          } else if (tier === "pro" && watermarkSettings?.watermarkEnabled && watermarkSettings?.customWatermark) {
+            watermarkText = watermarkSettings.customWatermark;
+          }
           await generatePDF(content, safeTitle, watermarkText)
           break
 

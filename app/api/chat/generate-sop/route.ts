@@ -9,7 +9,7 @@ import { streamText } from 'ai';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { createGroq } from '@ai-sdk/groq';
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
-import { streamWithFallback, getCachedProviderChain } from '@/lib/ai-fallback';
+import { getCachedProviderChain } from '@/lib/ai-fallback';
 import type { Note, ChatMessage } from '@/lib/types';
 import type { AnalysisResult } from '@/lib/sop-analyzer';
 import { ProviderConfig } from '@/lib/ai-types';
@@ -340,105 +340,149 @@ interface RequestBody {
   conversationHistory?: ChatMessage[];
 }
 
-function createStreamFunctions(
-  body: RequestBody,
-  providers: ProviderConfig[]
-): Array<() => Promise<Response>> {
-  const providerCache = new Map<string, any>();
+// -----------------------------------------------------------------------------
+// Provider Instance Factory
+// -----------------------------------------------------------------------------
 
-  return providers.map((provider) => {
-    return async () => {
-      let systemPrompt: string;
-      let userPrompt: string;
+const providerCache = new Map<string, any>();
 
-      if (body.mode === 'improve' && body.originalContent) {
-        systemPrompt = IMPROVE_SOP_SYSTEM_PROMPT;
-        userPrompt = buildImprovementPrompt(
-          body.originalContent,
-          body.analysis || null,
-          body.conversationHistory || [],
-          body.notes || [],
-          body.title || 'Standard Operating Procedure'
-        );
-      } else {
-        systemPrompt = CREATE_SOP_SYSTEM_PROMPT;
-        userPrompt = buildCreatePrompt(
-          body.notes || [],
-          body.title || 'Standard Operating Procedure',
-          body.description
-        );
-      }
+function getModelInstance(provider: ProviderConfig) {
+  if (provider.name === 'google') {
+    let googleProvider = providerCache.get(provider.name);
+    if (!googleProvider) {
+      googleProvider = createGoogleGenerativeAI({ apiKey: provider.apiKey });
+      providerCache.set(provider.name, googleProvider);
+    }
+    return googleProvider(provider.model);
+  }
 
-      // Google Provider
-      if (provider.name === 'google') {
-        let googleProvider = providerCache.get(provider.name);
-        if (!googleProvider) {
-          googleProvider = createGoogleGenerativeAI({
-            apiKey: provider.apiKey,
-          });
-          providerCache.set(provider.name, googleProvider);
-        }
+  if (provider.name.toLowerCase().includes('groq')) {
+    let groqProvider = providerCache.get(provider.name);
+    if (!groqProvider) {
+      groqProvider = createGroq({ apiKey: provider.apiKey });
+      providerCache.set(provider.name, groqProvider);
+    }
+    return groqProvider(provider.model);
+  }
 
-        const result = streamText({
-          model: googleProvider(provider.model),
-          system: systemPrompt,
-          prompt: userPrompt,
-          temperature: 0.3,
-        });
-        return result.toTextStreamResponse();
-      }
-      // Groq Provider
-      else if (provider.name.toLowerCase().includes('groq')) {
-        let groqProvider = providerCache.get(provider.name);
-        if (!groqProvider) {
-          groqProvider = createGroq({
-            apiKey: provider.apiKey,
-          });
-          providerCache.set(provider.name, groqProvider);
-        }
-
-        const result = streamText({
-          model: groqProvider(provider.model),
-          system: systemPrompt,
-          prompt: userPrompt,
-          temperature: 0.3,
-        });
-        return result.toTextStreamResponse();
-      }
-      // Generic OpenAI Compatible
-      else {
-        let openaiCompatible = providerCache.get(provider.name);
-        if (!openaiCompatible) {
-          openaiCompatible = createOpenAICompatible({
-            baseURL: provider.baseUrl || 'https://api.example.com/v1',
-            name: provider.name,
-            apiKey: provider.apiKey,
-          });
-          providerCache.set(provider.name, openaiCompatible);
-        }
-
-        const result = streamText({
-          model: openaiCompatible(provider.model) as any,
-          system: systemPrompt,
-          prompt: userPrompt,
-          temperature: 0.3,
-        });
-        return result.toTextStreamResponse();
-      }
-    };
-  });
+  let openaiCompatible = providerCache.get(provider.name);
+  if (!openaiCompatible) {
+    openaiCompatible = createOpenAICompatible({
+      baseURL: provider.baseUrl || 'https://api.example.com/v1',
+      name: provider.name,
+      apiKey: provider.apiKey,
+    });
+    providerCache.set(provider.name, openaiCompatible);
+  }
+  return openaiCompatible(provider.model) as any;
 }
+
+// -----------------------------------------------------------------------------
+// Try Stream with Provider (streamText variant)
+// Races result.text against a timeout to verify the provider works,
+// then returns the SDK's native response format.
+// -----------------------------------------------------------------------------
+
+async function tryStreamWithProvider(
+  provider: ProviderConfig,
+  systemPrompt: string,
+  userPrompt: string,
+): Promise<Response> {
+  const label = `${provider.name}/${provider.model}`;
+
+  console.log(`[AI-PROVIDER] [${new Date().toISOString()}] [INFO] Trying provider: ${label}`);
+
+  const result = streamText({
+    model: getModelInstance(provider),
+    system: systemPrompt,
+    prompt: userPrompt,
+    temperature: 0.3,
+  });
+
+  // Race: wait for either result.text to reject (provider error) or 5s timeout
+  const VERIFICATION_TIMEOUT_MS = 5000;
+
+  await Promise.race([
+    result.text.then(
+      () => { /* resolved = stream completed fully */ },
+      (err) => { throw err; } // re-throw to trigger fallback
+    ),
+    new Promise<void>((resolve) => setTimeout(resolve, VERIFICATION_TIMEOUT_MS)),
+  ]);
+
+  console.log(`[AI-PROVIDER] [${new Date().toISOString()}] [INFO] Provider accepted: ${label}`);
+
+  return result.toTextStreamResponse();
+}
+
+// -----------------------------------------------------------------------------
+// POST Handler with Sequential Fallback
+// -----------------------------------------------------------------------------
 
 export async function POST(req: Request) {
   try {
     const body = await req.json() as RequestBody;
 
+    let systemPrompt: string;
+    let userPrompt: string;
+
+    if (body.mode === 'improve' && body.originalContent) {
+      systemPrompt = IMPROVE_SOP_SYSTEM_PROMPT;
+      userPrompt = buildImprovementPrompt(
+        body.originalContent,
+        body.analysis || null,
+        body.conversationHistory || [],
+        body.notes || [],
+        body.title || 'Standard Operating Procedure'
+      );
+    } else {
+      systemPrompt = CREATE_SOP_SYSTEM_PROMPT;
+      userPrompt = buildCreatePrompt(
+        body.notes || [],
+        body.title || 'Standard Operating Procedure',
+        body.description
+      );
+    }
+
     const providers = getCachedProviderChain();
-    const streamFunctions = createStreamFunctions(body, providers);
+    const errors: string[] = [];
 
-    const { response } = await streamWithFallback(streamFunctions, providers);
+    for (let i = 0; i < providers.length; i++) {
+      const provider = providers[i];
+      const label = `${provider.name}/${provider.model}`;
 
-    return response;
+      try {
+        const response = await tryStreamWithProvider(provider, systemPrompt, userPrompt);
+        return response;
+      } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+        errors.push(`${label}: ${errorMsg}`);
+
+        console.error(
+          `[AI-PROVIDER] [${new Date().toISOString()}] [ERROR] Provider failed: ${label} — ${errorMsg}`
+        );
+
+        if (i < providers.length - 1) {
+          console.log(
+            `[AI-PROVIDER] [${new Date().toISOString()}] [INFO] Falling back → ${providers[i + 1].name}/${providers[i + 1].model}`
+          );
+        }
+      }
+    }
+
+    // All providers failed
+    console.error(`[AI-PROVIDER] [${new Date().toISOString()}] [ERROR] All ${providers.length} providers failed`);
+
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to generate SOP',
+        details: errors.join(' | '),
+      }),
+      {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   } catch (error) {
     console.error('[AI-PROVIDER] Generate SOP API Error:', error);
 

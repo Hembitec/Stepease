@@ -30,7 +30,7 @@ export function DraftsSection() {
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                     <Clock className="w-5 h-5 text-amber-500" />
-                    <h2 className="text-lg font-bold text-slate-900">Continue Where You Left Off</h2>
+                    <h2 className="text-base sm:text-lg font-bold text-slate-900">Continue Where You Left Off</h2>
                     <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-semibold rounded-full">
                         {sessions.length}
                     </span>
@@ -59,16 +59,16 @@ export function DraftsSection() {
                             href={isImprove ? `/improve?session=${session._id}` : `/create?session=${session._id}`}
                             className="group block"
                         >
-                            <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-slate-200/80 shadow-lg hover:shadow-xl hover:border-amber-200 transition-all duration-300 flex items-center gap-4">
+                            <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-slate-200/80 shadow-lg hover:shadow-xl hover:border-amber-200 transition-all duration-300 flex items-center gap-3 sm:gap-4">
                                 {/* Icon */}
-                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-md flex-shrink-0 ${isImprove
+                                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center shadow-md flex-shrink-0 ${isImprove
                                     ? "bg-gradient-to-br from-emerald-400 to-emerald-500 shadow-emerald-500/25"
                                     : "bg-gradient-to-br from-blue-500 to-blue-600 shadow-blue-500/25"
                                     }`}>
                                     {isImprove ? (
-                                        <Upload className="w-6 h-6 text-white" />
+                                        <Upload className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                                     ) : (
-                                        <Sparkles className="w-6 h-6 text-white" />
+                                        <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                                     )}
                                 </div>
 

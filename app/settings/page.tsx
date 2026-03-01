@@ -86,7 +86,7 @@ export default function SettingsPage() {
               Billing & Payment
             </h2>
             <div className="bg-white rounded-xl border border-slate-200 p-6">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                   <h3 className="font-medium text-slate-900">Current Plan</h3>
                   <p className="text-sm text-slate-500 mt-1">
@@ -221,7 +221,7 @@ function CancelSubscriptionButton() {
   }
 
   return (
-    <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-4 duration-200">
+    <div className="flex flex-wrap items-center gap-2 animate-in fade-in slide-in-from-right-4 duration-200">
       <span className="text-sm text-slate-600 mr-2">Are you sure?</span>
       <Button
         variant="ghost"

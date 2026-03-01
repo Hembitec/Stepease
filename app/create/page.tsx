@@ -220,9 +220,12 @@ function CreateSOPInner() {
   // Object Streaming Hook
   // ---------------------------------------------------------------------------
 
-  const { object, submit, isLoading } = useObject({
+  const { object, submit, isLoading, error } = useObject({
     api: "/api/chat/sop",
     schema: aiResponseSchema,
+    onError: (err) => {
+      toast.error(err.message || "Failed to connect to AI. Please try sending your message again.");
+    },
     onFinish: ({ object }) => {
       if (!object) return
 
@@ -573,7 +576,14 @@ function CreateSOPInner() {
                     <MessageBubble role="assistant" content={object.message} />
                   )}
 
-                  {isLoading && !object?.message && <TypingIndicator />}
+                  {isLoading && !object?.message && !error && <TypingIndicator />}
+
+                  {error && !isLoading && (
+                    <MessageBubble
+                      role="assistant"
+                      content={`I encountered an error connecting to the AI provider.\nError details: ${error.message}\n\nPlease try sending your message again.`}
+                    />
+                  )}
 
                   <div ref={messagesEndRef} />
                 </div>

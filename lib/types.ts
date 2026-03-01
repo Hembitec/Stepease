@@ -65,7 +65,7 @@ export const aiResponseSchema = z.object({
     notes: z.array(aiResponseNoteSchema),
     phase: conversationPhaseSchema,
     progress: z.number().min(0).max(100),
-    title: z.string().optional(), // AI-suggested title after understanding context
+    title: z.string().describe("AI-suggested title, or empty string if not yet determined"),
 })
 
 // -----------------------------------------------------------------------------
