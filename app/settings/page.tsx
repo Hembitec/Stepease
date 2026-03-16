@@ -1,21 +1,50 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
+import { useSearchParams, useRouter } from "next/navigation"
 import { DashboardLayout } from "@/components/layout/dashboard-layout"
 import { useSidebar } from "@/components/layout/sidebar-context"
-import { SubscriptionCard, UpgradeModal } from "@/components/pricing"
-import { UserProfile, useUser } from "@clerk/nextjs"
-import { Menu, Lock, Crown } from "lucide-react"
+import { SubscriptionCard } from "@/components/pricing"
+import { UserProfile } from "@clerk/nextjs"
+import { Menu, User, Palette, CreditCard, Sparkles } from "lucide-react"
 import { useQuery, useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { SettingsSkeleton } from "@/components/skeletons"
-import { Button } from "@/components/ui/button"
-import { toast } from "sonner"
-import { cancelSubscriptionAction } from "@/app/actions/payment"
+import { cn } from "@/lib/utils"
+import { WatermarkSettings } from "@/components/settings/watermark-settings"
+import { CancelSubscriptionButton } from "@/components/settings/cancel-subscription-button"
+import { SettingsPlansPanel } from "@/components/settings/settings-plans-panel"
 
-export default function SettingsPage() {
+const tabs = [
+  { id: "account", label: "Account", icon: User },
+  { id: "branding", label: "Branding", icon: Palette },
+  { id: "billing", label: "Billing & Usage", icon: CreditCard },
+  { id: "plans", label: "Plans", icon: Sparkles },
+] as const
+
+type TabId = (typeof tabs)[number]["id"]
+
+function SettingsContent() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
   const { toggleMobileMenu } = useSidebar()
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
+
+  const tabParam = searchParams.get("tab") as TabId | null
+  const [activeTab, setActiveTab] = useState<TabId>(
+    tabParam && tabs.some((t) => t.id === tabParam) ? tabParam : "account"
+  )
+
+  // Sync tab with URL param changes
+  useEffect(() => {
+    if (tabParam && tabs.some((t) => t.id === tabParam)) {
+      setActiveTab(tabParam)
+    }
+  }, [tabParam])
+
+  const handleTabChange = (tabId: TabId) => {
+    setActiveTab(tabId)
+    router.replace(`/settings?tab=${tabId}`, { scroll: false })
+  }
 
   // Fetch real user data from Convex
   const userData = useQuery(api.users.getByClerkId)
@@ -28,13 +57,9 @@ export default function SettingsPage() {
     }
   }, [userData, syncUsage])
 
-  // Show skeleton while loading (undefined means still fetching)
+  // Show skeleton while loading
   if (userData === undefined) {
-    return (
-      <DashboardLayout>
-        <SettingsSkeleton />
-      </DashboardLayout>
-    )
+    return <SettingsSkeleton />
   }
 
   const tier = (userData?.tier ?? "free") as "free" | "starter" | "pro"
@@ -44,75 +69,51 @@ export default function SettingsPage() {
   const improvesLimit = tier === "pro" ? Infinity : tier === "starter" ? 5 : 0
 
   return (
-    <DashboardLayout>
-      <div className="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto">
-        {/* Header Section */}
-        <div className="mb-6 sm:mb-8">
-          <div className="flex items-center gap-3 mb-1 sm:mb-2">
-            <button
-              onClick={toggleMobileMenu}
-              className="md:hidden p-1 -ml-1 text-slate-600 hover:text-slate-900"
-            >
-              <Menu className="w-6 h-6" />
-            </button>
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900">
-              Settings
-            </h1>
-          </div>
-          <p className="text-sm sm:text-base text-slate-500">
-            Manage your account preferences and application settings.
-          </p>
+    <div className="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto">
+      {/* Header */}
+      <div className="mb-6">
+        <div className="flex items-center gap-3 mb-1">
+          <button
+            onClick={toggleMobileMenu}
+            className="md:hidden p-1 -ml-1 text-slate-600 hover:text-slate-900"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900">
+            Settings
+          </h1>
         </div>
+        <p className="text-sm sm:text-base text-slate-500">
+          Manage your account, branding, billing, and plan.
+        </p>
+      </div>
 
-        {/* Subscription Section */}
-        <div className="mb-8">
-          <h2 className="text-lg font-semibold text-slate-900 mb-4">
-            Subscription
-          </h2>
-          <SubscriptionCard
-            tier={tier}
-            sopsCreated={sopsCreated}
-            sopsLimit={sopsLimit}
-            improvesUsed={improvesUsed}
-            improvesLimit={improvesLimit}
-            onUpgrade={() => setShowUpgradeModal(true)}
-          />
-        </div>
+      {/* Tab Navigation */}
+      <div className="border-b border-slate-200 mb-6 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
+        <nav className="flex gap-1" aria-label="Settings tabs">
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.id
+            return (
+              <button
+                key={tab.id}
+                onClick={() => handleTabChange(tab.id)}
+                className={cn(
+                  "flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors -mb-px",
+                  isActive
+                    ? "border-blue-600 text-blue-600"
+                    : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
+                )}
+              >
+                <tab.icon className="w-4 h-4" />
+                {tab.label}
+              </button>
+            )
+          })}
+        </nav>
+      </div>
 
-        {/* Billing Section (Only for paid tiers) */}
-        {tier !== "free" && (
-          <div className="mb-8">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">
-              Billing & Payment
-            </h2>
-            <div className="bg-white rounded-xl border border-slate-200 p-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div>
-                  <h3 className="font-medium text-slate-900">Current Plan</h3>
-                  <p className="text-sm text-slate-500 mt-1">
-                    You are currently on the <span className="font-semibold capitalize">{tier}</span> plan.
-                  </p>
-                  {userData?.usageResetAt && (
-                    <p className="text-xs text-slate-400 mt-2">
-                      Next billing cycle starts on {new Date(userData.usageResetAt).toLocaleDateString()}.
-                    </p>
-                  )}
-                </div>
-                <CancelSubscriptionButton />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* PDF Branding Section */}
-        <div className="mb-8">
-          <h2 className="text-lg font-semibold text-slate-900 mb-4">
-            PDF Branding
-          </h2>
-          <WatermarkSettings tier={tier} />
-        </div>
-
-        {/* User Profile Section */}
+      {/* Tab Panels */}
+      {activeTab === "account" && (
         <div className="flex justify-center">
           <UserProfile
             routing="hash"
@@ -120,7 +121,7 @@ export default function SettingsPage() {
               elements: {
                 rootBox: "w-full",
                 cardBox:
-                  "w-full shadow-xl shadow-slate-200/50 rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-sm",
+                  "w-full shadow-sm rounded-xl border border-slate-200 bg-white",
                 card: "bg-transparent shadow-none",
                 navbar:
                   "border-r border-slate-200/80 bg-slate-50/50",
@@ -167,195 +168,84 @@ export default function SettingsPage() {
             }}
           />
         </div>
-      </div>
+      )}
 
-      {/* Upgrade Modal */}
-      <UpgradeModal
-        isOpen={showUpgradeModal}
-        onClose={() => setShowUpgradeModal(false)}
-        triggerReason="manual"
-      />
-    </DashboardLayout>
-  )
-}
+      {activeTab === "branding" && (
+        <div className="max-w-2xl">
+          <h2 className="text-lg font-semibold text-slate-900 mb-4">
+            PDF Branding
+          </h2>
+          <WatermarkSettings tier={tier} />
+        </div>
+      )}
 
-// -----------------------------------------------------------------------------
-// HELPER COMPONENTS
-// -----------------------------------------------------------------------------
-
-function CancelSubscriptionButton() {
-  const [loading, setLoading] = useState(false)
-  const [open, setOpen] = useState(false)
-  const { user } = useUser()
-
-  const handleCancel = async () => {
-    setLoading(true)
-    try {
-      const email = user?.emailAddresses[0]?.emailAddress || ""
-      const result = await cancelSubscriptionAction(email)
-      if (result.success) {
-        toast.success(result.message)
-        setOpen(false)
-        // Ideally refresh data
-        window.location.reload()
-      } else {
-        toast.error(result.message)
-      }
-    } catch (error) {
-      toast.error("An unexpected error occurred.")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  if (!open) {
-    return (
-      <Button
-        variant="outline"
-        className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
-        onClick={() => setOpen(true)}
-      >
-        Cancel Subscription
-      </Button>
-    )
-  }
-
-  return (
-    <div className="flex flex-wrap items-center gap-2 animate-in fade-in slide-in-from-right-4 duration-200">
-      <span className="text-sm text-slate-600 mr-2">Are you sure?</span>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => setOpen(false)}
-        disabled={loading}
-      >
-        Keep it
-      </Button>
-      <Button
-        variant="destructive"
-        size="sm"
-        onClick={handleCancel}
-        disabled={loading}
-      >
-        {loading ? "Cancelling..." : "Yes, Cancel"}
-      </Button>
-    </div>
-  )
-}
-
-// -----------------------------------------------------------------------------
-// Watermark Settings Component
-// -----------------------------------------------------------------------------
-
-function WatermarkSettings({ tier }: { tier: "free" | "starter" | "pro" }) {
-  const watermarkData = useQuery(api.users.getWatermarkSettings)
-  const updateWatermark = useMutation(api.users.updateWatermarkSettings)
-  const [text, setText] = useState("")
-  const [enabled, setEnabled] = useState(false)
-  const [saving, setSaving] = useState(false)
-  const [saved, setSaved] = useState(false)
-
-  // Sync state when data loads
-  useEffect(() => {
-    if (watermarkData) {
-      setText(watermarkData.customWatermark)
-      setEnabled(watermarkData.watermarkEnabled)
-    }
-  }, [watermarkData])
-
-  const handleSave = async () => {
-    setSaving(true)
-    try {
-      await updateWatermark({ customWatermark: text, watermarkEnabled: enabled })
-      toast.success("Watermark settings saved")
-      setSaved(true)
-    } catch (error) {
-      toast.error("Failed to save watermark settings")
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  if (tier !== "pro") {
-    return (
-      <div className="bg-white rounded-xl border border-slate-200 p-6">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center">
-            <Lock className="w-4 h-4 text-slate-400" />
-          </div>
+      {activeTab === "billing" && (
+        <div className="space-y-6 max-w-2xl">
+          {/* Subscription overview */}
           <div>
-            <h3 className="font-medium text-slate-900">Custom PDF Watermark</h3>
-            <p className="text-xs text-slate-500">Brand your exported PDFs with your company name</p>
-          </div>
-        </div>
-        <div className="bg-amber-50 border border-amber-100 rounded-lg px-4 py-3 flex items-center gap-2">
-          <Crown className="w-4 h-4 text-amber-600 flex-shrink-0" />
-          <p className="text-sm text-amber-700">
-            Upgrade to <span className="font-semibold">Pro</span> to add custom watermarks to your PDF exports.
-          </p>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="bg-white rounded-xl border border-slate-200 p-6">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h3 className="font-medium text-slate-900">Custom PDF Watermark</h3>
-          <p className="text-sm text-slate-500 mt-0.5">Brand your exported PDFs with a subtle tiled watermark</p>
-        </div>
-        <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-blue-100 text-blue-700 uppercase tracking-wide">
-          Pro
-        </span>
-      </div>
-
-      <div className="space-y-4">
-        {/* Watermark Text */}
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1.5">
-            Watermark Text
-          </label>
-          <input
-            type="text"
-            value={text}
-            onChange={(e) => { setText(e.target.value); setSaved(false) }}
-            placeholder="e.g. Acme Corporation"
-            maxLength={30}
-            className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-slate-400"
-          />
-          <p className="text-xs text-slate-400 mt-1">
-            This text will appear as a subtle diagonal pattern on your PDF exports.
-          </p>
-        </div>
-
-        {/* Toggle */}
-        <div className="flex items-center justify-between">
-          <label className="text-sm text-slate-700">Enable watermark on PDF exports</label>
-          <button
-            onClick={() => { setEnabled(!enabled); setSaved(false) }}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${enabled ? "bg-blue-600" : "bg-slate-200"
-              }`}
-          >
-            <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm ${enabled ? "translate-x-6" : "translate-x-1"
-                }`}
+            <h2 className="text-lg font-semibold text-slate-900 mb-4">
+              Subscription
+            </h2>
+            <SubscriptionCard
+              tier={tier}
+              sopsCreated={sopsCreated}
+              sopsLimit={sopsLimit}
+              improvesUsed={improvesUsed}
+              improvesLimit={improvesLimit}
+              onUpgrade={() => handleTabChange("plans")}
             />
-          </button>
-        </div>
+          </div>
 
-        {/* Save */}
-        <Button
-          onClick={handleSave}
-          disabled={saving || saved}
-          className={saved
-            ? "bg-green-600 hover:bg-green-600 text-white text-sm cursor-default"
-            : "bg-blue-600 hover:bg-blue-700 text-white text-sm"
-          }
-        >
-          {saving ? "Saving..." : saved ? "✓ Saved" : "Save Changes"}
-        </Button>
-      </div>
+          {/* Billing details for paid users */}
+          {tier !== "free" && (
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">
+                Billing & Payment
+              </h2>
+              <div className="bg-white rounded-xl border border-slate-200 p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <h3 className="font-medium text-slate-900">Current Plan</h3>
+                    <p className="text-sm text-slate-500 mt-1">
+                      You are currently on the <span className="font-semibold capitalize">{tier}</span> plan.
+                    </p>
+                    {userData?.usageResetAt && (
+                      <p className="text-xs text-slate-400 mt-2">
+                        Next billing cycle starts on {new Date(userData.usageResetAt).toLocaleDateString()}.
+                      </p>
+                    )}
+                  </div>
+                  <CancelSubscriptionButton />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === "plans" && (
+        <div>
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold text-slate-900">
+              Choose Your Plan
+            </h2>
+            <p className="text-sm text-slate-500 mt-1">
+              No hidden fees. No surprises. Cancel anytime.
+            </p>
+          </div>
+          <SettingsPlansPanel currentTier={tier} />
+        </div>
+      )}
     </div>
+  )
+}
+
+export default function SettingsPage() {
+  return (
+    <DashboardLayout>
+      <Suspense fallback={<SettingsSkeleton />}>
+        <SettingsContent />
+      </Suspense>
+    </DashboardLayout>
   )
 }

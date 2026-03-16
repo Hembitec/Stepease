@@ -90,38 +90,23 @@ function DocItemSkeleton() {
 export function SettingsSkeleton() {
     return (
         <div className="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto">
-            <div className="mb-6 sm:mb-8">
+            {/* Header */}
+            <div className="mb-6">
                 <Skeleton className="h-7 w-28 mb-2 rounded" />
-                <Skeleton className="h-4 w-56 rounded" />
+                <Skeleton className="h-4 w-64 rounded" />
             </div>
 
-            {/* Subscription */}
-            <div className="mb-8">
-                <Skeleton className="h-4 w-24 mb-4 rounded" />
-                <div className="bg-white rounded-xl border border-slate-200 p-6">
-                    <div className="flex items-center justify-between mb-6">
-                        <div>
-                            <Skeleton className="h-5 w-28 mb-2 rounded" />
-                            <Skeleton className="h-3 w-44 rounded" />
-                        </div>
-                        <Skeleton className="h-9 w-20 rounded-lg" />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="p-3 bg-slate-50 rounded-lg">
-                            <Skeleton className="h-3 w-20 mb-2 rounded" />
-                            <Skeleton className="h-5 w-12 rounded" />
-                        </div>
-                        <div className="p-3 bg-slate-50 rounded-lg">
-                            <Skeleton className="h-3 w-20 mb-2 rounded" />
-                            <Skeleton className="h-5 w-12 rounded" />
-                        </div>
-                    </div>
-                </div>
+            {/* Tab bar */}
+            <div className="border-b border-slate-200 mb-6 flex gap-1">
+                <Skeleton className="h-10 w-24 rounded-t" />
+                <Skeleton className="h-10 w-24 rounded-t" />
+                <Skeleton className="h-10 w-28 rounded-t" />
+                <Skeleton className="h-10 w-20 rounded-t" />
             </div>
 
-            {/* Profile */}
+            {/* Content area */}
             <div className="bg-white rounded-xl border border-slate-200 p-6">
-                <Skeleton className="h-5 w-28 mb-5 rounded" />
+                <Skeleton className="h-5 w-32 mb-5 rounded" />
                 <div className="flex items-center gap-4 mb-5">
                     <Skeleton className="w-14 h-14 rounded-full" />
                     <div>

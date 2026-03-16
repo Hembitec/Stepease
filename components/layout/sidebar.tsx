@@ -213,57 +213,52 @@ export function Sidebar({ isCollapsed, onToggle, isMobileOpen, onMobileClose }: 
           </div>
         )}
 
-        {/* User Section */}
-        <div className="border-t border-slate-800/50 bg-gradient-to-b from-slate-800/20 to-transparent pt-1 p-4">
-          <div
-            className={cn(
-              "flex items-center gap-3 rounded-lg hover:bg-slate-800/50 transition-colors cursor-pointer",
-              isCollapsed && !isMobileOpen ? "justify-center p-2" : "px-2 py-2"
-            )}
-            title={isCollapsed && !isMobileOpen ? user?.fullName || "User" : undefined}
-          >
-            <Avatar className="w-9 h-9 bg-blue-600 flex-shrink-0">
-              <AvatarFallback className="bg-blue-600 text-white text-sm font-medium">
-                {user?.firstName?.charAt(0) || user?.emailAddresses[0]?.emailAddress?.charAt(0) || "U"}
-              </AvatarFallback>
-            </Avatar>
-            {(!isCollapsed || isMobileOpen) && (
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-0.5">
-                  <p className="text-sm font-medium text-white truncate">{user?.fullName || "User"}</p>
-                  {userData === undefined ? (
-                    // Loading Skeleton for Badge
-                    <div className="h-4 w-12 bg-slate-700/50 rounded animate-pulse" />
-                  ) : isPro ? (
-                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-sm shadow-blue-500/30">
-                      <Crown className="w-2.5 h-2.5" />
-                      Pro
-                    </span>
-                  ) : isStarter ? (
-                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/30">
-                      Starter
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-700/60 text-slate-400 border border-slate-600/50">
-                      Free
-                    </span>
-                  )}
-                </div>
-                <p className="text-xs text-slate-500 truncate max-w-[180px]">{user?.primaryEmailAddress?.emailAddress || ""}</p>
-              </div>
-            )}
-          </div>
+        {/* Profile Card */}
+        <div className={cn(
+          "border-t border-slate-800/50 p-3",
+          isCollapsed && !isMobileOpen && "flex flex-col items-center gap-2"
+        )}>
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <button
                 className={cn(
-                  "flex items-center gap-3 w-full mt-2 text-sm text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 group",
-                  isCollapsed && !isMobileOpen ? "justify-center p-2.5" : "px-3 py-2"
+                  "w-full flex items-center rounded-lg transition-colors hover:bg-slate-800/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 group",
+                  isCollapsed && !isMobileOpen ? "justify-center p-2" : "gap-3 px-3 py-2.5"
                 )}
-                title={isCollapsed && !isMobileOpen ? "Sign out" : undefined}
+                title={isCollapsed && !isMobileOpen ? `${user?.fullName || "User"} · Sign out` : undefined}
               >
-                <LogOut className="w-4 h-4 flex-shrink-0 group-hover:text-red-400 transition-colors" />
-                {(!isCollapsed || isMobileOpen) && <span>Sign out</span>}
+                <Avatar className="w-8 h-8 bg-blue-600 flex-shrink-0">
+                  <AvatarFallback className="bg-blue-600 text-white text-xs font-medium">
+                    {user?.firstName?.charAt(0) || user?.emailAddresses[0]?.emailAddress?.charAt(0) || "U"}
+                  </AvatarFallback>
+                </Avatar>
+                {(!isCollapsed || isMobileOpen) && (
+                  <>
+                    <div className="flex-1 min-w-0 text-left">
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-sm font-medium text-white truncate">{user?.fullName || "User"}</p>
+                        {userData === undefined ? (
+                          <div className="h-4 w-10 bg-slate-700/50 rounded animate-pulse flex-shrink-0" />
+                        ) : isPro ? (
+                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-600/20 text-blue-400 flex-shrink-0">
+                            <Crown className="w-2.5 h-2.5" />
+                            Pro
+                          </span>
+                        ) : isStarter ? (
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-500/10 text-blue-400 flex-shrink-0">
+                            Starter
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-700/60 text-slate-400 flex-shrink-0">
+                            Free
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-slate-500 truncate">{user?.primaryEmailAddress?.emailAddress || ""}</p>
+                    </div>
+                    <LogOut className="w-4 h-4 flex-shrink-0 text-slate-500 group-hover:text-red-400 transition-colors" />
+                  </>
+                )}
               </button>
             </AlertDialogTrigger>
             <AlertDialogContent className="bg-slate-900 border-slate-700">
