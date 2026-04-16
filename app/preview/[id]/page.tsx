@@ -43,7 +43,7 @@ export default function SOPPreviewPage() {
 
   const [content, setContent] = useState(sop?.content || "")
   const [viewMode, setViewMode] = useState<ViewMode>("preview")
-  const [editingSection, setEditingSection] = useState<{ title: string; content: string } | null>(null)
+  const [editingSection, setEditingSection] = useState<{ title: string; content: string; index: number } | null>(null)
   const [copied, setCopied] = useState(false)
   const [approving, setApproving] = useState(false)
   const [showActivity, setShowActivity] = useState(false)
@@ -87,9 +87,31 @@ export default function SOPPreviewPage() {
   }
 
   const handleSectionSave = (newContent: string) => {
-    // In a real app, this would update the specific section
-    setContent(content.replace(editingSection?.content || "", newContent))
+    if (editingSection === null) return
+
+    let updatedContent: string
+
+    if (editingSection.index === -1) {
+      // Full document edit
+      updatedContent = newContent
+    } else {
+      // Section edit - use index-based replacement for reliability
+      const sections = content.split(/(?=^## )/m).filter(Boolean)
+      if (editingSection.index < 0 || editingSection.index >= sections.length) {
+        return
+      }
+      sections[editingSection.index] = newContent
+      updatedContent = sections.join('')
+    }
+
+    setContent(updatedContent)
     setEditingSection(null)
+
+    // Persist to Convex
+    if (sop) {
+      updateSOP(sop.id, { content: updatedContent })
+      toast.success("Section saved")
+    }
   }
 
   // Extract sections for editing
@@ -179,7 +201,7 @@ export default function SOPPreviewPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => setEditingSection({ title, content: section })}
+                      onClick={() => setEditingSection({ title, content: section, index })}
                       className="absolute -right-2 top-0 opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-blue-600"
                     >
                       <Pencil className="w-4 h-4" />
@@ -196,7 +218,7 @@ export default function SOPPreviewPage() {
         <div className="flex flex-col sm:flex-row gap-4 mt-6 justify-end">
           <Button
             variant="outline"
-            onClick={() => setEditingSection({ title: "Full Document", content })}
+            onClick={() => setEditingSection({ title: "Full Document", content, index: -1 })}
             className="gap-2 bg-transparent"
           >
             <Pencil className="w-4 h-4" />
@@ -302,6 +324,8 @@ export default function SOPPreviewPage() {
         <SectionEditorModal
           sectionTitle={editingSection.title}
           content={editingSection.content}
+          fullSopContent={content}
+          sopTitle={sop?.title}
           isOpen={true}
           onClose={() => setEditingSection(null)}
           onSave={handleSectionSave}
