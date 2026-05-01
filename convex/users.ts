@@ -68,9 +68,28 @@ export const getByClerkId = query({
             .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
             .first();
 
-        return user;
+        if (!user) return null;
+
+        return {
+            ...user,
+            tier: getActiveTier(user),
+        };
     },
 });
+
+function getActiveTier(user: any) {
+    if (user.tier === "free") return "free";
+    
+    // If we have an expiration date and it's in the past, fallback to free
+    if (user.subscriptionExpiresAt) {
+        const expiresAt = new Date(user.subscriptionExpiresAt);
+        if (new Date() > expiresAt) {
+            return "free";
+        }
+    }
+    
+    return user.tier;
+}
 
 /**
  * Check if user can create more SOPs
@@ -93,14 +112,15 @@ export const checkCanCreate = query({
             return { canCreate: true, remaining: 2, limit: 2 };
         }
 
-        const limit = PLAN_LIMITS[user.tier].creates;
+        const activeTier = getActiveTier(user);
+        const limit = PLAN_LIMITS[activeTier as "free" | "starter" | "pro"].creates;
         const remaining = limit === Infinity ? Infinity : limit - user.sopsCreatedThisMonth;
 
         return {
             canCreate: remaining > 0,
             remaining,
             limit,
-            tier: user.tier,
+            tier: activeTier,
         };
     },
 });
@@ -125,14 +145,15 @@ export const checkCanImprove = query({
             return { canImprove: true, remaining: 1, limit: 1 };
         }
 
-        const limit = PLAN_LIMITS[user.tier].improves;
+        const activeTier = getActiveTier(user);
+        const limit = PLAN_LIMITS[activeTier as "free" | "starter" | "pro"].improves;
         const remaining = limit === Infinity ? Infinity : limit - user.improvesUsedThisMonth;
 
         return {
             canImprove: remaining > 0,
             remaining,
             limit,
-            tier: user.tier,
+            tier: activeTier,
         };
     },
 });
@@ -564,7 +585,7 @@ export const getWatermarkSettings = query({
         return {
             customWatermark: user.customWatermark ?? "",
             watermarkEnabled: user.watermarkEnabled ?? false,
-            tier: user.tier,
+            tier: getActiveTier(user),
         };
     },
 });

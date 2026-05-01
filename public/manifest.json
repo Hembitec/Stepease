@@ -4,13 +4,8 @@
     "description": "AI-powered SOP builder that helps you create professional Standard Operating Procedures",
     "icons": [
         {
-            "src": "/favicon.ico",
-            "sizes": "48x48",
-            "type": "image/x-icon"
-        },
-        {
-            "src": "/icon.png",
-            "sizes": "192x192",
+            "src": "/icon-bg.png",
+            "sizes": "512x512",
             "type": "image/png",
             "purpose": "any maskable"
         }

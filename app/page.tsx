@@ -164,13 +164,13 @@ const testimonials = [
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=96&h=96&fit=crop&crop=face",
   },
   {
-    quote: "Passed our SOC2 audit with zero documentation gaps. The compliance team was shocked we had everything ready in two days.",
+    quote: "Standardizing our compliance procedures used to be a nightmare. Stepease helped us build a central source of truth that our entire team actually follows.",
     author: "Elena Rodriguez",
     role: "Compliance Director",
     department: "Financial services",
     teamSize: "Mid-size firm",
     location: "Miami",
-    outcome: "Zero audit gaps",
+    outcome: "100% policy adoption",
     image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=96&h=96&fit=crop&crop=face",
   },
 ]

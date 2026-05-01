@@ -29,6 +29,8 @@ export default function LibraryPage() {
   const { toggleMobileMenu } = useSidebar()
   const sessionsResult = useQuery(api.sessions.list)
   const reopenSession = useMutation(api.sessions.reopen)
+  const currentUser = useQuery(api.users.getByClerkId)
+  const userTier = (currentUser?.tier as "free" | "starter" | "pro") || "free"
 
   const [activeTab, setActiveTab] = useState<LibraryTab>("completed")
   const [viewMode, setViewMode] = useState<ViewMode>("list")
@@ -246,6 +248,7 @@ export default function LibraryPage() {
             onArchive={handleArchive}
             onRevise={handleRevise}
             onTableSort={handleTableSort}
+            tier={userTier}
           />
         )}
       </div>
@@ -284,7 +287,6 @@ export default function LibraryPage() {
               onChange={(e) => setRevisionReason(e.target.value)}
               placeholder="e.g. Compliance update, process change..."
               className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-4"
-              autoFocus
               onKeyDown={(e) => e.key === "Enter" && confirmRevise()}
             />
             <div className="flex gap-2.5">
@@ -418,6 +420,7 @@ interface CompletedViewProps {
   onArchive: (id: string) => void
   onRevise: (sessionId: string) => void
   onTableSort: (col: string) => void
+  tier?: "free" | "starter" | "pro"
 }
 
 // =============================================================================
@@ -429,16 +432,18 @@ function SOPVersionGroup({
   onDelete,
   onArchive,
   onRevise,
+  tier,
 }: {
   sops: SOP[]
   onDelete: (id: string) => void
   onArchive: (id: string) => void
   onRevise?: (sessionId: string) => void
+  tier?: "free" | "starter" | "pro"
 }) {
   const [isExpanded, setIsExpanded] = useState(false)
 
   // Sort by version descending to get latest first
-  const sortedSops = [...sops].sort((a, b) => (b.version ?? 1) - (a.version ?? 1))
+  const sortedSops = sops.toSorted((a, b) => (b.version ?? 1) - (a.version ?? 1))
   const latestSop = sortedSops[0]
   const olderVersions = sortedSops.slice(1)
   const hasHistory = olderVersions.length > 0
@@ -453,6 +458,7 @@ function SOPVersionGroup({
         hasHistory={hasHistory}
         isHistoryExpanded={isExpanded}
         onToggleHistory={() => setIsExpanded(!isExpanded)}
+        tier={tier}
       />
       {isExpanded && hasHistory && (
         <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
@@ -464,6 +470,7 @@ function SOPVersionGroup({
               onArchive={onArchive}
               onRevise={onRevise}
               isHistory={true}
+              tier={tier}
             />
           ))}
         </div>
@@ -483,6 +490,7 @@ function CompletedView({
   sortBy, setSortBy,
   viewMode, setViewMode,
   onDelete, onArchive, onRevise, onTableSort,
+  tier = "free",
 }: CompletedViewProps) {
   // Group SOPs by parentSopId
   const groupedSOPs = useMemo(() => {
@@ -500,8 +508,8 @@ function CompletedView({
     const groups = Array.from(parentMap.values())
 
     groups.sort((groupA, groupB) => {
-      const latestA = [...groupA].sort((a, b) => (b.version ?? 1) - (a.version ?? 1))[0]
-      const latestB = [...groupB].sort((a, b) => (b.version ?? 1) - (a.version ?? 1))[0]
+      const latestA = groupA.toSorted((a, b) => (b.version ?? 1) - (a.version ?? 1))[0]
+      const latestB = groupB.toSorted((a, b) => (b.version ?? 1) - (a.version ?? 1))[0]
 
       if (sortBy === "recent") {
         return new Date(latestB.updatedAt).getTime() - new Date(latestA.updatedAt).getTime()
@@ -613,6 +621,7 @@ function CompletedView({
                     onDelete={onDelete}
                     onArchive={onArchive}
                     onRevise={onRevise}
+                    tier={tier}
                   />
                 )
               })}
@@ -622,7 +631,7 @@ function CompletedView({
           {viewMode === "grid" && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
               {filteredSOPs.map((sop) => (
-                <SOPGridCard key={sop.id} sop={sop} />
+                <SOPGridCard key={sop.id} sop={sop} tier={tier} onRevise={onRevise} />
               ))}
             </div>
           )}
@@ -634,6 +643,8 @@ function CompletedView({
               onArchive={onArchive}
               sortBy={sortBy}
               onSort={onTableSort}
+              tier={tier}
+              onRevise={onRevise}
             />
           )}
         </>

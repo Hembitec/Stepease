@@ -65,7 +65,7 @@ interface SOPContextType {
   advancePhase: () => void
 
   // Finalization
-  finalizeSession: (title?: string, department?: string) => SOP | null
+
 
   // Utilities
   getSessionNotesByCategory: () => Record<string, Note[]>
@@ -559,39 +559,6 @@ export function SOPProvider({ children }: { children: ReactNode }) {
     })
   }, [session?.phase, activeSessionId, updateSessionProgressMutation])
 
-  // -------------------------------------------------------------------------
-  // Session Finalization
-  // -------------------------------------------------------------------------
-
-  const finalizeSession = useCallback((title?: string, department?: string): SOP | null => {
-    if (!session) return null
-
-    // Check if this is a revision (session metadata has version info from reopen)
-    const metadata = (activeConvexSession?.metadata as Record<string, unknown>) || {}
-    const isRevision = !!metadata.revisionOf
-    const nextVersion = isRevision ? ((metadata.revisionFromVersion as number) ?? 1) + 1 : 1
-    const parentSopId = isRevision ? (metadata.parentSopId as string) : undefined
-
-    const newSOP: SOP = {
-      id: session.id.replace("session", "sop"),
-      title: title || session.title || "Untitled SOP",
-      department: department || "General",
-      status: "draft",
-      createdAt: session.createdAt,
-      updatedAt: new Date().toISOString(),
-      notes: session.notes,
-      chatHistory: session.messages,
-      content: "",
-      version: nextVersion,
-      parentSopId,
-    }
-
-    addSOP(newSOP)
-    setCurrentSOP(newSOP)
-    endSession()
-
-    return newSOP
-  }, [session, activeConvexSession, addSOP, endSession])
 
   // -------------------------------------------------------------------------
   // Utility Functions
@@ -677,7 +644,7 @@ export function SOPProvider({ children }: { children: ReactNode }) {
     advancePhase,
 
     // Finalization
-    finalizeSession,
+
 
     // Utilities
     getSessionNotesByCategory,

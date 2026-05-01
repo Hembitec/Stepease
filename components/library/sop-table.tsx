@@ -1,21 +1,32 @@
 "use client"
 
 import Link from "next/link"
-import { MoreVertical, Download, Trash2, Archive, ArchiveRestore, ArrowUpDown } from "lucide-react"
+import { MoreVertical, Trash2, Archive, ArchiveRestore, ArrowUpDown, FileEdit } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { DownloadMenu } from "@/components/sop/download-menu"
 import { cn } from "@/lib/utils"
 import type { SOP } from "@/lib/types"
+
+type UserTier = "free" | "starter" | "pro"
 
 interface SOPTableProps {
   sops: SOP[]
   onDelete: (id: string) => void
   onArchive: (id: string) => void
   sortBy: string
-  onSort: (column: string) => void
+  onSort: (col: string) => void
+  tier?: UserTier
+  onRevise?: (sessionId: string) => void
 }
 
-export function SOPTable({ sops, onDelete, onArchive, sortBy, onSort }: SOPTableProps) {
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+})
+
+export function SOPTable({ sops, onDelete, onArchive, sortBy, onSort, tier = "free", onRevise }: SOPTableProps) {
   const statusColors = {
     draft: "bg-yellow-100 text-yellow-700",
     complete: "bg-green-100 text-green-700",
@@ -24,11 +35,7 @@ export function SOPTable({ sops, onDelete, onArchive, sortBy, onSort }: SOPTable
 
   const formatDate = (dateString: string) => {
     // Use explicit locale to prevent hydration mismatch
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    }).format(new Date(dateString))
+    return dateFormatter.format(new Date(dateString))
   }
 
   return (
@@ -114,10 +121,22 @@ export function SOPTable({ sops, onDelete, onArchive, sortBy, onSort }: SOPTable
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem>
-                        <Download className="w-4 h-4 mr-2" />
-                        Download
-                      </DropdownMenuItem>
+                      {sop.content && sop.status !== "draft" && (
+                        <div className="px-2 py-1.5">
+                          <DownloadMenu
+                            content={sop.content}
+                            title={sop.title}
+                            tier={tier}
+                            sopId={sop.id}
+                          />
+                        </div>
+                      )}
+                      {sop.sessionId && sop.status === "complete" && onRevise && (
+                        <DropdownMenuItem onClick={() => onRevise(sop.sessionId!)}>
+                          <FileEdit className="w-4 h-4 mr-2" />
+                          Revise
+                        </DropdownMenuItem>
+                      )}
                       <DropdownMenuItem onClick={() => onArchive(sop.id)}>
                         {sop.status === "archived" ? (
                           <><ArchiveRestore className="w-4 h-4 mr-2" />Unarchive</>

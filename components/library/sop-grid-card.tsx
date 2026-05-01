@@ -1,16 +1,27 @@
 "use client"
 
 import Link from "next/link"
-import { FileText } from "lucide-react"
+import { FileText, FileEdit } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { DownloadMenu } from "@/components/sop/download-menu"
 import { cn } from "@/lib/utils"
 import type { SOP } from "@/lib/types"
 
+type UserTier = "free" | "starter" | "pro"
+
 interface SOPGridCardProps {
   sop: SOP
+  tier?: UserTier
+  onRevise?: (sessionId: string) => void
 }
 
-export function SOPGridCard({ sop }: SOPGridCardProps) {
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+})
+
+export function SOPGridCard({ sop, tier = "free", onRevise }: SOPGridCardProps) {
   const statusColors = {
     draft: "bg-yellow-100 text-yellow-700",
     complete: "bg-green-100 text-green-700",
@@ -27,11 +38,7 @@ export function SOPGridCard({ sop }: SOPGridCardProps) {
     if (diffDays === 1) return "Yesterday"
     if (diffDays < 7) return `${diffDays}d ago`
     // Use explicit locale to prevent hydration mismatch
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    }).format(date)
+    return dateFormatter.format(date)
   }
 
   return (
@@ -48,21 +55,40 @@ export function SOPGridCard({ sop }: SOPGridCardProps) {
         <span className={cn("px-2 py-0.5 text-xs font-medium rounded-full capitalize", statusColors[sop.status])}>
           {sop.status}
         </span>
-        {sop.version && sop.version > 1 && (
-          <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-slate-100 text-slate-600 border border-slate-200 uppercase">
-            v{sop.version}
-          </span>
-        )}
+        <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-slate-100 text-slate-600 border border-slate-200 uppercase">
+          v{sop.version ?? 1}
+        </span>
       </div>
       <p className="text-xs text-slate-400 mb-4">Updated {formatDate(sop.updatedAt)}</p>
 
-      {/* Action */}
-      <div className="mt-auto">
-        <Link href={sop.status === "draft" ? `/create?id=${sop.id}` : `/preview/${sop.id}`}>
+      {/* Actions */}
+      <div className="mt-auto flex gap-2">
+        <Link href={sop.status === "draft" ? `/create?id=${sop.id}` : `/preview/${sop.id}`} className="flex-1">
           <Button variant="outline" className="w-full bg-transparent">
             {sop.status === "draft" ? "Continue" : "View"}
           </Button>
         </Link>
+        {sop.content && sop.status !== "draft" && (
+          <>
+            <DownloadMenu
+              content={sop.content}
+              title={sop.title}
+              tier={tier}
+              sopId={sop.id}
+            />
+            {sop.sessionId && sop.status === "complete" && onRevise && (
+              <Button 
+                variant="outline" 
+                size="icon" 
+                onClick={() => onRevise(sop.sessionId!)}
+                title="Revise SOP"
+                className="bg-transparent"
+              >
+                <FileEdit className="w-4 h-4 text-blue-600" />
+              </Button>
+            )}
+          </>
+        )}
       </div>
     </div>
   )

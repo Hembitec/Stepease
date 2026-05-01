@@ -21,6 +21,27 @@ export const list = query({
     },
 });
 
+// Get only active (in-progress) sessions — excludes approved/completed
+// Used by the dashboard "Continue Where You Left Off" section
+export const listActive = query({
+    args: {},
+    handler: async (ctx) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) return [];
+
+        const allSessions = await ctx.db
+            .query("sessions")
+            .withIndex("by_user", (q) => q.eq("userId", identity.subject))
+            .order("desc")
+            .collect();
+
+        // Filter out approved sessions and sessions at 100% completion
+        return allSessions.filter(
+            (s) => s.status !== "approved" && s.phase !== "complete"
+        );
+    },
+});
+
 // Get a single session by ID
 export const get = query({
     args: { id: v.id("sessions") },

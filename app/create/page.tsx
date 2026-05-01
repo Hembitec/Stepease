@@ -348,63 +348,18 @@ function CreateSOPInner() {
   // ---------------------------------------------------------------------------
 
   const handleSaveDraft = useCallback(() => {
-    // Check if this is a revision — find existing SOP with same sessionId
-    const existingSop = sops.find(s => s.sessionId === session?.id && s.status === 'complete')
-    const parentId = existingSop?.parentSopId || existingSop?.id
-    const currentMaxVersion = parentId
-      ? Math.max(...sops.filter(s => s.parentSopId === parentId || s.id === parentId).map(s => s.version ?? 1))
-      : 0
-    const nextVersion = parentId ? currentMaxVersion + 1 : 1
-    const titleBase = (session?.title || "New SOP Draft").replace(/\s*—\s*v\d+$/, '')
-
-    const newSOP: SOP = {
-      id: `sop-${Date.now()}`,
-      title: nextVersion > 1 ? `${titleBase} — v${nextVersion}` : titleBase,
-      department: "General",
-      status: "draft",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      content: "",
-      notes,
-      chatHistory,
-      sessionId: session?.id,
-      version: nextVersion,
-      parentSopId: parentId,
-    }
-    addSOP(newSOP)
     toast.success("Draft saved successfully")
     router.push("/dashboard")
-  }, [notes, chatHistory, addSOP, router, session?.id, session?.title, sops])
+  }, [router])
 
   const handleReview = useCallback(() => {
-    // Check if this is a revision — find existing SOP with same sessionId
-    const existingSop = sops.find(s => s.sessionId === session?.id && s.status === 'complete')
-    const parentId = existingSop?.parentSopId || existingSop?.id
-    const currentMaxVersion = parentId
-      ? Math.max(...sops.filter(s => s.parentSopId === parentId || s.id === parentId).map(s => s.version ?? 1))
-      : 0
-    const nextVersion = parentId ? currentMaxVersion + 1 : 1
-    const titleBase = (session?.title || "New SOP").replace(/\s*—\s*v\d+$/, '')
-
-    const sopId = `sop-${Date.now()}`
-    const newSOP: SOP = {
-      id: sopId,
-      title: nextVersion > 1 ? `${titleBase} — v${nextVersion}` : titleBase,
-      department: "General",
-      status: "draft",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      content: "",
-      notes,
-      chatHistory,
-      sessionId: session?.id,
-      version: nextVersion,
-      parentSopId: parentId,
+    if (!session?.id) {
+      toast.error("No active session found")
+      return
     }
-    addSOP(newSOP)
     toast.success("SOP ready for review")
-    router.push(`/review/${sopId}`)
-  }, [notes, chatHistory, addSOP, router, session?.id, session?.title, sops])
+    router.push(`/review/${session.id}`)
+  }, [router, session?.id])
 
   const handleDeleteNote = useCallback((id: string) => {
     setNotes((prev) => prev.filter((n) => n.id !== id))

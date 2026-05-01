@@ -9,15 +9,14 @@ import { calculateOverallProgress, type ConversationPhase } from "@/lib/types"
 import { DraftsSkeleton } from "@/components/skeletons"
 
 export function DraftsSection() {
-    const sessionsResult = useQuery(api.sessions.list)
+    const sessionsResult = useQuery(api.sessions.listActive)
 
     // Show skeleton while loading
     if (sessionsResult === undefined) {
         return <DraftsSkeleton />
     }
 
-    const allSessions = sessionsResult ?? []
-    const sessions = allSessions.filter(s => s.status !== "approved" && s.phaseProgress < 100)
+    const sessions = sessionsResult ?? []
 
     if (sessions.length === 0) {
         return null
@@ -50,8 +49,7 @@ export function DraftsSection() {
             {/* List style layout */}
             <div className="space-y-3">
                 {displaySessions.map((session) => {
-                    // Use phaseProgress directly (not overall progress)
-                    const progress = session.phaseProgress
+                    const progress = calculateOverallProgress(session.phase as ConversationPhase, session.phaseProgress)
                     const isImprove = session.metadata?.mode === "improve"
 
                     return (
@@ -110,7 +108,7 @@ export function DraftsSection() {
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="text-slate-600 hover:text-blue-600 hover:bg-blue-50 flex-shrink-0"
+                                    className="text-slate-600 hover:text-blue-700 hover:bg-blue-50 flex-shrink-0"
                                 >
                                     <Play className="w-4 h-4 mr-1" />
                                     <span className="hidden sm:inline">Continue</span>

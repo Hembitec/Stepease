@@ -1,15 +1,15 @@
 "use client"
 
 import Link from "next/link"
-import { FileText, MoreVertical, Download, Trash2, Archive, ArchiveRestore, Eye, Pencil, RefreshCw } from "lucide-react"
+import { FileText, MoreVertical, Trash2, Archive, ArchiveRestore, Eye, Pencil, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { DownloadMenu } from "@/components/sop/download-menu"
 import { cn } from "@/lib/utils"
 import { formatRelativeDate } from "@/lib/format-date"
 import type { SOP } from "@/lib/types"
-import { useQuery } from "convex/react"
-import { api } from "@/convex/_generated/api"
-import { DownloadMenu } from "@/components/sop/download-menu"
+
+type UserTier = "free" | "starter" | "pro"
 
 interface SOPListItemProps {
   sop: SOP
@@ -20,20 +20,19 @@ interface SOPListItemProps {
   hasHistory?: boolean
   isHistoryExpanded?: boolean
   onToggleHistory?: () => void
+  tier?: UserTier
 }
 
 export function SOPListItem({
   sop, onDelete, onArchive, onRevise,
-  isHistory, hasHistory, isHistoryExpanded, onToggleHistory
+  isHistory, hasHistory, isHistoryExpanded, onToggleHistory,
+  tier = "free",
 }: SOPListItemProps) {
   const statusColors = {
     draft: "bg-yellow-100 text-yellow-700",
     complete: "bg-green-100 text-green-700",
     archived: "bg-slate-100 text-slate-600",
   }
-
-  const currentUser = useQuery(api.users.getByClerkId)
-  const userTier = (currentUser?.tier as "free" | "starter" | "pro") || "free"
 
 
   return (
@@ -78,14 +77,12 @@ export function SOPListItem({
           <span className={cn("px-2 py-0.5 text-xs font-medium rounded-full capitalize", statusColors[sop.status])}>
             {sop.status}
           </span>
-          {sop.version && (
-            <>
+          <>
               <span>&middot;</span>
               <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-slate-100 text-slate-600 border border-slate-200 uppercase">
-                v{sop.version}
+                v{sop.version ?? 1}
               </span>
             </>
-          )}
         </div>
       </div>
 
@@ -110,9 +107,14 @@ export function SOPListItem({
             )}
           </Button>
         </Link>
-        <div className="relative">
-          <DownloadMenu content={sop.content} title={sop.title} tier={userTier} sopId={sop.id} />
-        </div>
+        {sop.content && sop.status !== "draft" && (
+          <DownloadMenu
+            content={sop.content}
+            title={sop.title}
+            tier={tier}
+            sopId={sop.id}
+          />
+        )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm" className="h-8 w-8 p-0">

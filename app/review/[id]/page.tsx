@@ -36,7 +36,7 @@ export default function ReviewNotesPage() {
   const { sops, updateSOP, session, addSessionNotes, addSOP } = useSOPContext()
 
   // Try to find existing SOP, or use session notes for improvement mode
-  const sop = sops.find((s) => s.id === params.id)
+  const sop = sops.find((s) => s.id === params.id || s.sessionId === params.id)
   const isImprovementMode = session?.metadata?.mode === 'improve'
 
   // Use session notes if in improvement mode and no SOP exists yet
@@ -176,10 +176,16 @@ export default function ReviewNotesPage() {
 
       // Update the SOP/session with the generated content
       if (!sop) {
-        // SOP doesn't exist, create it (common in improvement mode)
+        // SOP doesn't exist, create it
+        const metadata = (session?.metadata as Record<string, unknown>) || {}
+        const isRevision = !!metadata.revisionOf
+        const nextVersion = isRevision ? ((metadata.revisionFromVersion as number) ?? 1) + 1 : 1
+        const parentSopId = isRevision ? (metadata.parentSopId as string) : undefined
+        const titleBase = (session?.title || 'Standard Operating Procedure').replace(/\s*—\s*v\d+$/, '')
+
         const newSOP: SOP = {
-          id: sessionId,
-          title: session?.title || 'Standard Operating Procedure',
+          id: `sop-${Date.now()}`,
+          title: nextVersion > 1 ? `${titleBase} — v${nextVersion}` : titleBase,
           status: 'draft',
           content: generatedContent,
           notes,
@@ -187,6 +193,8 @@ export default function ReviewNotesPage() {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           sessionId: session?.id, // Link back to original session
+          version: nextVersion,
+          parentSopId,
         }
         await addSOP(newSOP)
       } else {
@@ -199,7 +207,8 @@ export default function ReviewNotesPage() {
       }
 
       // Navigate to preview after database write completes
-      router.push(`/preview/${sessionId}`)
+      // We push to the preview page using the sessionId, which the preview page can use to find the SOP
+      router.push(`/preview/${session?.id || params.id}`)
     } catch (error) {
       console.error('Generation error:', error)
       alert('Failed to generate SOP. Please try again.')
