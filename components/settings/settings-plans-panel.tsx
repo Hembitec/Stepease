@@ -1,13 +1,10 @@
 "use client"
 
-import { useState } from "react"
 import { Check, Sparkles, Crown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { PLANS } from "@/lib/flutterwave/plans"
-import { upgradeSubscription } from "@/app/actions/payment"
-import { toast } from "sonner"
-import { useUser } from "@clerk/nextjs"
+import { useUpgrade } from "@/hooks/use-upgrade"
 
 interface SettingsPlansPanelProps {
     currentTier: "free" | "starter" | "pro"
@@ -41,27 +38,7 @@ const plans = [
 ]
 
 export function SettingsPlansPanel({ currentTier }: SettingsPlansPanelProps) {
-    const [loading, setLoading] = useState<string | null>(null)
-    const { user } = useUser()
-
-    const handleUpgrade = async (planKey: "starter" | "pro") => {
-        try {
-            setLoading(planKey)
-            const email = user?.emailAddresses[0]?.emailAddress
-            if (!email) {
-                toast.error("Could not find your email address. Please try again.")
-                setLoading(null)
-                return
-            }
-
-            const checkoutUrl = await upgradeSubscription(planKey, email)
-            window.location.href = checkoutUrl
-        } catch (error) {
-            console.error("Upgrade error:", error)
-            toast.error("Failed to start upgrade. Please try again.")
-            setLoading(null)
-        }
-    }
+    const { loading, handleUpgrade } = useUpgrade()
 
     return (
         <div>

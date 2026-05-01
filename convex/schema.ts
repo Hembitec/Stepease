@@ -44,12 +44,19 @@ export default defineSchema({
         improvesUsedThisMonth: v.number(),
         usageResetAt: v.string(), // ISO date for monthly reset
 
+        // Subscription Billing Period
+        subscriptionStartedAt: v.optional(v.string()),  // When current subscription began
+        subscriptionExpiresAt: v.optional(v.string()),  // When it expires (1 month from last payment)
+        lastPaymentAt: v.optional(v.string()),           // Last successful payment timestamp
+        totalPayments: v.optional(v.number()),           // Lifetime payment count
+
         // PDF Branding (Pro tier)
         customWatermark: v.optional(v.string()),
         watermarkEnabled: v.optional(v.boolean()),
     })
         .index("by_clerk_id", ["clerkId"])
-        .index("by_flw_customer", ["flwCustomerId"]),
+        .index("by_flw_customer", ["flwCustomerId"])
+        .index("by_expires_at", ["subscriptionExpiresAt"]),
 
     // Table for Finalized/Saved SOPs
     sops: defineTable({
@@ -98,7 +105,7 @@ export default defineSchema({
     // Activity/Audit Log — tracks user actions across the app
     activity_log: defineTable({
         userId: v.string(),
-        action: v.string(),         // 'created' | 'approved' | 'revised' | 'exported' | 'shared' | 'archived' | 'deleted'
+        action: v.string(),         // 'created' | 'approved' | 'revised' | 'exported' | 'shared' | 'archived' | 'deleted' | 'subscription_updated' | 'subscription_cancelled' | 'subscription_expired'
         sopId: v.optional(v.string()),
         sopTitle: v.optional(v.string()),
         details: v.optional(v.string()), // Extra context, e.g. "Exported as PDF"
@@ -106,4 +113,21 @@ export default defineSchema({
     })
         .index("by_user", ["userId"])
         .index("by_sop", ["sopId"]),
+
+    // Payment History — records every payment/billing event from Flutterwave
+    payment_history: defineTable({
+        userId: v.string(),               // clerkId of the user
+        flwTransactionId: v.string(),     // Flutterwave transaction ID (for deduplication)
+        flwTxRef: v.string(),             // tx_ref used in the checkout (also for dedup)
+        amount: v.number(),               // Amount charged
+        currency: v.string(),             // e.g. "USD"
+        tier: v.union(v.literal("free"), v.literal("starter"), v.literal("pro")),
+        event: v.string(),                // "charge.completed", "subscription.cancelled", "charge.failed"
+        status: v.string(),               // "successful", "failed", "cancelled"
+        metadata: v.optional(v.any()),    // Additional raw data from FLW
+        timestamp: v.string(),            // ISO timestamp of the event
+    })
+        .index("by_user", ["userId"])
+        .index("by_flw_txn", ["flwTransactionId"])
+        .index("by_tx_ref", ["flwTxRef"]),
 });

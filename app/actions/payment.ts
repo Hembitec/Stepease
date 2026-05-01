@@ -40,27 +40,6 @@ export async function upgradeSubscription(
     return checkoutUrl;
 }
 
-/**
- * Handle successful payment redirect
- * This is called when user returns from Flutterwave
- */
-export async function handlePaymentSuccess(): Promise<{
-    success: boolean;
-    message: string;
-}> {
-    const { userId } = await auth();
-
-    if (!userId) {
-        return { success: false, message: "Not authenticated" };
-    }
-
-    // The webhook will have already updated the subscription
-    // This action just confirms the return
-    return {
-        success: true,
-        message: "Your subscription has been upgraded! Enjoy unlimited access.",
-    };
-}
 
 /**
  * Cancel the current subscription

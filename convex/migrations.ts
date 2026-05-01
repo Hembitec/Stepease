@@ -107,3 +107,94 @@ export const backfillTitles = mutation({
         };
     },
 });
+
+/**
+ * Fix stale user data — one-time migration for existing users.
+ *
+ * Issues fixed:
+ * 1. usageResetAt dates 1-2 months in the past (usage never reset)
+ * 2. Free-tier user with 9 SOPs + 3 improves (exceeds limits)
+ * 3. Paying users missing subscriptionExpiresAt, totalPayments, lastPaymentAt
+ *
+ * Run with: npx convex run migrations:fixStaleUserData
+ */
+export const fixStaleUserData = mutation({
+    args: {},
+    handler: async (ctx) => {
+        const now = new Date();
+        const users = await ctx.db.query("users").collect();
+        const report: Record<string, string[]> = {};
+
+        for (const user of users) {
+            const changes: string[] = [];
+
+            // Fix 1: Advance stale usageResetAt to next valid future date
+            const resetDate = new Date(user.usageResetAt);
+            if (now >= resetDate) {
+                const newReset = new Date(resetDate);
+                while (now >= newReset) {
+                    newReset.setMonth(newReset.getMonth() + 1);
+                }
+                await ctx.db.patch(user._id, { usageResetAt: newReset.toISOString() });
+                changes.push(
+                    `usageResetAt: ${resetDate.toISOString().split("T")[0]} → ${newReset.toISOString().split("T")[0]}`
+                );
+            }
+
+            // Fix 2: Clear corrupted usage for free-tier users over limits
+            if (user.tier === "free") {
+                const hasExcessCreates = user.sopsCreatedThisMonth > 2;
+                const hasExcessImproves = user.improvesUsedThisMonth > 0;
+                if (hasExcessCreates || hasExcessImproves) {
+                    await ctx.db.patch(user._id, {
+                        sopsCreatedThisMonth: 0,
+                        improvesUsedThisMonth: 0,
+                    });
+                    changes.push(
+                        `Reset corrupted usage — creates: ${user.sopsCreatedThisMonth}→0, improves: ${user.improvesUsedThisMonth}→0`
+                    );
+                }
+            }
+
+            // Fix 3: Backfill subscription fields for existing paying users
+            if (user.tier !== "free" && user.flwCustomerId) {
+                const patch: Record<string, unknown> = {};
+
+                if (!user.totalPayments) {
+                    patch.totalPayments = 1;
+                    changes.push("totalPayments: null → 1");
+                }
+                if (!user.lastPaymentAt) {
+                    patch.lastPaymentAt = "2026-03-01T00:00:00.000Z";
+                    changes.push("lastPaymentAt: null → 2026-03-01 (estimated)");
+                }
+                if (!user.subscriptionStartedAt) {
+                    patch.subscriptionStartedAt = "2026-03-01T00:00:00.000Z";
+                    changes.push("subscriptionStartedAt: null → 2026-03-01 (estimated)");
+                }
+                if (!user.subscriptionExpiresAt) {
+                    // Expire in 48h — forces re-subscription to test the new renewal flow
+                    const expiresAt = new Date(now);
+                    expiresAt.setHours(now.getHours() + 48);
+                    patch.subscriptionExpiresAt = expiresAt.toISOString();
+                    changes.push(`subscriptionExpiresAt: null → ${expiresAt.toISOString().split("T")[0]} (48h from now)`);
+                }
+
+                if (Object.keys(patch).length > 0) {
+                    await ctx.db.patch(user._id, patch);
+                }
+            }
+
+            if (changes.length > 0) {
+                report[user.email] = changes;
+            }
+        }
+
+        return {
+            message: "Migration complete",
+            usersModified: Object.keys(report).length,
+            totalUsers: users.length,
+            details: report,
+        };
+    },
+});

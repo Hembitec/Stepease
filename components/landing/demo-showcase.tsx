@@ -7,7 +7,7 @@
 // =============================================================================
 
 import { useState, useEffect, useRef, useCallback } from "react"
-import { Play, RotateCcw, Sparkles, PanelRightClose, PanelRightOpen } from "lucide-react"
+import { Play, Pause, RotateCcw, SkipForward, Sparkles, PanelRightClose, PanelRightOpen } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { DEMO_PHASES, GENERATED_SOP_PREVIEW } from "./demo-data"
@@ -33,6 +33,7 @@ const RESULT_DISPLAY_DELAY = 2000  // ms before showing generated SOP
 type DemoState =
     | "idle"           // Waiting to start
     | "playing"        // Actively animating
+    | "paused"         // User paused playback
     | "typing"         // Showing typing indicator
     | "phase-transition" // Pause between phases
     | "generating"     // Simulating SOP generation
@@ -51,9 +52,11 @@ export function DemoShowcase() {
     const [showResult, setShowResult] = useState(false)
     const [progress, setProgress] = useState(0)
     const [showNotesMobile, setShowNotesMobile] = useState(false)
+    const [isPaused, setIsPaused] = useState(false)
     const chatContainerRef = useRef<HTMLDivElement>(null)
     const timeoutRef = useRef<NodeJS.Timeout | null>(null)
     const containerRef = useRef<HTMLDivElement>(null)
+    const resumeRef = useRef<(() => void) | null>(null)
 
     // Track if component is mounted to prevent state updates after unmount
     const isMounted = useRef(true)
@@ -63,6 +66,18 @@ export function DemoShowcase() {
             if (timeoutRef.current) clearTimeout(timeoutRef.current)
         }
     }, [])
+
+    // Keyboard controls: space to pause/resume
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.code === "Space" && demoState !== "idle" && demoState !== "complete") {
+                e.preventDefault()
+                togglePause()
+            }
+        }
+        window.addEventListener("keydown", handleKeyDown)
+        return () => window.removeEventListener("keydown", handleKeyDown)
+    }, [demoState, isPaused])
 
     // Auto-scroll chat — scoped to the chat container, NOT the page
     useEffect(() => {
@@ -74,6 +89,54 @@ export function DemoShowcase() {
     // Animation Engine
     // ---------------------------------------------------------------------------
 
+    // Pause/resume mechanism
+    const wait = useCallback((ms: number) => {
+        return new Promise<void>((resolve) => {
+            const checkPause = () => {
+                if (!isMounted.current) return
+                if (isPaused) {
+                    resumeRef.current = () => {
+                        timeoutRef.current = setTimeout(resolve, ms)
+                    }
+                } else {
+                    timeoutRef.current = setTimeout(resolve, ms)
+                }
+            }
+            checkPause()
+        })
+    }, [isPaused])
+
+    const togglePause = useCallback(() => {
+        setIsPaused((prev) => {
+            const next = !prev
+            if (!next && resumeRef.current) {
+                // Resuming
+                resumeRef.current()
+                resumeRef.current = null
+            }
+            return next
+        })
+    }, [])
+
+    const skipToEnd = useCallback(() => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current)
+        // Show all phases' messages and notes
+        const allMessages = DEMO_PHASES.flatMap(p => p.messages)
+        const allNotes = DEMO_PHASES.flatMap(p => p.notes)
+        setVisibleMessages(allMessages)
+        setVisibleNotes(allNotes)
+        setCurrentPhaseIndex(DEMO_PHASES.length - 1)
+        setProgress(100)
+        setIsTyping(false)
+        setIsPaused(false)
+        setDemoState("generating")
+        timeoutRef.current = setTimeout(() => {
+            if (!isMounted.current) return
+            setShowResult(true)
+            setDemoState("complete")
+        }, 800)
+    }, [])
+
     const playPhaseMessages = useCallback(
         async (phaseIndex: number) => {
             if (!isMounted.current) return
@@ -83,11 +146,10 @@ export function DemoShowcase() {
                 // All phases done → show generated SOP
                 setDemoState("generating")
                 setProgress(100)
-                timeoutRef.current = setTimeout(() => {
-                    if (!isMounted.current) return
-                    setShowResult(true)
-                    setDemoState("complete")
-                }, RESULT_DISPLAY_DELAY)
+                await wait(RESULT_DISPLAY_DELAY)
+                if (!isMounted.current) return
+                setShowResult(true)
+                setDemoState("complete")
                 return
             }
 
@@ -104,16 +166,12 @@ export function DemoShowcase() {
                 // Show typing indicator for AI messages
                 if (msg.role === "ai") {
                     setIsTyping(true)
-                    await new Promise((resolve) => {
-                        timeoutRef.current = setTimeout(resolve, delay)
-                    })
+                    await wait(delay)
                     if (!isMounted.current) return
                     setIsTyping(false)
                 } else {
                     // Brief pause before user messages
-                    await new Promise((resolve) => {
-                        timeoutRef.current = setTimeout(resolve, delay)
-                    })
+                    await wait(delay)
                     if (!isMounted.current) return
                 }
 
@@ -121,18 +179,14 @@ export function DemoShowcase() {
                 setVisibleMessages((prev) => [...prev, msg])
 
                 // Brief pause after each message
-                await new Promise((resolve) => {
-                    timeoutRef.current = setTimeout(resolve, TYPING_DELAY)
-                })
+                await wait(TYPING_DELAY)
             }
 
             if (!isMounted.current) return
 
             // Add notes for this phase
             if (phase.notes.length > 0) {
-                await new Promise((resolve) => {
-                    timeoutRef.current = setTimeout(resolve, NOTE_APPEAR_DELAY)
-                })
+                await wait(NOTE_APPEAR_DELAY)
                 if (!isMounted.current) return
                 setVisibleNotes((prev) => [...prev, ...phase.notes])
             }
@@ -141,15 +195,13 @@ export function DemoShowcase() {
             setProgress(phase.progress)
 
             // Transition to next phase
-            await new Promise((resolve) => {
-                timeoutRef.current = setTimeout(resolve, PHASE_TRANSITION_DELAY)
-            })
+            await wait(PHASE_TRANSITION_DELAY)
             if (!isMounted.current) return
 
             // Next phase
             playPhaseMessages(phaseIndex + 1)
         },
-        []
+        [wait]
     )
 
     // ---------------------------------------------------------------------------
@@ -164,11 +216,14 @@ export function DemoShowcase() {
         setProgress(0)
         setShowResult(false)
         setIsTyping(false)
+        setIsPaused(false)
         playPhaseMessages(0)
     }, [playPhaseMessages])
 
     const restartDemo = useCallback(() => {
         if (timeoutRef.current) clearTimeout(timeoutRef.current)
+        setIsPaused(false)
+        resumeRef.current = null
         startDemo()
     }, [startDemo])
 
@@ -180,12 +235,13 @@ export function DemoShowcase() {
         <div ref={containerRef} className="w-full max-w-5xl mx-auto overflow-hidden">
             {/* Demo Window — Mock App UI */}
             <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xl shadow-slate-200/50 overflow-hidden">
-                {/* Mock Window Bar */}
+                {/* Mock Window Bar - macOS accurate colors */}
                 <div className="bg-slate-800 px-3 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between">
                     <div className="flex items-center gap-1.5 sm:gap-2">
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500" />
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500" />
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500" />
+                        {/* macOS window control colors: close #FF5F57, minimize #FFBD2E, maximize #28C840 */}
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full" style={{ backgroundColor: '#FF5F57' }} />
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full" style={{ backgroundColor: '#FFBD2E' }} />
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full" style={{ backgroundColor: '#28C840' }} />
                     </div>
                     <div className="text-[10px] sm:text-xs text-slate-400 font-medium">
                         stepease.app — Create New SOP
@@ -229,22 +285,21 @@ export function DemoShowcase() {
                     {demoState === "idle" && (
                         <div className="flex-1 flex items-center justify-center">
                             <div className="text-center px-4">
-                                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-5">
-                                    <Sparkles className="w-7 h-7 sm:w-8 sm:h-8 text-blue-600" />
+                                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-5">
+                                    <Sparkles className="w-7 h-7 sm:w-8 sm:h-8 text-slate-700" />
                                 </div>
                                 <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-1.5 sm:mb-2">
-                                    Watch AI Create an SOP
+                                    See how it works
                                 </h3>
                                 <p className="text-xs sm:text-sm text-slate-500 mb-5 sm:mb-6 max-w-xs mx-auto">
-                                    See how our AI interviews you and generates a professional SOP
-                                    in minutes — not weeks.
+                                    In 60 seconds, watch Stepease interview you about a process and build a complete SOP — with notes, roles, and export-ready formatting.
                                 </p>
                                 <Button
                                     onClick={startDemo}
-                                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white gap-2 px-5 sm:px-6 h-10 sm:h-11 text-sm shadow-lg shadow-blue-600/25"
+                                    className="bg-slate-900 hover:bg-slate-800 text-white gap-2 px-5 sm:px-6 h-10 sm:h-11 text-sm"
                                 >
                                     <Play className="w-4 h-4" />
-                                    Play Demo
+                                    Start Walkthrough
                                 </Button>
                             </div>
                         </div>
@@ -320,12 +375,40 @@ export function DemoShowcase() {
                     )}
                 </div>
 
-                {/* Bottom Bar — Replay */}
-                {demoState === "complete" && (
+                {/* Controls Bar — Pause/Resume/Skip + Replay */}
+                {demoState !== "idle" && (
                     <div className="border-t border-slate-200 bg-slate-50 px-3 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between">
-                        <span className="text-[10px] sm:text-xs text-slate-500">
-                            ✨ SOP generated from a 5-minute conversation
-                        </span>
+                        <div className="flex items-center gap-2">
+                            {demoState !== "complete" && (
+                                <>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={togglePause}
+                                        className="gap-1.5 text-xs text-slate-600 hover:text-slate-900 h-7 sm:h-8"
+                                    >
+                                        {isPaused ? <Play className="w-3 h-3" /> : <Pause className="w-3 h-3" />}
+                                        {isPaused ? "Resume" : "Pause"}
+                                    </Button>
+                                    {!showResult && (
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={skipToEnd}
+                                            className="gap-1.5 text-xs text-slate-500 hover:text-slate-700 h-7 sm:h-8"
+                                        >
+                                            <SkipForward className="w-3 h-3" />
+                                            Skip to end
+                                        </Button>
+                                    )}
+                                </>
+                            )}
+                            {demoState === "complete" && (
+                                <span className="text-[10px] sm:text-xs text-slate-500">
+                                    ✨ SOP generated from a 5-minute conversation
+                                </span>
+                            )}
+                        </div>
                         <Button
                             variant="ghost"
                             size="sm"
@@ -333,7 +416,7 @@ export function DemoShowcase() {
                             className="gap-1.5 text-xs text-slate-600 hover:text-slate-900 h-7 sm:h-8"
                         >
                             <RotateCcw className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                            Replay
+                            Restart
                         </Button>
                     </div>
                 )}

@@ -10,6 +10,8 @@
 
 import type * as activity from "../activity.js";
 import type * as cleanup from "../cleanup.js";
+import type * as constants from "../constants.js";
+import type * as crons from "../crons.js";
 import type * as migrations from "../migrations.js";
 import type * as sessions from "../sessions.js";
 import type * as sops from "../sops.js";
@@ -24,6 +26,8 @@ import type {
 declare const fullApi: ApiFromModules<{
   activity: typeof activity;
   cleanup: typeof cleanup;
+  constants: typeof constants;
+  crons: typeof crons;
   migrations: typeof migrations;
   sessions: typeof sessions;
   sops: typeof sops;

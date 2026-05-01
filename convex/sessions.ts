@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { PLAN_LIMITS } from "./constants";
 
 // =============================================================================
 // SESSIONS - Active SOP Creation/Improvement Workflows
@@ -28,12 +29,6 @@ export const get = query({
     },
 });
 
-// Plan limits (Free, Starter, Pro) - same as in users.ts
-const PLAN_LIMITS = {
-    free: { creates: 2, improves: 0 },
-    starter: { creates: 12, improves: 5 },
-    pro: { creates: Infinity, improves: Infinity },
-} as const;
 
 // Create a new session
 export const create = mutation({

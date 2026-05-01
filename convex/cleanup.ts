@@ -1,8 +1,8 @@
 import { v } from "convex/values";
-import { mutation } from "./_generated/server";
+import { internalMutation } from "./_generated/server";
 
 // One-time cleanup mutation to remove duplicate notes from sessions
-export const cleanupDuplicateNotes = mutation({
+export const cleanupDuplicateNotes = internalMutation({
     args: {},
     handler: async (ctx) => {
         // Get ALL sessions (one-time cleanup, no auth needed)

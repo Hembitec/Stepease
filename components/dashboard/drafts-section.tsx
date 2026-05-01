@@ -16,7 +16,8 @@ export function DraftsSection() {
         return <DraftsSkeleton />
     }
 
-    const sessions = sessionsResult ?? []
+    const allSessions = sessionsResult ?? []
+    const sessions = allSessions.filter(s => s.status !== "approved" && s.phaseProgress < 100)
 
     if (sessions.length === 0) {
         return null

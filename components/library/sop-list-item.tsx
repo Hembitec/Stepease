@@ -7,6 +7,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { cn } from "@/lib/utils"
 import { formatRelativeDate } from "@/lib/format-date"
 import type { SOP } from "@/lib/types"
+import { useQuery } from "convex/react"
+import { api } from "@/convex/_generated/api"
+import { DownloadMenu } from "@/components/sop/download-menu"
 
 interface SOPListItemProps {
   sop: SOP
@@ -28,6 +31,9 @@ export function SOPListItem({
     complete: "bg-green-100 text-green-700",
     archived: "bg-slate-100 text-slate-600",
   }
+
+  const currentUser = useQuery(api.users.getByClerkId)
+  const userTier = (currentUser?.tier as "free" | "starter" | "pro") || "free"
 
 
   return (
@@ -104,10 +110,9 @@ export function SOPListItem({
             )}
           </Button>
         </Link>
-        <Button variant="outline" size="sm" className="gap-1.5 bg-transparent">
-          <Download className="w-4 h-4" />
-          <span className="hidden sm:inline">Download</span>
-        </Button>
+        <div className="relative">
+          <DownloadMenu content={sop.content} title={sop.title} tier={userTier} sopId={sop.id} />
+        </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm" className="h-8 w-8 p-0">

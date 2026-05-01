@@ -1,13 +1,12 @@
 import { v } from "convex/values";
 import { mutation, query, internalMutation } from "./_generated/server";
-import { auth } from "@clerk/nextjs/server";
+import { MutationCtx, QueryCtx } from "./_generated/server";
+import { UserIdentity } from "convex/server";
+import { PLAN_LIMITS } from "./constants";
 
-// Plan limits (Free, Starter, Pro)
-const PLAN_LIMITS = {
-    free: { creates: 2, improves: 0 },
-    starter: { creates: 12, improves: 5 },
-    pro: { creates: Infinity, improves: Infinity },
-} as const;
+// ============================================================================
+// USER MANAGEMENT & SUBSCRIPTION LIFECYCLE
+// ============================================================================
 
 /**
  * Get or create a user record on first sign-in
@@ -34,7 +33,7 @@ export const getOrCreate = mutation({
             return existingUser;
         }
 
-        // Create new user with Starter tier
+        // Create new user on free tier
         const now = new Date();
         const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
 
@@ -46,6 +45,7 @@ export const getOrCreate = mutation({
             sopsCreatedThisMonth: 0,
             improvesUsedThisMonth: 0,
             usageResetAt: nextMonth.toISOString(),
+            totalPayments: 0,
         });
 
         return await ctx.db.get(userId);
@@ -138,7 +138,7 @@ export const checkCanImprove = query({
 });
 
 /**
- * Increment SOP creation count
+ * Increment SOP creation count (lazy monthly reset)
  */
 export const incrementSopCount = mutation({
     args: {},
@@ -148,18 +148,16 @@ export const incrementSopCount = mutation({
             throw new Error("Unauthorized");
         }
 
-        // Get or create user
         const user = await getOrCreateUserForIncrement(ctx, identity);
         if (!user) {
             throw new Error("Failed to get or create user");
         }
 
-        // Check if month has reset
+        // Lazy reset: check if billing period has passed
         const now = new Date();
         const resetDate = new Date(user.usageResetAt);
 
         if (now >= resetDate) {
-            // Reset counts and update reset date
             const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
             await ctx.db.patch(user._id, {
                 sopsCreatedThisMonth: 1,
@@ -175,7 +173,7 @@ export const incrementSopCount = mutation({
 });
 
 /**
- * Increment Improve usage count
+ * Increment Improve usage count (lazy monthly reset)
  */
 export const incrementImproveCount = mutation({
     args: {},
@@ -185,13 +183,11 @@ export const incrementImproveCount = mutation({
             throw new Error("Unauthorized");
         }
 
-        // Get or create user
         const user = await getOrCreateUserForIncrement(ctx, identity);
         if (!user) {
             throw new Error("Failed to get or create user");
         }
 
-        // Check if month has reset
         const now = new Date();
         const resetDate = new Date(user.usageResetAt);
 
@@ -210,13 +206,17 @@ export const incrementImproveCount = mutation({
     },
 });
 
+// ============================================================================
+// SUBSCRIPTION MANAGEMENT (Webhook-driven)
+// ============================================================================
+
 /**
- * Update subscription (called from webhook)
- * Uses a secret key for authentication since webhooks don't have user sessions
+ * Update subscription after a successful payment (called from webhook)
+ * Also records the payment in payment_history and logs to activity_log
  */
 export const updateSubscription = mutation({
     args: {
-        webhookSecret: v.string(), // For authentication
+        webhookSecret: v.string(),
         clerkId: v.string(),
         tier: v.union(v.literal("free"), v.literal("starter"), v.literal("pro")),
         status: v.union(
@@ -227,6 +227,11 @@ export const updateSubscription = mutation({
         ),
         flwCustomerId: v.optional(v.string()),
         flwSubscriptionId: v.optional(v.string()),
+        // Payment event fields
+        flwTransactionId: v.optional(v.string()),
+        flwTxRef: v.optional(v.string()),
+        amount: v.optional(v.number()),
+        currency: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
         // Validate webhook secret
@@ -244,27 +249,77 @@ export const updateSubscription = mutation({
             throw new Error(`User not found: ${args.clerkId}`);
         }
 
-        // Calculate next billing date (1 month from now)
         const now = new Date();
+
+        // Calculate next billing period (1 month from now)
         const nextMonth = new Date(now);
         nextMonth.setMonth(now.getMonth() + 1);
 
-        await ctx.db.patch(user._id, {
+        // Calculate subscription expiry (35 days grace = 5 extra days to allow for FLW retry)
+        const expiresAt = new Date(now);
+        expiresAt.setDate(now.getDate() + 35);
+
+        // Determine if this is a new payment (has transaction ID) or just a status update
+        const isNewPayment = Boolean(args.flwTransactionId);
+
+        // Build user update patch
+        const userPatch: Record<string, unknown> = {
             tier: args.tier,
             status: args.status,
-            // Reset usage on upgrade/payment
+            // Reset usage on successful payment / new billing cycle
             sopsCreatedThisMonth: 0,
             improvesUsedThisMonth: 0,
             usageResetAt: nextMonth.toISOString(),
+            subscriptionExpiresAt: expiresAt.toISOString(),
+            ...(isNewPayment && {
+                lastPaymentAt: now.toISOString(),
+                subscriptionStartedAt: user.subscriptionStartedAt ?? now.toISOString(),
+                totalPayments: (user.totalPayments ?? 0) + 1,
+            }),
             ...(args.flwCustomerId && { flwCustomerId: args.flwCustomerId }),
             ...(args.flwSubscriptionId && { flwSubscriptionId: args.flwSubscriptionId }),
+        };
+
+        await ctx.db.patch(user._id, userPatch);
+
+        // Record payment in payment_history (only if we have transaction details)
+        if (args.flwTransactionId && args.flwTxRef) {
+            // Idempotency check: skip if this transaction was already recorded
+            const existing = await ctx.db
+                .query("payment_history")
+                .withIndex("by_flw_txn", (q) => q.eq("flwTransactionId", args.flwTransactionId!))
+                .first();
+
+            if (!existing) {
+                await ctx.db.insert("payment_history", {
+                    userId: args.clerkId,
+                    flwTransactionId: args.flwTransactionId,
+                    flwTxRef: args.flwTxRef,
+                    amount: args.amount ?? 0,
+                    currency: args.currency ?? "USD",
+                    tier: args.tier,
+                    event: "charge.completed",
+                    status: "successful",
+                    timestamp: now.toISOString(),
+                });
+            }
+        }
+
+        // Log subscription change to activity_log
+        const tierLabel = args.tier.charAt(0).toUpperCase() + args.tier.slice(1);
+        const amountLabel = args.amount ? ` ($${args.amount})` : "";
+        await ctx.db.insert("activity_log", {
+            userId: args.clerkId,
+            action: "subscription_updated",
+            details: `Upgraded to ${tierLabel} plan${amountLabel}`,
+            timestamp: now.toISOString(),
         });
     },
 });
 
 /**
  * Cancel subscription (called from webhook)
- * Downgrades user to free tier when subscription is cancelled
+ * Downgrades user to free tier and logs the event
  */
 export const cancelSubscription = mutation({
     args: {
@@ -285,48 +340,148 @@ export const cancelSubscription = mutation({
 
         if (!user) {
             console.warn(`[Cancel] User not found for FLW Customer ID: ${args.flwCustomerId}`);
-            return; // Idempotent success
+            return; // Idempotent — no-op if already removed
         }
+
+        const now = new Date();
 
         // Downgrade to free
         await ctx.db.patch(user._id, {
             tier: "free",
             status: "canceled",
-            flwSubscriptionId: undefined, // Clear subscription ID
+            flwSubscriptionId: undefined,
+            subscriptionExpiresAt: undefined,
+        });
+
+        // Record cancellation in payment_history
+        await ctx.db.insert("payment_history", {
+            userId: user.clerkId,
+            flwTransactionId: `cancel_${args.flwCustomerId}_${Date.now()}`,
+            flwTxRef: `cancel_${args.flwCustomerId}`,
+            amount: 0,
+            currency: "USD",
+            tier: "free",
+            event: "subscription.cancelled",
+            status: "cancelled",
+            timestamp: now.toISOString(),
+        });
+
+        // Log cancellation to activity_log
+        await ctx.db.insert("activity_log", {
+            userId: user.clerkId,
+            action: "subscription_cancelled",
+            details: "Subscription cancelled — downgraded to Free plan",
+            timestamp: now.toISOString(),
         });
     },
 });
 
 /**
- * Reset monthly usage (for cron job)
+ * Check for and expire subscriptions past their expiry date (for cron job)
+ * Applies a 3-day grace period beyond subscriptionExpiresAt
+ */
+export const checkExpiredSubscriptions = internalMutation({
+    args: {},
+    handler: async (ctx) => {
+        const now = new Date();
+        // Add 3-day grace period — only expire if >3 days past expiry
+        const gracePeriodMs = 3 * 24 * 60 * 60 * 1000;
+
+        // Find all non-free users
+        const paidUsers = await ctx.db
+            .query("users")
+            .filter((q) =>
+                q.and(
+                    q.neq(q.field("tier"), "free"),
+                    q.neq(q.field("subscriptionExpiresAt"), undefined)
+                )
+            )
+            .collect();
+
+        let expiredCount = 0;
+
+        for (const user of paidUsers) {
+            if (!user.subscriptionExpiresAt) continue;
+
+            const expiresAt = new Date(user.subscriptionExpiresAt);
+            const isExpired = now.getTime() > expiresAt.getTime() + gracePeriodMs;
+
+            if (isExpired) {
+                // Downgrade to free
+                await ctx.db.patch(user._id, {
+                    tier: "free",
+                    status: "canceled",
+                    flwSubscriptionId: undefined,
+                    subscriptionExpiresAt: undefined,
+                });
+
+                // Record expiration event
+                await ctx.db.insert("payment_history", {
+                    userId: user.clerkId,
+                    flwTransactionId: `expired_${user.clerkId}_${Date.now()}`,
+                    flwTxRef: `expired_${user.clerkId}`,
+                    amount: 0,
+                    currency: "USD",
+                    tier: "free",
+                    event: "subscription.expired",
+                    status: "cancelled",
+                    timestamp: now.toISOString(),
+                });
+
+                // Log to activity_log
+                await ctx.db.insert("activity_log", {
+                    userId: user.clerkId,
+                    action: "subscription_expired",
+                    details: "Subscription expired — downgraded to Free plan (no renewal received)",
+                    timestamp: now.toISOString(),
+                });
+
+                expiredCount++;
+            }
+        }
+
+        return { checked: paidUsers.length, expired: expiredCount };
+    },
+});
+
+/**
+ * Reset monthly usage counters (for cron job)
  */
 export const resetMonthlyUsage = internalMutation({
     args: {},
     handler: async (ctx) => {
         const now = new Date();
         const users = await ctx.db.query("users").collect();
+        let resetCount = 0;
 
         for (const user of users) {
             const resetDate = new Date(user.usageResetAt);
             if (now >= resetDate) {
-                // Determine next reset date (same day next month)
-                // Use resetDate as base to preserve the day of month (e.g. 14th)
-                const nextMonth = new Date(resetDate);
-                nextMonth.setMonth(nextMonth.getMonth() + 1);
+                // Advance reset date month by month until it's in the future
+                const nextReset = new Date(resetDate);
+                while (now >= nextReset) {
+                    nextReset.setMonth(nextReset.getMonth() + 1);
+                }
 
                 await ctx.db.patch(user._id, {
                     sopsCreatedThisMonth: 0,
                     improvesUsedThisMonth: 0,
-                    usageResetAt: nextMonth.toISOString(),
+                    usageResetAt: nextReset.toISOString(),
                 });
+                resetCount++;
             }
         }
+
+        return { checked: users.length, reset: resetCount };
     },
 });
 
+// ============================================================================
+// DATA MAINTENANCE
+// ============================================================================
+
 /**
- * Sync usage counts from existing sessions
- * This is a one-time function to populate usage from historical data
+ * Sync usage counts from existing sessions for the current user only
  */
 export const syncUsageFromSessions = mutation({
     args: {},
@@ -343,10 +498,8 @@ export const syncUsageFromSessions = mutation({
             .first();
 
         if (!user) {
-            // Auto-create user if doesn't exist
             const now = new Date();
             const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-
             const userId = await ctx.db.insert("users", {
                 clerkId: identity.subject,
                 email: identity.email ?? "unknown@example.com",
@@ -355,15 +508,18 @@ export const syncUsageFromSessions = mutation({
                 sopsCreatedThisMonth: 0,
                 improvesUsedThisMonth: 0,
                 usageResetAt: nextMonth.toISOString(),
+                totalPayments: 0,
             });
             user = await ctx.db.get(userId);
             if (!user) throw new Error("Failed to create user");
         }
 
-        // Get all sessions
-        const sessions = await ctx.db.query("sessions").collect();
+        // Only count THIS user's sessions (fixed from global count)
+        const sessions = await ctx.db
+            .query("sessions")
+            .withIndex("by_user", (q) => q.eq("userId", identity.subject))
+            .collect();
 
-        // Count sessions by mode
         let createCount = 0;
         let improveCount = 0;
 
@@ -372,58 +528,22 @@ export const syncUsageFromSessions = mutation({
             if (mode === "improve") {
                 improveCount++;
             } else {
-                // Default to create mode
                 createCount++;
             }
         }
 
-        // Update user with counts
         await ctx.db.patch(user._id, {
             sopsCreatedThisMonth: createCount,
             improvesUsedThisMonth: improveCount,
         });
 
-        return {
-            synced: true,
-            createCount,
-            improveCount,
-            userId: user._id,
-        };
+        return { synced: true, createCount, improveCount, userId: user._id };
     },
 });
 
-/**
- * Helper: Get or auto-create user for increment operations
- */
-const getOrCreateUserForIncrement = async (ctx: any, identity: any) => {
-    let user = await ctx.db
-        .query("users")
-        .withIndex("by_clerk_id", (q: any) => q.eq("clerkId", identity.subject))
-        .first();
-
-    if (!user) {
-        // Auto-create user
-        const now = new Date();
-        const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-
-        const userId = await ctx.db.insert("users", {
-            clerkId: identity.subject,
-            email: identity.email ?? "unknown@example.com",
-            tier: "free",
-            status: "active",
-            sopsCreatedThisMonth: 0,
-            improvesUsedThisMonth: 0,
-            usageResetAt: nextMonth.toISOString(),
-        });
-        user = await ctx.db.get(userId);
-    }
-
-    return user;
-};
-
-// =============================================================================
-// PDF Branding (Pro Tier)
-// =============================================================================
+// ============================================================================
+// PDF BRANDING (Pro Tier)
+// ============================================================================
 
 /**
  * Get watermark settings for the current user
@@ -475,3 +595,39 @@ export const updateWatermarkSettings = mutation({
         });
     },
 });
+
+// ============================================================================
+// HELPERS (Private)
+// ============================================================================
+
+/**
+ * Get or auto-create a user record — used by increment mutations
+ */
+const getOrCreateUserForIncrement = async (
+    ctx: MutationCtx,
+    identity: UserIdentity
+) => {
+    const user = await ctx.db
+        .query("users")
+        .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+        .first();
+
+    if (user) return user;
+
+    // Auto-create user if they don't have a record yet
+    const now = new Date();
+    const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+
+    const userId = await ctx.db.insert("users", {
+        clerkId: identity.subject,
+        email: identity.email ?? "unknown@example.com",
+        tier: "free",
+        status: "active",
+        sopsCreatedThisMonth: 0,
+        improvesUsedThisMonth: 0,
+        usageResetAt: nextMonth.toISOString(),
+        totalPayments: 0,
+    });
+
+    return await ctx.db.get(userId);
+};

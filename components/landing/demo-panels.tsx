@@ -70,7 +70,7 @@ export function DemoNotesPanel({ notes, totalNotes }: DemoNotesPanelProps) {
 }
 
 // -----------------------------------------------------------------------------
-// Phase Progress Bar
+// Phase Progress Bar - Enhanced with labeled segments
 // -----------------------------------------------------------------------------
 
 interface DemoPhaseBarProps {
@@ -85,31 +85,71 @@ export function DemoPhaseBar({
     progress,
 }: DemoPhaseBarProps) {
     return (
-        <div className="flex items-center gap-1 sm:gap-2 overflow-hidden">
-            {phases.map((phase, index) => {
-                const isComplete = index < currentPhaseIndex
-                const isCurrent = index === currentPhaseIndex
+        <div className="flex items-center gap-2 sm:gap-3">
+            {/* Connected phases with labeled segments */}
+            <div className="flex items-center">
+                {phases.map((phase, index) => {
+                    const isComplete = index < currentPhaseIndex
+                    const isCurrent = index === currentPhaseIndex
+                    const isLast = index === phases.length - 1
 
-                return (
-                    <div key={phase.id} className="flex items-center gap-1 sm:gap-1.5">
-                        <div
-                            className={cn(
-                                "h-1.5 sm:h-2 rounded-full transition-all duration-500",
-                                index === 0 ? "w-6 sm:w-8" : "w-4 sm:w-6",
-                                isComplete && "bg-emerald-500",
-                                isCurrent && "bg-blue-600",
-                                !isComplete && !isCurrent && "bg-slate-200"
+                    return (
+                        <div key={phase.id} className="flex items-center">
+                            {/* Phase node with number/icon */}
+                            <div className="flex flex-col items-center gap-1">
+                                <div
+                                    className={cn(
+                                        "w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-semibold transition-all duration-500 border-2",
+                                        isComplete && "bg-emerald-500 border-emerald-500 text-white",
+                                        isCurrent && "bg-slate-900 border-slate-900 text-white scale-110 shadow-md",
+                                        !isComplete && !isCurrent && "bg-white border-slate-300 text-slate-400"
+                                    )}
+                                >
+                                    {isComplete ? (
+                                        <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    ) : (
+                                        index + 1
+                                    )}
+                                </div>
+                                {/* Phase name label */}
+                                <span
+                                    className={cn(
+                                        "text-[10px] sm:text-xs whitespace-nowrap transition-all duration-300",
+                                        isCurrent
+                                            ? "text-slate-900 font-semibold"
+                                            : isComplete
+                                                ? "text-emerald-600 font-medium"
+                                                : "text-slate-400"
+                                    )}
+                                >
+                                    {phase.name}
+                                </span>
+                            </div>
+                            {/* Connecting line between phases */}
+                            {!isLast && (
+                                <div className="flex flex-col items-center mx-1 sm:mx-2">
+                                    <div
+                                        className={cn(
+                                            "w-4 sm:w-6 h-0.5 transition-all duration-500",
+                                            isComplete ? "bg-emerald-500" : "bg-slate-200"
+                                        )}
+                                    />
+                                    <div className="h-4" /> {/* Spacer to align with labels */}
+                                </div>
                             )}
-                        />
-                    </div>
-                )
-            })}
-            <span className="text-[10px] sm:text-xs font-medium text-slate-500 ml-1 hidden sm:inline truncate">
-                {phases[currentPhaseIndex]?.name || "Complete"}
-            </span>
-            <span className="text-[10px] sm:text-xs text-slate-400 flex-shrink-0">
-                {Math.round(progress)}%
-            </span>
+                        </div>
+                    )
+                })}
+            </div>
+            {/* Progress percentage */}
+            <div className="flex flex-col items-center ml-1">
+                <span className="text-[10px] sm:text-xs font-semibold text-slate-600">
+                    {Math.round(progress)}%
+                </span>
+                <span className="text-[9px] text-slate-400">done</span>
+            </div>
         </div>
     )
 }
