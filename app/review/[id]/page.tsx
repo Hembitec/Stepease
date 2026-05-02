@@ -3,31 +3,34 @@
 import { useState, useMemo } from "react"
 import Link from "next/link"
 import { useRouter, useParams } from "next/navigation"
-import { ArrowLeft, ArrowRight, Plus, Search, AlertTriangle, Loader2 } from "lucide-react"
+import { ArrowLeft, ArrowRight, Plus, Search, AlertTriangle, Loader2, ShieldCheck, Sparkles, CheckCircle, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ExpandedNoteCard } from "@/components/notes/expanded-note-card"
 import { NoteEditorModal } from "@/components/notes/note-editor-modal"
 import { useSOPContext } from "@/lib/sop-context"
-import { CATEGORY_STYLES, type Note, type NoteCategory, type SOP } from "@/lib/types"
+import { CATEGORY_STYLES, type Note, type NoteCategory, type SOP, NOTE_CATEGORIES } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
 const categoryColors = CATEGORY_STYLES
 
-const categories = [
-  "All",
+// The "Ghost Document" skeleton order
+const ORDERED_CATEGORIES: NoteCategory[] = [
   "HEADER_INFO",
   "PURPOSE_SCOPE",
   "ROLES_RESPONSIBILITIES",
   "PROCEDURE_STEPS",
+  "DECISION_POINTS",
   "QUALITY_SUCCESS",
   "TROUBLESHOOTING",
+  "DEFINITIONS_REFERENCES",
+  "MATERIALS_RESOURCES",
 ]
+
 const sortOptions = ["Chronological", "By Section", "By Priority"]
 
 const missingCritical = [
   "No troubleshooting steps defined",
   "Quality metrics not specified",
-  "Visual aids not discussed",
 ]
 
 export default function ReviewNotesPage() {
@@ -220,158 +223,215 @@ export default function ReviewNotesPage() {
   return (
     <div className="min-h-screen bg-slate-50 overflow-x-hidden">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between">
-        <button onClick={() => router.back()} className="text-slate-500 hover:text-slate-900 flex items-center gap-2 transition-colors">
-          <ArrowLeft className="w-5 h-5" />
-          <span className="hidden sm:inline text-sm font-medium">Back to Chat</span>
-        </button>
-        <h1 className="text-lg font-semibold text-slate-900">Review & Edit Notes</h1>
-        <Button
-          onClick={handleGenerate}
-          disabled={isGenerating}
-          className="bg-blue-600 hover:bg-blue-700 text-white gap-2 disabled:opacity-70"
-        >
-          {isGenerating ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Generating...
-            </>
-          ) : (
-            <>
-              Generate SOP
-              <ArrowRight className="w-4 h-4" />
-            </>
-          )}
-        </Button>
+      <header className="bg-white border-b border-slate-200 px-4 py-3 sticky top-0 z-20">
+        <div className="max-w-5xl mx-auto flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <button onClick={() => router.back()} className="text-slate-500 hover:text-slate-900 shrink-0">
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <div className="flex items-center gap-1.5 min-w-0">
+              <Sparkles className="w-4 h-4 text-blue-500 fill-blue-50 shrink-0 hidden xs:block" />
+              <h1 className="text-sm sm:text-base font-bold text-slate-900 truncate">Review Notes</h1>
+            </div>
+          </div>
+          <Button
+            onClick={handleGenerate}
+            disabled={isGenerating}
+            size="sm"
+            className="bg-blue-600 hover:bg-blue-700 text-white gap-1.5 px-3 sm:px-5 h-9 rounded-lg font-bold shadow-md shadow-blue-600/10 transition-all active:scale-95 shrink-0 group"
+          >
+            {isGenerating ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <>
+                <span className="hidden xs:inline">Generate</span>
+                <span className="xs:hidden">Build</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </>
+            )}
+          </Button>
+        </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
-        {/* Title & Count */}
-        <div className="mb-4 sm:mb-6">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-1">All Conversation Notes ({notes.length} total)</h2>
-          <p className="text-sm text-slate-500">Review and edit notes before generating your SOP</p>
+      <main className="max-w-5xl mx-auto px-4 py-6 sm:py-8">
+        {/* Title & Progress */}
+        <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div className="min-w-0">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-1.5">Procedural Architecture</h2>
+            <p className="text-sm text-slate-500 max-w-lg leading-relaxed">
+              Verify your captured knowledge mapped to standard SOP sections.
+            </p>
+          </div>
+          
+          <div className="bg-white border border-slate-200 p-3 sm:p-4 rounded-xl shadow-sm w-full md:min-w-[200px] md:w-auto">
+            <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">
+              <span>Coverage</span>
+              <span className="text-blue-600">{Math.round((notes.map(n => n.category).filter((v, i, a) => a.indexOf(v) === i).length / ORDERED_CATEGORIES.length) * 100)}%</span>
+            </div>
+            <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-blue-600 transition-all duration-1000 ease-out-expo" 
+                style={{ width: `${(notes.map(n => n.category).filter((v, i, a) => a.indexOf(v) === i).length / ORDERED_CATEGORIES.length) * 100}%` }}
+              />
+            </div>
+          </div>
         </div>
 
-        {/* Filters & Search */}
-        <div className="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 mb-6">
-          <div className="flex flex-col lg:flex-row gap-4">
-            {/* Category Filters */}
-            <div className="flex flex-wrap gap-1.5 flex-1">
-              {categories.map((cat) => {
-                const count = categoryCounts[cat] || 0
-                const colors = cat === "All" ? { bg: "bg-slate-100", text: "text-slate-700" } : (categoryColors[cat as NoteCategory] || categoryColors.OTHER)
-                return (
-                  <button
-                    key={cat}
-                    onClick={() => setActiveFilter(cat)}
-                    className={cn(
-                      "px-2.5 py-1 text-xs font-medium rounded-md transition-colors flex items-center gap-1",
-                      activeFilter === cat
-                        ? `${colors?.bg} ${colors?.text} ring-2 ring-blue-500`
-                        : "bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700",
-                    )}
-                  >
-                    {cat === "All" ? "All" : cat.replace(/_/g, " ")}
-                    <span className={cn(
-                      "text-[10px] px-1 rounded",
-                      activeFilter === cat ? "bg-white/50" : "bg-slate-100"
-                    )}>{count}</span>
-                  </button>
-                )
-              })}
-            </div>
-
-            {/* Sort */}
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="px-2.5 py-1.5 border border-slate-200 rounded-lg text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {sortOptions.map((opt) => (
-                <option key={opt} value={opt}>
-                  Sort: {opt}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Search */}
-          <div className="relative mt-3">
+        {/* Refinement Controls */}
+        <div className="bg-white border border-slate-200 rounded-2xl p-4 mb-10 shadow-sm flex flex-col md:flex-row gap-4 items-center">
+          <div className="relative flex-1 w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search notes..."
-              className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-slate-400"
+              placeholder="Search captured details..."
+              className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-slate-400"
             />
+          </div>
+          
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Sort By</span>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
+            >
+              {sortOptions.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
-        {/* Notes List */}
-        <div className="space-y-4 mb-6">
-          {filteredNotes.length > 0 ? (
-            filteredNotes.map((note) => (
-              <ExpandedNoteCard
-                key={note.id}
-                note={note}
-                onEdit={setEditingNote}
-                onDelete={(id) => setShowDeleteConfirm(id)}
-              />
-            ))
-          ) : (
-            <div className="text-center py-12 bg-white border border-slate-200 rounded-xl">
-              <p className="text-slate-500 text-sm">No notes match your filters</p>
-            </div>
-          )}
+        {/* Ghost Document Structure */}
+        <div className="space-y-8 sm:space-y-10 mb-10">
+          {ORDERED_CATEGORIES.map((cat) => {
+            const categoryNotes = filteredNotes.filter((n) => n.category === cat)
+            const style = categoryColors[cat] || categoryColors.OTHER
+            const hasNotes = categoryNotes.length > 0
+
+            return (
+              <section key={cat} className="relative">
+                {/* Section Header */}
+                <div className="flex items-center gap-2.5 mb-3">
+                  <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center shrink-0", style.bg, style.text)}>
+                    <Info className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-slate-900 leading-none mb-0.5">{style.label}</h3>
+                    <p className="text-[10px] text-slate-500 uppercase tracking-wider font-medium">
+                      {hasNotes ? `${categoryNotes.length} captured` : "Empty"}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Content Area */}
+                <div className={cn(
+                  "rounded-xl transition-all duration-300",
+                  hasNotes 
+                    ? "space-y-3" 
+                    : "border border-dashed border-slate-200 bg-slate-50/50 p-6 flex flex-col items-center justify-center text-center group hover:border-blue-300 hover:bg-blue-50/30 cursor-pointer"
+                )}
+                onClick={!hasNotes ? () => {
+                  setIsAddingNote(true)
+                  setEditingNote({
+                    id: `manual-${Date.now()}`,
+                    category: cat,
+                    priority: 'medium',
+                    timestamp: new Date().toISOString(),
+                    source: 'Manual',
+                    content: '',
+                    relatedTo: style.label,
+                    action: 'Add to SOP'
+                  })
+                } : undefined}
+                >
+                  {hasNotes ? (
+                    categoryNotes.map((note) => (
+                      <ExpandedNoteCard
+                        key={note.id}
+                        note={note}
+                        onEdit={setEditingNote}
+                        onDelete={(id) => setShowDeleteConfirm(id)}
+                      />
+                    ))
+                  ) : (
+                    <>
+                      <div className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center mb-2 text-slate-400 group-hover:text-blue-500 group-hover:scale-110 transition-all shadow-sm">
+                        <Plus className="w-4 h-4" />
+                      </div>
+                      <p className="text-xs font-bold text-slate-600 group-hover:text-blue-700 transition-colors uppercase tracking-tight">
+                        Add {style.label}
+                      </p>
+                    </>
+                  )}
+                </div>
+              </section>
+            )
+          })}
         </div>
 
-        {/* Add Manual Note */}
-        <Button
-          variant="outline"
-          onClick={() => setIsAddingNote(true)}
-          className="w-full border-dashed border-slate-300 text-slate-500 hover:border-blue-500 hover:text-blue-600 mb-6 bg-transparent"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Add Manual Note
-        </Button>
+        {/* Global Add Button */}
+        <div className="flex justify-center mb-10">
+          <Button
+            variant="outline"
+            onClick={() => setIsAddingNote(true)}
+            size="sm"
+            className="rounded-full px-5 border-slate-300 text-slate-600 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-all shadow-sm gap-2 h-9 text-xs font-bold uppercase tracking-wider"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Add Detail
+          </Button>
+        </div>
 
-        {/* Missing Critical Info Warning */}
+        {/* AI Quality Audit Section - COMPACT */}
         {missingCritical.length > 0 && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-5 mb-6">
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+          <div className="bg-slate-900 rounded-2xl p-5 sm:p-6 mb-10 relative overflow-hidden border border-slate-800">
+            <div className="relative flex flex-col sm:flex-row gap-4 sm:items-center">
+              <div className="w-10 h-10 rounded-xl bg-blue-600/20 flex items-center justify-center shrink-0 border border-blue-500/20">
+                <ShieldCheck className="w-6 h-6 text-blue-400" />
+              </div>
+              
               <div className="flex-1">
-                <h3 className="font-semibold text-yellow-800 mb-2">Missing Critical Information</h3>
-                <p className="text-sm text-yellow-700 mb-3">The following sections need attention:</p>
-                <ul className="space-y-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-[10px] font-bold text-blue-400 uppercase tracking-widest">Quality Audit</span>
+                </div>
+                <h3 className="text-lg font-bold text-white mb-3">Refinement Opportunities</h3>
+                
+                <div className="flex flex-wrap gap-2 mb-5">
                   {missingCritical.map((item, index) => (
-                    <li key={index} className="text-sm text-yellow-700 flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 bg-yellow-600 rounded-full" />
-                      {item}
-                    </li>
+                    <div key={index} className="flex items-center gap-2 bg-slate-800/80 border border-slate-700/50 px-3 py-1.5 rounded-lg">
+                      <div className="w-1 h-1 bg-blue-500 rounded-full shrink-0" />
+                      <span className="text-[11px] text-slate-300 font-semibold">{item}</span>
+                    </div>
                   ))}
-                </ul>
-                <div className="flex flex-wrap gap-3 mt-4">
+                </div>
+
+                <div className="flex flex-wrap gap-3">
                   <Button
                     variant="outline"
                     onClick={() => router.back()}
-                    className="text-yellow-700 border-yellow-300 hover:bg-yellow-100 bg-transparent"
+                    size="sm"
+                    className="border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white bg-transparent h-9 px-4 rounded-lg text-xs font-bold"
                   >
-                    Back to Chat to Address
+                    Back to Chat
                   </Button>
                   <Button
                     onClick={handleGenerate}
                     disabled={isGenerating}
-                    className="bg-yellow-600 hover:bg-yellow-700 text-white disabled:opacity-70"
+                    size="sm"
+                    className="bg-blue-600 hover:bg-blue-500 text-white border-0 h-9 px-5 rounded-lg font-bold shadow-lg shadow-blue-600/10 transition-all active:scale-95 group text-xs"
                   >
                     {isGenerating ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                        Generating...
-                      </>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
                     ) : (
-                      'Generate Anyway'
+                      <>
+                        Generate Anyway
+                        <ArrowRight className="w-3.5 h-3.5 ml-1.5 group-hover:translate-x-0.5 transition-transform" />
+                      </>
                     )}
                   </Button>
                 </div>
@@ -380,27 +440,40 @@ export default function ReviewNotesPage() {
           </div>
         )}
 
-        {/* Generate CTA */}
-        <div className="flex justify-end">
-          <Button
-            onClick={handleGenerate}
-            size="lg"
-            disabled={isGenerating}
-            className="bg-blue-600 hover:bg-blue-700 text-white gap-2 px-8 disabled:opacity-70"
-          >
-            {isGenerating ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                Generating SOP...
-              </>
-            ) : (
-              <>
-                Generate Complete SOP
-                <ArrowRight className="w-5 h-5" />
-              </>
-            )}
-          </Button>
-        </div>
+        {/* Generate CTA - Large & Minimal */}
+        {!isGenerating && missingCritical.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-12 border-t border-slate-200 mt-8">
+            <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mb-6 border border-emerald-100">
+              <CheckCircle className="w-8 h-8 text-emerald-600" />
+            </div>
+            <h3 className="text-xl font-bold text-slate-900 mb-2">Ready for Generation</h3>
+            <p className="text-slate-500 text-center max-w-sm mb-8">
+              All critical sections have been addressed. Click below to transform your notes into a professional SOP.
+            </p>
+            <Button
+              onClick={handleGenerate}
+              size="lg"
+              className="bg-blue-600 hover:bg-blue-700 text-white gap-3 px-12 h-14 rounded-2xl font-bold shadow-xl shadow-blue-600/20 hover:scale-105 transition-all group"
+            >
+              Generate Complete SOP
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Button>
+          </div>
+        )}
+
+        {/* Show loading state when generating if missingCritical is empty */}
+        {isGenerating && missingCritical.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-24">
+            <div className="relative">
+              <div className="w-20 h-20 rounded-full border-4 border-blue-100 border-t-blue-600 animate-spin" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Sparkles className="w-8 h-8 text-blue-600 animate-pulse" />
+              </div>
+            </div>
+            <h3 className="text-xl font-bold text-slate-900 mt-8 mb-2">Building your procedure...</h3>
+            <p className="text-slate-500 animate-pulse font-mono text-sm tracking-widest uppercase">Applying Surgical Edits</p>
+          </div>
+        )}
       </main>
 
       {/* Note Editor Modal */}

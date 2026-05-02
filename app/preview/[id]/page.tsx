@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter, useParams } from "next/navigation"
-import { ArrowLeft, FileText, Eye, Pencil, CheckCircle, Copy, Check, Clock, ChevronDown, History } from "lucide-react"
+import { ArrowLeft, FileText, Eye, Pencil, CheckCircle, Copy, Check, Clock, ChevronDown, History, Sparkles, ShieldCheck } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { MarkdownRenderer } from "@/components/sop/markdown-renderer"
@@ -46,6 +46,7 @@ export default function SOPPreviewPage() {
   const [editingSection, setEditingSection] = useState<{ title: string; content: string; index: number } | null>(null)
   const [copied, setCopied] = useState(false)
   const [approving, setApproving] = useState(false)
+  const [approved, setApproved] = useState(false)
   const [showActivity, setShowActivity] = useState(false)
   const [showVersions, setShowVersions] = useState(false)
 
@@ -82,8 +83,14 @@ export default function SOPPreviewPage() {
       updateSOP(sop.id, { status: "complete", content })
     }
 
-    toast.success("SOP approved & saved to Library")
-    router.push("/library")
+    // Delightful transition delay
+    setTimeout(() => {
+      setApproved(true)
+      toast.success("SOP approved & saved to Library")
+      setTimeout(() => {
+        router.push("/library")
+      }, 1500)
+    }, 800)
   }
 
   const handleSectionSave = (newContent: string) => {
@@ -120,32 +127,39 @@ export default function SOPPreviewPage() {
   return (
     <div className="min-h-screen bg-slate-50 overflow-x-hidden">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-10">
-        <button onClick={() => router.back()} className="text-slate-500 hover:text-slate-900 flex items-center gap-2 transition-colors">
-          <ArrowLeft className="w-5 h-5" />
-          <span className="hidden sm:inline text-sm font-medium">Back</span>
-        </button>
-        <div className="flex items-center gap-2">
-          <h1 className="text-lg font-semibold text-slate-900">Your Generated SOP</h1>
-          {sop?.version && (
-            <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded bg-slate-100 text-slate-600 border border-slate-200 uppercase">
-              v{sop.version}
-            </span>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          <SharePopover sopId={sop?.id || ""} existingToken={sop?.shareToken} />
-          <DownloadMenu content={content} title={sop?.title || "SOP"} tier={userTier} sopId={sop?.id} />
+      <header className="bg-white border-b border-slate-200 px-4 py-3 sticky top-0 z-20">
+        <div className="max-w-5xl mx-auto flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 min-w-0">
+            <button onClick={() => router.back()} className="text-slate-500 hover:text-slate-900 shrink-0">
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <div className="flex items-center gap-1.5 min-w-0">
+              <Sparkles className="w-4 h-4 text-blue-500 fill-blue-50 shrink-0 hidden xs:block" />
+              <h1 className="text-sm sm:text-base font-bold text-slate-900 truncate">Final SOP</h1>
+              {sop?.version && (
+                <span className="shrink-0 px-1.5 py-0.5 text-[9px] font-bold rounded bg-slate-100 text-slate-500 border border-slate-200 uppercase tracking-tighter">
+                  v{sop.version}
+                </span>
+              )}
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-1.5 shrink-0">
+            <SharePopover sopId={sop?.id || ""} existingToken={sop?.shareToken} />
+            <div className="hidden xs:block">
+              <DownloadMenu content={content} title={sop?.title || "SOP"} tier={userTier} sopId={sop?.id} />
+            </div>
+          </div>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-3 sm:px-6 py-4 sm:py-8">
+      <main className="max-w-4xl mx-auto px-4 py-6 sm:py-8">
         {/* View Toggle */}
-        <div className="flex gap-1 p-1 bg-slate-100 rounded-lg mb-6 w-fit">
+        <div className="flex gap-1 p-1 bg-slate-100 rounded-xl mb-6 w-fit">
           <button
             onClick={() => setViewMode("markdown")}
             className={cn(
-              "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all",
+              "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all uppercase tracking-tight",
               viewMode === "markdown" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700",
             )}
           >
@@ -155,39 +169,39 @@ export default function SOPPreviewPage() {
           <button
             onClick={() => setViewMode("preview")}
             className={cn(
-              "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all",
+              "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all uppercase tracking-tight",
               viewMode === "preview" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700",
             )}
           >
             <Eye className="w-3.5 h-3.5" />
-            Formatted Preview
+            Preview
           </button>
         </div>
 
         {/* Content */}
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
           {viewMode === "markdown" ? (
             <div className="relative">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleCopyMarkdown}
-                className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"
+                className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 h-8 px-2"
               >
                 {copied ? (
                   <>
-                    <Check className="w-4 h-4 mr-1" />
-                    Copied
+                    <Check className="w-3.5 h-3.5 mr-1" />
+                    <span className="text-[10px] font-bold uppercase">Copied</span>
                   </>
                 ) : (
                   <>
-                    <Copy className="w-4 h-4 mr-1" />
-                    Copy
+                    <Copy className="w-3.5 h-3.5 mr-1" />
+                    <span className="text-[10px] font-bold uppercase">Copy</span>
                   </>
                 )}
               </Button>
               <div className="p-4 sm:p-6 overflow-x-auto">
-                <pre className="font-mono text-sm text-slate-800 whitespace-pre-wrap leading-relaxed">{content}</pre>
+                <pre className="font-mono text-xs sm:text-sm text-slate-800 whitespace-pre-wrap leading-relaxed">{content}</pre>
               </div>
             </div>
           ) : (
@@ -202,7 +216,7 @@ export default function SOPPreviewPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => setEditingSection({ title, content: section, index })}
-                      className="absolute -right-2 top-0 opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-blue-600"
+                      className="absolute -right-2 top-0 opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-blue-600 h-8 w-8 p-0 rounded-full"
                     >
                       <Pencil className="w-4 h-4" />
                     </Button>
@@ -215,33 +229,56 @@ export default function SOPPreviewPage() {
         </div>
 
         {/* Bottom Actions */}
-        <div className="flex flex-col sm:flex-row gap-4 mt-6 justify-end">
+        <div className="flex flex-col sm:flex-row gap-3 mt-6 justify-end">
           <Button
             variant="outline"
             onClick={() => setEditingSection({ title: "Full Document", content, index: -1 })}
-            className="gap-2 bg-transparent"
+            className="gap-2 bg-transparent h-10 rounded-xl text-xs font-bold uppercase tracking-wide border-slate-200"
           >
-            <Pencil className="w-4 h-4" />
-            Ask AI to Modify
+            <Pencil className="w-3.5 h-3.5" />
+            AI Refinement
           </Button>
           <Button
             onClick={handleApprove}
-            disabled={approving}
-            className="bg-green-600 hover:bg-green-700 text-white gap-2"
+            disabled={approving || approved}
+            className={cn(
+              "gap-2 px-6 h-10 rounded-xl text-xs font-bold uppercase tracking-wide transition-all duration-500",
+              approved 
+                ? "bg-emerald-500 hover:bg-emerald-500 scale-105" 
+                : "bg-green-600 hover:bg-green-700 shadow-lg shadow-green-600/10"
+            )}
           >
-            {approving ? (
+            {approving && !approved ? (
               <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Approving...
+                <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Finalizing...
+              </>
+            ) : approved ? (
+              <>
+                <CheckCircle className="w-3.5 h-3.5" />
+                Published
               </>
             ) : (
               <>
-                <CheckCircle className="w-4 h-4" />
-                Approve Final SOP
+                <CheckCircle className="w-3.5 h-3.5" />
+                Approve SOP
               </>
             )}
           </Button>
         </div>
+
+        {/* Success Overlay Animation */}
+        {approved && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/60 backdrop-blur-md animate-in fade-in duration-500">
+            <div className="text-center animate-in zoom-in slide-in-from-bottom-8 duration-700 ease-out-expo px-6">
+              <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-5 border-4 border-emerald-50">
+                <ShieldCheck className="w-10 h-10 text-emerald-600 animate-pulse" />
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Procedure Certified</h2>
+              <p className="text-sm sm:text-base text-slate-500 font-medium">Redirecting to your library...</p>
+            </div>
+          </div>
+        )}
 
         {/* Version History Section */}
         {hasVersions && (

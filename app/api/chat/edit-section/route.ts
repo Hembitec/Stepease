@@ -36,7 +36,15 @@ ${body.fullSopContent}
 ## USER'S REQUEST
 ${body.userPrompt}
 
-Modify the section above according to the user's request. Return ONLY the modified section content as Markdown (without the section header).`;
+Modify the section above according to the user's request. 
+
+## IMPORTANT INSTRUCTIONS:
+- Perform a **SURGICAL** edit. 
+- If the user asks to add something, ONLY add it. Do not rewrite or rephrase existing content.
+- Maintain existing numbering sequences. If you add a step between 2 and 3, renumber 3 to 4, but do not change its text.
+- If appropriate to maintain main step identity, use sub-numbering (e.g., 2a, 2b).
+- Return ONLY the modified section body as Markdown (do NOT include the section header "## ${body.sectionTitle}").
+- Do NOT use code blocks or conversational text.`;
 }
 
 // -----------------------------------------------------------------------------
