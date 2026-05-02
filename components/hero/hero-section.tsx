@@ -44,7 +44,6 @@ export function HeroSection() {
             src="/hero-bg-dots.png"
             alt=""
             fill
-            priority
             sizes="100vw"
             className="object-cover object-center"
           />
@@ -54,28 +53,28 @@ export function HeroSection() {
       <div className="relative max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           <div
-            className={`lg:col-span-8 text-center lg:text-left transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
+            className="lg:col-span-8 text-center lg:text-left"
           >
             {/* Callout Badge */}
-            <div className="inline-flex items-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium mb-5 border border-slate-200 dark:border-slate-700 max-w-[calc(100vw-2rem)]">
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 inline-flex items-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium mb-5 border border-slate-200 dark:border-slate-700 max-w-[calc(100vw-2rem)]">
               <span className="flex h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-blue-600 flex-shrink-0"></span>
               <span className="truncate">Your team&apos;s knowledge lives in people&apos;s heads. That&apos;s a risk.</span>
             </div>
 
             {/* Headline */}
-            <h1 className={`${bricolage.className} text-4xl sm:text-5xl lg:text-[5.5rem] font-bold text-foreground tracking-tight leading-[0.95] mb-4`}>
+            <h1 className={`${bricolage.className} animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-100 text-4xl sm:text-5xl lg:text-[5.5rem] font-bold text-foreground tracking-tight leading-[0.95] mb-4`}>
               Stop explaining things
               <br />
               <span className="text-blue-600 dark:text-blue-500">over and over.</span>
             </h1>
 
             {/* Subheadline */}
-            <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl mb-6">
+            <p className="animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200 text-xl text-muted-foreground leading-relaxed max-w-2xl mb-6">
               Describe your process out loud. Get a polished, audit-ready SOP in under 10 minutes.
             </p>
 
             {/* Inline Stats Proof */}
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-4 gap-y-2 text-sm font-medium text-muted-foreground mb-6">
+            <div className="animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300 flex flex-wrap items-center justify-center lg:justify-start gap-x-4 gap-y-2 text-sm font-medium text-muted-foreground mb-6">
               {stats.map((stat, index) => (
                 <span key={stat.label} className="flex items-center whitespace-nowrap">
                   <span className="text-foreground font-semibold">{stat.value}</span>
@@ -88,7 +87,7 @@ export function HeroSection() {
             </div>
 
             {/* CTAs */}
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-5">
+            <div className="animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-400 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-5">
               <Link href="/dashboard" className="w-full sm:w-auto">
                 <Button
                   size="lg"
@@ -111,7 +110,7 @@ export function HeroSection() {
             </div>
 
             {/* Micro-copy */}
-            <p className="text-sm text-muted-foreground flex items-center justify-center lg:justify-start gap-6 flex-wrap">
+            <p className="animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500 text-sm text-muted-foreground flex items-center justify-center lg:justify-start gap-6 flex-wrap">
               <span className="flex items-center gap-1.5">
                 <CheckCircle className="w-4 h-4 text-green-500/80" />
                 No credit card required
