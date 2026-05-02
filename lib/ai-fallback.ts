@@ -329,13 +329,17 @@ export async function streamTextWithFallback(
       // Verification race: catch provider errors (e.g. 503, 401) within the first 5s.
       // If result.text rejects, the provider is broken and we fall back.
       // If the timeout fires, the stream is likely healthy.
+      let timeoutId: NodeJS.Timeout;
       await Promise.race([
         result.text.then(
           () => {},
           (err) => { throw err; }
         ),
-        new Promise<void>((resolve) => setTimeout(resolve, VERIFICATION_TIMEOUT_MS)),
+        new Promise<void>((resolve) => {
+          timeoutId = setTimeout(resolve, VERIFICATION_TIMEOUT_MS);
+        }),
       ]);
+      if (timeoutId!) clearTimeout(timeoutId);
 
       logInfo(requestId, `Provider accepted: ${label}`);
       return result.toTextStreamResponse();
@@ -387,13 +391,17 @@ export async function streamObjectWithFallback(
       // Verification race: catch provider errors (e.g. 503, 401) within the first 5s.
       // If result.object rejects, the provider is broken and we fall back.
       // If the timeout fires, the stream is likely healthy.
+      let timeoutId: NodeJS.Timeout;
       await Promise.race([
         result.object.then(
           () => {},
           (err) => { throw err; }
         ),
-        new Promise<void>((resolve) => setTimeout(resolve, VERIFICATION_TIMEOUT_MS)),
+        new Promise<void>((resolve) => {
+          timeoutId = setTimeout(resolve, VERIFICATION_TIMEOUT_MS);
+        }),
       ]);
+      if (timeoutId!) clearTimeout(timeoutId);
 
       logInfo(requestId, `Provider accepted: ${label}`);
       return result.toTextStreamResponse();
