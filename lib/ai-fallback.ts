@@ -3,6 +3,7 @@
 // Core fallback logic with retry, exponential backoff, and provider chain
 // =============================================================================
 
+import { streamText, streamObject } from 'ai';
 import {
   ProviderConfig,
   ProviderResult,
@@ -11,6 +12,7 @@ import {
   DEFAULT_FALLBACK_OPTIONS,
 } from './ai-types';
 import { getCachedProviderChain, getCachedFallbackOptions, shouldEnableFallback } from './ai-provider-config';
+import { getModelInstance } from './ai-models';
 
 const GENERATE_ID_CHARS = 'abcdefghijklmnopqrstuvwxyz0123456789';
 export function generateId(prefix: string = 'req'): string {
@@ -293,3 +295,118 @@ export async function generateWithFallback<T>(
 
 export { logInfo, logWarn, logError };
 export { getCachedProviderChain, getCachedFallbackOptions, shouldEnableFallback } from './ai-provider-config';
+
+/**
+ * Executes a streaming text request with sequential fallback across multiple providers.
+ * Includes a 5-second verification race to quickly detect and skip failing providers.
+ */
+export async function streamTextWithFallback(
+  options: {
+    system?: string;
+    prompt: string;
+    temperature?: number;
+    [key: string]: any;
+  },
+  providers?: ProviderConfig[]
+): Promise<Response> {
+  const requestId = generateId('stream-text');
+  const providerChain = providers || getCachedProviderChain();
+  const errors: string[] = [];
+  const VERIFICATION_TIMEOUT_MS = 5000;
+
+  for (let i = 0; i < providerChain.length; i++) {
+    const provider = providerChain[i];
+    const label = getProviderLabel(provider);
+
+    logInfo(requestId, `Trying provider: ${label}`);
+
+    try {
+      const result = streamText({
+        model: getModelInstance(provider),
+        ...options,
+      });
+
+      // Verification race: catch provider errors (e.g. 503, 401) within the first 5s.
+      // If result.text rejects, the provider is broken and we fall back.
+      // If the timeout fires, the stream is likely healthy.
+      await Promise.race([
+        result.text.then(
+          () => {},
+          (err) => { throw err; }
+        ),
+        new Promise<void>((resolve) => setTimeout(resolve, VERIFICATION_TIMEOUT_MS)),
+      ]);
+
+      logInfo(requestId, `Provider accepted: ${label}`);
+      return result.toTextStreamResponse();
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      errors.push(`${label}: ${errorMsg}`);
+      logError(requestId, `Provider failed: ${label}`, { error: errorMsg });
+
+      if (i < providerChain.length - 1) {
+        logInfo(requestId, `Falling back → ${getProviderLabel(providerChain[i + 1])}`);
+      }
+    }
+  }
+
+  throw new Error(`All AI providers failed: ${errors.join(' | ')}`);
+}
+
+/**
+ * Executes a streaming object request with sequential fallback across multiple providers.
+ * Includes a 5-second verification race to quickly detect and skip failing providers.
+ */
+export async function streamObjectWithFallback(
+  options: {
+    system?: string;
+    prompt: string;
+    schema: any;
+    temperature?: number;
+    [key: string]: any;
+  },
+  providers?: ProviderConfig[]
+): Promise<Response> {
+  const requestId = generateId('stream-obj');
+  const providerChain = providers || getCachedProviderChain();
+  const errors: string[] = [];
+  const VERIFICATION_TIMEOUT_MS = 5000;
+
+  for (let i = 0; i < providerChain.length; i++) {
+    const provider = providerChain[i];
+    const label = getProviderLabel(provider);
+
+    logInfo(requestId, `Trying provider: ${label}`);
+
+    try {
+      const result = streamObject({
+        model: getModelInstance(provider),
+        ...options,
+      });
+
+      // Verification race: catch provider errors (e.g. 503, 401) within the first 5s.
+      // If result.object rejects, the provider is broken and we fall back.
+      // If the timeout fires, the stream is likely healthy.
+      await Promise.race([
+        result.object.then(
+          () => {},
+          (err) => { throw err; }
+        ),
+        new Promise<void>((resolve) => setTimeout(resolve, VERIFICATION_TIMEOUT_MS)),
+      ]);
+
+      logInfo(requestId, `Provider accepted: ${label}`);
+      return result.toTextStreamResponse();
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      errors.push(`${label}: ${errorMsg}`);
+      logError(requestId, `Provider failed: ${label}`, { error: errorMsg });
+
+      if (i < providerChain.length - 1) {
+        logInfo(requestId, `Falling back → ${getProviderLabel(providerChain[i + 1])}`);
+      }
+    }
+  }
+
+  throw new Error(`All AI providers failed: ${errors.join(' | ')}`);
+}

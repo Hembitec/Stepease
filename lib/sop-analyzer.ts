@@ -5,10 +5,8 @@
 // =============================================================================
 
 import { generateObject } from 'ai';
-import { createGoogleGenerativeAI } from '@ai-sdk/google';
-import { createGroq } from '@ai-sdk/groq';
-import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import { generateWithFallback, getCachedProviderChain } from '@/lib/ai-fallback';
+import { getModelInstance } from '@/lib/ai-models';
 import { z } from 'zod';
 import { SOP_ANALYSIS_PROMPT } from '@/lib/sop-system-prompt';
 import { ProviderConfig } from '@/lib/ai-types';
@@ -85,69 +83,16 @@ function createGenerateFunctions(
   text: string,
   providers: ProviderConfig[]
 ): Array<() => Promise<{ object: AnalysisResult }>> {
-  const providerCache = new Map<string, any>();
-
   return providers.map((provider) => {
     return async () => {
-      // Google Provider
-      if (provider.name === 'google') {
-        let googleProvider = providerCache.get(provider.name);
-        if (!googleProvider) {
-          googleProvider = createGoogleGenerativeAI({
-            apiKey: provider.apiKey,
-          });
-          providerCache.set(provider.name, googleProvider);
-        }
-
-        const result = await generateObject({
-          model: googleProvider(provider.model),
-          schema: analysisResultSchema,
-          system: SOP_ANALYSIS_PROMPT,
-          prompt: `Please analyze the following SOP text:\n\n${text}`,
-          temperature: 0.2,
-        });
-        return { object: result.object as AnalysisResult };
-      }
-      // Groq Provider
-      else if (provider.name.toLowerCase().includes('groq')) {
-        let groqProvider = providerCache.get(provider.name);
-        if (!groqProvider) {
-          groqProvider = createGroq({
-            apiKey: provider.apiKey,
-          });
-          providerCache.set(provider.name, groqProvider);
-        }
-
-        const result = await generateObject({
-          model: groqProvider(provider.model),
-          schema: analysisResultSchema,
-          system: SOP_ANALYSIS_PROMPT,
-          prompt: `Please analyze the following SOP text:\n\n${text}`,
-          temperature: 0.2,
-        });
-        return { object: result.object as AnalysisResult };
-      }
-      // Generic OpenAI Compatible
-      else {
-        let openaiCompatible = providerCache.get(provider.name);
-        if (!openaiCompatible) {
-          openaiCompatible = createOpenAICompatible({
-            baseURL: provider.baseUrl || 'https://api.example.com/v1',
-            name: provider.name,
-            apiKey: provider.apiKey,
-          });
-          providerCache.set(provider.name, openaiCompatible);
-        }
-
-        const result = await generateObject({
-          model: openaiCompatible(provider.model) as any,
-          schema: analysisResultSchema,
-          system: SOP_ANALYSIS_PROMPT,
-          prompt: `Please analyze the following SOP text:\n\n${text}`,
-          temperature: 0.2,
-        });
-        return { object: result.object as AnalysisResult };
-      }
+      const result = await generateObject({
+        model: getModelInstance(provider),
+        schema: analysisResultSchema,
+        system: SOP_ANALYSIS_PROMPT,
+        prompt: `Please analyze the following SOP text:\n\n${text}`,
+        temperature: 0.2,
+      });
+      return { object: result.object as AnalysisResult };
     };
   });
 }
