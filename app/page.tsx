@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import dynamic from "next/dynamic"
-import { useEffect, useRef, useState } from "react"
+import { useState } from "react"
 import { Navbar } from "@/components/layout/navbar"
 import { Footer } from "@/components/layout/footer"
 import { Button } from "@/components/ui/button"
@@ -13,11 +13,9 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { HeroSection } from "@/components/hero/hero-section"
-import { useCountUp } from "@/components/landing/count-up"
 import {
   features,
   steps,
-  statsData,
   testimonials,
   useCases,
   faqs,
@@ -34,42 +32,6 @@ const DemoShowcase = dynamic(() => import("@/components/landing/demo-showcase").
   ssr: false
 })
 
-// Animated stat component with count-up
-interface StatData {
-  prefix: string
-  value: number
-  suffix: string
-  label: string
-  isTime: boolean
-}
-
-function AnimatedStat({ stat, className, labelClassName }: { stat: StatData; className?: string; labelClassName?: string }) {
-  const [isVisible, setIsVisible] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
-  const countValue = useCountUp({ end: stat.value, duration: 2000, prefix: stat.prefix, suffix: stat.suffix, enabled: isVisible })
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
-          observer.disconnect()
-        }
-      },
-      { threshold: 0.5 }
-    )
-    if (ref.current) observer.observe(ref.current)
-    return () => observer.disconnect()
-  }, [])
-
-  return (
-    <div ref={ref} className="text-center">
-      <div className={cn("font-bold text-slate-900", className)}>{countValue}</div>
-      <div className={cn("text-slate-600", labelClassName)}>{stat.label}</div>
-    </div>
-  )
-}
-
 export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null)
 
@@ -80,48 +42,24 @@ export default function LandingPage() {
       {/* Hero Section - Minimal & Editorial */}
       <HeroSection />
 
-      {/* Stats Section - Asymmetric layout with animated count-up */}
-      <section className="py-16 px-4 bg-background">
-        <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-            {/* Left column - Primary stats (time ratio story) */}
-            <div className="space-y-4 md:space-y-6">
-              {/* Mobile: Side by side with arrow | Desktop: Row layout */}
-              <div className="flex items-center gap-3 sm:gap-3">
-                <div className="flex-1">
-                  <AnimatedStat stat={statsData[0]} className="text-3xl sm:text-4xl lg:text-6xl" />
-                </div>
-                <div className="flex flex-col items-center px-2 sm:px-3">
-                  <span className="text-slate-400 text-lg sm:text-xl">→</span>
-                  <span className="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wide">saves</span>
-                </div>
-                <div className="flex-1">
-                  <AnimatedStat stat={statsData[1]} className="text-2xl sm:text-3xl lg:text-5xl text-slate-600" />
-                </div>
-              </div>
-              <p className="text-sm text-slate-500">Average time to create vs. time saved per SOP</p>
-            </div>
-            {/* Right column - Scale stats */}
-            <div className="grid grid-cols-2 gap-4 sm:gap-6 md:pl-8 md:border-l border-slate-200 pt-6 md:pt-0 border-t md:border-t-0">
-              <AnimatedStat stat={statsData[2]} className="text-2xl sm:text-3xl lg:text-4xl" labelClassName="text-sm" />
-              <AnimatedStat stat={statsData[3]} className="text-2xl sm:text-3xl lg:text-4xl" labelClassName="text-sm" />
-            </div>
-          </div>
-          {/* Trust bar */}
-          <div className="mt-10 md:mt-12 pt-6 md:pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-8 text-sm text-slate-500">
-            <span className="whitespace-nowrap">Trusted by ops teams at</span>
-            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4">
-              {["fintech", "healthcare", "logistics", "manufacturing"].map((industry) => (
-                <span key={industry} className="px-2 py-1 bg-slate-100 rounded text-xs text-slate-600 capitalize whitespace-nowrap">
-                  {industry}
-                </span>
-              ))}
-            </div>
+      <section className="px-4 pb-10">
+        <div className="mx-auto flex max-w-6xl flex-col gap-4 border-y border-slate-200 py-4 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+          <span className="font-medium text-slate-600">Trusted by fast-moving ops, compliance, and enablement teams.</span>
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <span>
+              <span className="font-semibold text-slate-900">47,892</span> SOPs created
+            </span>
+            <span>
+              <span className="font-semibold text-slate-900">&lt;10 min</span> average first draft
+            </span>
+            <span>
+              <span className="font-semibold text-slate-900">12+ hrs</span> saved per document
+            </span>
           </div>
         </div>
       </section>
 
-      {/* Features Section - Staggered layout with dividing lines */}
+      {/* Features Section */}
       <section id="features" className="py-24 px-4 bg-background">
         <div className="max-w-5xl mx-auto">
           <div className="mb-12">
@@ -133,57 +71,23 @@ export default function LandingPage() {
             </p>
           </div>
 
-          {/* Mobile: Stack with horizontal dividers | Desktop: Grid with vertical dividers */}
-          <div className="border-t border-slate-200">
-            {/* Row 1 */}
-            {features.slice(0, 3).map((feature, index) => (
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {features.map((feature, index) => (
               <div
                 key={index}
-                className={cn(
-                  "py-6 md:py-8 border-b border-slate-200",
-                  "md:float-left md:w-1/3 md:py-8",
-                  index < 2 && "md:border-r md:border-b-0",
-                  index > 0 && "md:pl-6 lg:pl-8"
-                )}
+                className="rounded-2xl border border-slate-200 bg-white p-6 transition-shadow hover:shadow-sm"
               >
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <feature.icon className="w-5 h-5 text-blue-600" />
+                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-blue-50">
+                    <feature.icon className="h-5 w-5 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-foreground mb-1">{feature.title}</h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
+                    <h3 className="mb-2 text-lg font-semibold text-foreground">{feature.title}</h3>
+                    <p className="text-sm leading-relaxed text-muted-foreground">{feature.description}</p>
                   </div>
                 </div>
               </div>
             ))}
-            <div className="md:clear-both" />
-
-            {/* Row 2 - Offset on desktop */}
-            <div className="md:ml-16 lg:ml-24">
-              {features.slice(3, 6).map((feature, index) => (
-                <div
-                  key={index}
-                  className={cn(
-                    "py-6 md:py-8 border-b border-slate-200 last:border-b-0",
-                    "md:float-left md:w-1/3 md:py-8",
-                    index < 2 && "md:border-r",
-                    index > 0 && "md:pl-6 lg:pl-8"
-                  )}
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <feature.icon className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-foreground mb-1">{feature.title}</h3>
-                      <p className="text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="md:clear-both" />
           </div>
         </div>
       </section>
@@ -199,7 +103,7 @@ export default function LandingPage() {
               From your words to a finished document
             </h2>
             <p className="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto">
-              Watch Stepease conduct a structured interview and build a complete SOP — with extracted notes, assigned roles, and export-ready formatting.
+              Watch Stepease capture the conversation, extract structured notes, route them through review, and generate an export-ready SOP draft.
             </p>
           </div>
 
@@ -207,40 +111,60 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* How It Works Section - Compact 2x2 grid */}
-      <section id="how-it-works" className="py-24 px-4 bg-slate-50">
-        <div className="max-w-5xl mx-auto">
-          <div className="mb-12">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 mb-4">
+      <section id="how-it-works" className="border-y border-slate-200/70 bg-white py-24 px-4">
+        <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[minmax(0,18rem)_1fr] lg:gap-16">
+          <div className="lg:sticky lg:top-28 lg:self-start">
+            <p className="mb-3 text-sm font-medium uppercase tracking-[0.18em] text-slate-500">
               How it works
+            </p>
+            <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl lg:text-5xl">
+              How Stepease builds the SOP
             </h2>
-            <p className="text-lg text-slate-600 max-w-xl">
-              Four steps. Five minutes. One perfect document.
+            <p className="mt-4 max-w-md text-lg leading-relaxed text-slate-600">
+              Describe the work once. Stepease turns it into a structured interview, a reviewed note set, and a final document your team can publish.
             </p>
           </div>
 
-          {/* Compact 2x2 grid with connecting lines */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-slate-200 border border-slate-200 rounded-2xl overflow-hidden">
-            {steps.map((step, index) => (
-              <div key={index} className="bg-white p-6 lg:p-8">
-                <div className="flex items-start gap-4">
-                  {/* Step number - blue */}
-                  <span className="text-2xl font-bold text-blue-600 w-12 flex-shrink-0">
-                    {step.number}
-                  </span>
-                  <div className="space-y-2">
+          <div className="relative">
+            <div className="absolute bottom-0 left-5 top-0 w-px bg-slate-200 md:left-1/2 md:-translate-x-px" />
+            <div className="space-y-5">
+              {steps.map((step, index) => (
+                <div
+                  key={index}
+                  className="relative grid gap-4 rounded-[1.75rem] border border-slate-200 bg-slate-50/80 p-5 sm:p-6 md:grid-cols-2 md:gap-8"
+                >
+                  <div className={cn("pl-14 md:pl-0", index % 2 === 1 && "md:order-2")}>
                     <div className="flex items-center gap-2 text-slate-500">
-                      <step.icon className="w-4 h-4" />
-                      <span className="text-xs uppercase tracking-wide font-medium">
+                      <step.icon className="h-4 w-4" />
+                      <span className="text-xs font-semibold uppercase tracking-[0.18em]">
                         {step.subtitle}
                       </span>
                     </div>
-                    <h3 className="text-lg font-semibold text-slate-900">{step.title}</h3>
-                    <p className="text-sm text-slate-600 leading-relaxed">{step.description}</p>
+                    <h3 className="mt-3 text-xl font-semibold text-slate-900">
+                      {step.title}
+                    </h3>
+                    <p className="mt-2 text-sm leading-relaxed text-slate-600 sm:text-[15px]">
+                      {step.description}
+                    </p>
+                  </div>
+
+                  <div className={cn("pl-14 md:pl-0", index % 2 === 1 && "md:order-1")}>
+                    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                      <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                        What shows up in the product
+                      </div>
+                      <p className="mt-2 text-sm leading-relaxed text-slate-700">
+                        {step.detail}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="absolute left-0 top-6 flex h-10 w-10 items-center justify-center rounded-full border border-slate-900 bg-slate-900 text-sm font-semibold text-white md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2">
+                    {step.number}
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>

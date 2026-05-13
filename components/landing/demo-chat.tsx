@@ -39,6 +39,26 @@ export function DemoTypingIndicator() {
     )
 }
 
+export function DemoChatSkeleton() {
+    return (
+        <div className="space-y-4">
+            <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-blue-700">
+                Live interview
+            </div>
+            <div className="flex gap-2.5">
+                <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 sm:h-8 sm:w-8">
+                    <Bot className="h-3.5 w-3.5 text-white sm:h-4 sm:w-4" />
+                </div>
+                <div className="max-w-[76%] rounded-2xl rounded-tl-sm border border-slate-200 bg-slate-50 px-4 py-3">
+                    <div className="h-2.5 w-44 rounded-full bg-slate-200" />
+                    <div className="mt-2 h-2.5 w-56 rounded-full bg-slate-200" />
+                    <div className="mt-2 h-2.5 w-32 rounded-full bg-slate-200" />
+                </div>
+            </div>
+        </div>
+    )
+}
+
 // -----------------------------------------------------------------------------
 // Message Bubble
 // -----------------------------------------------------------------------------

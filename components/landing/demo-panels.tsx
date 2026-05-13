@@ -5,16 +5,17 @@
 // Shows extracted notes appearing with animations during the demo
 // =============================================================================
 
-import { FileText, CheckCircle2 } from "lucide-react"
+import { ArrowRight, CheckCircle2, Download, FileText, Search, ShieldCheck } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { DemoNote } from "./demo-data"
 
 interface DemoNotesPanelProps {
     notes: DemoNote[]
     totalNotes: number
+    reviewReady?: boolean
 }
 
-export function DemoNotesPanel({ notes, totalNotes }: DemoNotesPanelProps) {
+export function DemoNotesPanel({ notes, totalNotes, reviewReady = false }: DemoNotesPanelProps) {
     return (
         <div className="h-full flex flex-col bg-slate-50 border-l border-slate-200">
             {/* Header */}
@@ -35,11 +36,23 @@ export function DemoNotesPanel({ notes, totalNotes }: DemoNotesPanelProps) {
             {/* Notes List */}
             <div className="flex-1 overflow-y-auto p-2.5 sm:p-3 space-y-2">
                 {notes.length === 0 && (
-                    <div className="text-center py-8">
-                        <FileText className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-                        <p className="text-xs text-slate-400">
-                            Notes appear here as you chat...
-                        </p>
+                    <div className="py-3 space-y-2.5">
+                        <div className="rounded-lg border border-dashed border-slate-200 bg-white px-3 py-3">
+                            <FileText className="w-6 h-6 text-slate-300 mb-2" />
+                            <p className="text-[11px] font-medium text-slate-500">
+                                Notes appear here as Stepease extracts them from the conversation.
+                            </p>
+                        </div>
+                        {[1, 2, 3].map((item) => (
+                            <div
+                                key={item}
+                                className="rounded-lg border border-slate-200 bg-white p-3"
+                            >
+                                <div className="h-4 w-20 rounded-md bg-slate-100" />
+                                <div className="mt-3 h-2.5 w-full rounded-full bg-slate-100" />
+                                <div className="mt-2 h-2.5 w-5/6 rounded-full bg-slate-100" />
+                            </div>
+                        ))}
                     </div>
                 )}
 
@@ -64,6 +77,21 @@ export function DemoNotesPanel({ notes, totalNotes }: DemoNotesPanelProps) {
                         </p>
                     </div>
                 ))}
+            </div>
+
+            <div className="border-t border-slate-200 bg-white p-3">
+                <button
+                    type="button"
+                    className={cn(
+                        "flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition-colors",
+                        reviewReady
+                            ? "bg-blue-600 text-white shadow-sm"
+                            : "bg-slate-100 text-slate-400"
+                    )}
+                >
+                    <ShieldCheck className="h-3.5 w-3.5" />
+                    {reviewReady ? "Review & Generate SOP" : "Capturing Notes"}
+                </button>
             </div>
         </div>
     )
@@ -173,18 +201,33 @@ export function DemoResult({ content }: DemoResultProps) {
                 <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500" />
                     <span className="text-xs sm:text-sm font-semibold text-slate-800">
-                        Generated SOP
+                        Final SOP
+                    </span>
+                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-500">
+                        v1
                     </span>
                 </div>
                 <div className="flex gap-1.5">
-                    <span className="text-[10px] sm:text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium">
-                        PDF
-                    </span>
-                    <span className="text-[10px] sm:text-xs bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full font-medium">
-                        Word
-                    </span>
                     <span className="text-[10px] sm:text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium">
-                        MD
+                        Preview
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-[10px] sm:text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium">
+                        <Download className="h-3 w-3" />
+                        Export
+                    </span>
+                    <span className="text-[10px] sm:text-xs bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full font-medium">
+                        Share
+                    </span>
+                </div>
+            </div>
+
+            <div className="border-b border-slate-100 px-3 sm:px-4 py-2">
+                <div className="flex gap-1.5">
+                    <span className="rounded-md bg-slate-900 px-2 py-1 text-[10px] font-semibold text-white">
+                        Preview
+                    </span>
+                    <span className="rounded-md bg-slate-100 px-2 py-1 text-[10px] font-semibold text-slate-500">
+                        Markdown
                     </span>
                 </div>
             </div>
@@ -223,6 +266,18 @@ export function DemoResult({ content }: DemoResultProps) {
                                 </h3>
                             )
                         }
+                        const metaMatch = line.match(/^\*\*(.+?):\*\*\s*(.+)$/)
+                        if (metaMatch) {
+                            return (
+                                <div
+                                    key={i}
+                                    className="grid grid-cols-[auto_1fr] gap-2 border-b border-slate-100 py-1 text-[11px] sm:text-xs"
+                                >
+                                    <span className="font-semibold text-slate-700">{metaMatch[1]}:</span>
+                                    <span className="text-slate-600">{metaMatch[2]}</span>
+                                </div>
+                            )
+                        }
                         if (line.startsWith("- [ ] ")) {
                             return (
                                 <div
@@ -251,6 +306,18 @@ export function DemoResult({ content }: DemoResultProps) {
                                     </div>
                                 )
                             }
+                        }
+                        if (/^\d+\.\s/.test(line)) {
+                            const [, numeral, text] = line.match(/^(\d+)\.\s(.+)$/) || []
+                            return (
+                                <div
+                                    key={i}
+                                    className="grid grid-cols-[1.25rem_1fr] gap-2 py-0.5 text-[11px] sm:text-xs text-slate-600"
+                                >
+                                    <span className="font-semibold text-slate-700">{numeral}.</span>
+                                    <span>{text}</span>
+                                </div>
+                            )
                         }
                         if (line.startsWith("|") && line.includes("|")) {
                             if (line.includes("---")) return null
@@ -290,6 +357,162 @@ export function DemoResult({ content }: DemoResultProps) {
                             </p>
                         )
                     })}
+                </div>
+            </div>
+        </div>
+    )
+}
+
+const REVIEW_CATEGORY_ORDER = [
+    "HEADER_INFO",
+    "PURPOSE_SCOPE",
+    "ROLES_RESPONSIBILITIES",
+    "PROCEDURE_STEPS",
+    "DECISION_POINTS",
+    "QUALITY_SUCCESS",
+    "TROUBLESHOOTING",
+    "DEFINITIONS_REFERENCES",
+    "MATERIALS_RESOURCES",
+    "METADATA",
+]
+
+export function DemoReviewBoard({ notes }: { notes: DemoNote[] }) {
+    const groupedNotes = REVIEW_CATEGORY_ORDER
+        .map((category) => {
+            const items = notes.filter((note) => note.category === category)
+            return items.length > 0
+                ? {
+                    category,
+                    label: items[0].label,
+                    color: items[0].color,
+                    items,
+                }
+                : null
+        })
+        .filter(Boolean) as Array<{
+        category: string
+        label: string
+        color: string
+        items: DemoNote[]
+    }>
+
+    const coverage = Math.min(100, Math.round((groupedNotes.length / REVIEW_CATEGORY_ORDER.length) * 100))
+    const highlightedGroups = groupedNotes.slice(0, 4)
+
+    return (
+        <div className="h-full bg-slate-50 p-3 sm:p-4">
+            <div className="grid h-full gap-3 lg:grid-cols-[minmax(0,1fr)_19rem] xl:grid-cols-[minmax(0,1.05fr)_20rem]">
+                <div className="flex min-h-0 flex-col rounded-xl border border-slate-200 bg-white">
+                    <div className="border-b border-slate-200 px-4 py-3">
+                        <div className="flex items-start justify-between gap-3">
+                            <div>
+                                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                                    Review Notes
+                                </p>
+                                <h3 className="mt-1 text-sm font-semibold text-slate-900 sm:text-base">
+                                    Procedural Architecture
+                                </h3>
+                            </div>
+                            <div className="rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-semibold text-blue-700">
+                                Coverage {coverage}%
+                            </div>
+                        </div>
+                        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-100">
+                            <div
+                                className="h-full rounded-full bg-blue-600 transition-all duration-700"
+                                style={{ width: `${coverage}%` }}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="border-b border-slate-100 px-4 py-3">
+                        <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-400">
+                            <Search className="h-3.5 w-3.5" />
+                            Search captured details...
+                        </div>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto px-4 py-3">
+                        <div className="space-y-2">
+                            {groupedNotes.map((group) => (
+                                <div
+                                    key={group.category}
+                                    className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50/70 px-3 py-2"
+                                >
+                                    <div className="flex min-w-0 items-center gap-2">
+                                        <span className={cn("rounded-md px-1.5 py-0.5 text-[10px] font-medium", group.color)}>
+                                            {group.label}
+                                        </span>
+                                        <span className="truncate text-xs text-slate-500">
+                                            {group.items[0].content}
+                                        </span>
+                                    </div>
+                                    <span className="text-[10px] font-semibold text-slate-400">
+                                        {group.items.length}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex min-h-0 flex-col gap-3">
+                    <div className="rounded-xl border border-slate-200 bg-white p-4">
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                            Ready To Generate
+                        </p>
+                        <div className="mt-2 flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                            <h4 className="text-sm font-semibold text-slate-900">
+                                {notes.length} structured notes captured
+                            </h4>
+                        </div>
+                        <p className="mt-2 text-xs leading-relaxed text-slate-500">
+                            Stepease has mapped the conversation into SOP sections, ownership, tooling, and quality checks.
+                        </p>
+                    </div>
+
+                    <div className="grid gap-3 rounded-xl border border-slate-200 bg-white p-4">
+                        <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+                            <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                                Next step
+                            </div>
+                            <p className="mt-1 text-xs leading-relaxed text-slate-600">
+                                Generate the draft, then open preview mode to edit sections or export the SOP.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto rounded-xl border border-slate-200 bg-white p-4">
+                        <div className="space-y-2.5">
+                            {highlightedGroups.map((group) => (
+                                <div
+                                    key={group.category}
+                                    className="rounded-lg border border-slate-200 p-3"
+                                >
+                                    <div className="mb-1.5 flex items-center gap-2">
+                                        <span className={cn("rounded-md px-1.5 py-0.5 text-[10px] font-medium", group.color)}>
+                                            {group.label}
+                                        </span>
+                                        <span className="text-[10px] font-medium text-slate-400">
+                                            {group.items.length} captured
+                                        </span>
+                                    </div>
+                                    <p className="text-xs leading-relaxed text-slate-600">
+                                        {group.items[0].content}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <button
+                        type="button"
+                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white shadow-sm"
+                    >
+                        Generate SOP
+                        <ArrowRight className="h-4 w-4" />
+                    </button>
                 </div>
             </div>
         </div>

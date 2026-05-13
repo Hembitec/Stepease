@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Stepease Hero — 3 Variants</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  body { font-family: 'Inter', system-ui, sans-serif; }
+  .font-display { font-family: 'Bricolage Grotesque', sans-serif; }
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+<div class="max-w-5xl mx-auto px-6 py-16">
+  <div class="mb-10">
+    <div class="text-xs uppercase tracking-[0.2em] text-slate-400 mb-3">Stepease landing page</div>
+    <h1 class="font-display text-4xl font-bold text-slate-900 mb-3">Hero graphic — 3 directions</h1>
+    <p class="text-slate-600 max-w-2xl leading-relaxed">
+      Three mockups showing different takes on the hero's right-side graphic. Click any card to preview it full-width.
+      Each reflects Stepease's actual product flow (interview → structured notes → polished SOP) but prioritizes a different visual strategy.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <!-- Variant 1 REFINED (recommended) -->
+    <a href="variant-1-refined.html" class="group relative bg-white rounded-2xl border-2 border-blue-400 overflow-hidden hover:shadow-xl transition-all md:col-span-3">
+      <div class="absolute top-3 right-3 z-10 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-600 text-white text-[10px] font-bold tracking-wide uppercase shadow-md">
+        <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4L12 2z"/></svg>
+        Refined — Your pick
+      </div>
+      <div class="grid md:grid-cols-[1fr_1.3fr] gap-0">
+        <div class="p-8 bg-gradient-to-br from-blue-50 to-slate-50 flex items-center">
+          <div class="w-full">
+            <div class="mb-3 flex items-center gap-2">
+              <div class="flex items-center gap-0.5">
+                <span class="h-1 w-3 rounded-full bg-emerald-500"></span>
+                <span class="h-1 w-4 rounded-full bg-blue-600"></span>
+                <span class="h-1 w-2.5 rounded-full bg-slate-300"></span>
+                <span class="h-1 w-2.5 rounded-full bg-slate-300"></span>
+                <span class="h-1 w-2.5 rounded-full bg-slate-300"></span>
+              </div>
+              <span class="text-[9px] font-mono text-slate-500 uppercase tracking-wider">Process · 35%</span>
+              <span class="text-[9px] font-mono text-slate-400 ml-auto">3/12 cats</span>
+            </div>
+            <div class="flex justify-end mb-2">
+              <div class="bg-blue-600 text-white text-[9px] px-2 py-1 rounded-lg rounded-tr-sm max-w-[80%]">
+                After <span class="bg-orange-300/50 px-0.5 rounded">AP clerk logs it</span>, we route by amount
+              </div>
+            </div>
+            <div class="flex gap-1 mb-3">
+              <div class="w-4 h-4 rounded-full bg-blue-600 flex-shrink-0"></div>
+              <div class="bg-slate-100 text-[9px] px-2 py-1 rounded-lg rounded-tl-sm">What thresholds?<span class="inline-block w-0.5 h-2 bg-slate-600 ml-0.5 translate-y-px animate-pulse"></span></div>
+            </div>
+            <div class="relative bg-white border border-blue-300 rounded-lg p-2 shadow-lg" style="box-shadow: 0 8px 20px -8px rgba(59, 130, 246, 0.3);">
+              <div class="absolute -top-1.5 -right-1.5 px-1.5 py-0.5 rounded-full bg-blue-600 text-white text-[7px] font-bold tracking-wide">JUST EXTRACTED</div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[8px] bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded font-bold">PROCEDURE</span>
+                <span class="text-[8px] text-red-600 font-bold">● HIGH</span>
+              </div>
+              <div class="h-0.5 bg-slate-300 rounded w-full mb-0.5"></div>
+              <div class="h-0.5 bg-slate-200 rounded w-3/4"></div>
+            </div>
+            <div class="mt-1.5 space-y-1.5">
+              <div class="bg-white border border-slate-200 rounded-lg p-1.5">
+                <div class="flex items-center justify-between mb-0.5">
+                  <span class="text-[7px] bg-green-100 text-green-700 px-1 rounded font-bold">ROLES</span>
+                  <span class="text-[7px] text-amber-600 font-bold">● MED</span>
+                </div>
+                <div class="h-0.5 bg-slate-200 rounded w-4/5"></div>
+              </div>
+              <div class="bg-white border border-slate-200 rounded-lg p-1.5">
+                <div class="flex items-center justify-between mb-0.5">
+                  <span class="text-[7px] bg-amber-100 text-amber-700 px-1 rounded font-bold">DECISIONS</span>
+                  <span class="text-[7px] text-amber-600 font-bold">● MED</span>
+                </div>
+                <div class="h-0.5 bg-slate-200 rounded w-2/3"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="p-8 flex flex-col justify-center">
+          <div class="text-xs font-semibold uppercase tracking-wider text-blue-600 mb-2">Variant 1 — Refined</div>
+          <h3 class="font-display text-2xl font-bold text-slate-900 mb-3">Interview → Notes (Polished)</h3>
+          <p class="text-sm text-slate-600 leading-relaxed mb-4">
+            The original Variant 1 with 8 targeted improvements: a visible extraction moment (highlighted phrases connect to notes they became), app-accurate category colors, unified phase+category header, hero note hierarchy with "Just extracted" pulse, live typing AI, voice waveform hint, and a dedicated mobile composition.
+          </p>
+          <div class="flex items-center gap-1.5 flex-wrap mb-5">
+            <span class="text-[10px] bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full font-medium">✦ Visible extraction</span>
+            <span class="text-[10px] bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full font-medium">Matches real app</span>
+            <span class="text-[10px] bg-purple-50 text-purple-700 px-2.5 py-1 rounded-full font-medium">Live typing</span>
+            <span class="text-[10px] bg-rose-50 text-rose-700 px-2.5 py-1 rounded-full font-medium">Mobile version</span>
+          </div>
+          <div class="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 group-hover:text-blue-700">
+            View full preview →
+          </div>
+        </div>
+      </div>
+    </a>
+
+    <!-- Original Variant 1 (for comparison) -->
+    <a href="variant-1-interview-to-notes.html" class="group bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-xl hover:border-blue-300 transition-all">
+      <div class="aspect-[4/3] bg-gradient-to-br from-blue-50 to-slate-50 p-4 relative overflow-hidden">
+        <!-- Preview: Chat + notes -->
+        <div class="h-full flex flex-col gap-2">
+          <div class="flex justify-end">
+            <div class="bg-blue-600 text-white text-[8px] px-2 py-1 rounded-lg rounded-tr-sm max-w-[70%]">So the AP clerk logs it…</div>
+          </div>
+          <div class="flex gap-1">
+            <div class="w-4 h-4 rounded-full bg-blue-600 flex-shrink-0"></div>
+            <div class="bg-slate-100 text-[8px] px-2 py-1 rounded-lg rounded-tl-sm">Who reviews next?</div>
+          </div>
+          <div class="mt-auto grid grid-cols-1 gap-1.5">
+            <div class="bg-white border border-slate-200 rounded p-1.5">
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-[7px] bg-blue-50 text-blue-700 px-1 rounded font-bold">PROCEDURE</span>
+                <span class="text-[7px] text-red-600 font-bold">● HIGH</span>
+              </div>
+              <div class="h-0.5 bg-slate-200 rounded w-full mb-0.5"></div>
+              <div class="h-0.5 bg-slate-200 rounded w-2/3"></div>
+            </div>
+            <div class="bg-white border border-slate-200 rounded p-1.5">
+              <div class="flex items-center justify-between mb-0.5">
+                <span class="text-[7px] bg-emerald-50 text-emerald-700 px-1 rounded font-bold">ROLES</span>
+                <span class="text-[7px] text-amber-600 font-bold">● MED</span>
+              </div>
+              <div class="h-0.5 bg-slate-200 rounded w-4/5"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="p-5">
+        <div class="text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Variant 1 — Original</div>
+        <h3 class="font-display text-lg font-bold text-slate-900 mb-2">Interview → Notes (v1)</h3>
+        <p class="text-sm text-slate-600 leading-relaxed mb-3">Shows your actual product: chat bubbles on left, tagged extracted notes on right, with phase badge.</p>
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <span class="text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full font-medium">Most communicative</span>
+          <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium">Medium effort</span>
+        </div>
+        <div class="mt-4 text-sm font-medium text-blue-600 group-hover:text-blue-700">View full preview →</div>
+      </div>
+    </a>
+
+    <!-- Variant 2 -->
+    <a href="variant-2-single-document.html" class="group bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-xl hover:border-blue-300 transition-all">
+      <div class="aspect-[4/3] bg-gradient-to-br from-slate-50 to-blue-50 p-4 relative overflow-hidden flex items-center justify-center">
+        <!-- Preview: Single document card -->
+        <div class="w-full max-w-[80%] bg-white rounded-lg shadow-lg border border-slate-200 p-3">
+          <div class="text-[7px] font-bold text-blue-600 uppercase tracking-wider mb-1">Section 3 · Procedure</div>
+          <div class="text-[10px] font-bold text-slate-900 mb-2">Invoice Approval</div>
+          <div class="space-y-1">
+            <div class="flex items-start gap-1">
+              <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 flex-shrink-0"></div>
+              <div class="flex-1 space-y-0.5">
+                <div class="h-0.5 bg-slate-300 rounded w-full"></div>
+                <div class="h-0.5 bg-slate-200 rounded w-3/4"></div>
+              </div>
+            </div>
+            <div class="flex items-start gap-1">
+              <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 flex-shrink-0"></div>
+              <div class="flex-1 space-y-0.5">
+                <div class="h-0.5 bg-slate-300 rounded w-full"></div>
+                <div class="h-0.5 bg-slate-200 rounded w-2/3"></div>
+              </div>
+            </div>
+            <div class="flex items-start gap-1">
+              <div class="w-2.5 h-2.5 rounded-full border-2 border-blue-400 flex-shrink-0"></div>
+              <div class="flex-1 space-y-0.5">
+                <div class="h-0.5 bg-slate-300 rounded w-4/5"></div>
+                <div class="h-0.5 bg-slate-200 rounded w-1/2"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="p-5">
+        <div class="text-[10px] font-semibold uppercase tracking-wider text-blue-600 mb-1">Variant 2</div>
+        <h3 class="font-display text-lg font-bold text-slate-900 mb-2">Single Document</h3>
+        <p class="text-sm text-slate-600 leading-relaxed mb-3">One clean document preview with real SOP content. Quiet confidence — doesn't compete with the headline.</p>
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <span class="text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full font-medium">Calmest</span>
+          <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium">Low effort</span>
+          <span class="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-medium">Premium feel</span>
+        </div>
+        <div class="mt-4 text-sm font-medium text-blue-600 group-hover:text-blue-700">View full preview →</div>
+      </div>
+    </a>
+
+    <!-- Variant 3 -->
+    <a href="variant-3-editorial.html" class="group bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-xl hover:border-blue-300 transition-all">
+      <div class="aspect-[4/3] bg-gradient-to-br from-white to-slate-100 p-4 relative overflow-hidden">
+        <!-- Preview: Editorial layout -->
+        <div class="font-display text-base font-bold text-slate-900 leading-tight mb-2">Stop explaining<br/>things <span class="text-blue-600">over and over.</span></div>
+        <div class="grid grid-cols-2 gap-1.5 mt-3">
+          <!-- Input -->
+          <div class="bg-white border border-slate-200 rounded p-1.5">
+            <div class="flex gap-0.5 mb-1 h-2 items-center">
+              <div class="w-0.5 h-1 bg-blue-500 rounded"></div>
+              <div class="w-0.5 h-2 bg-blue-500 rounded"></div>
+              <div class="w-0.5 h-1 bg-blue-500 rounded"></div>
+              <div class="w-0.5 h-2 bg-blue-500 rounded"></div>
+              <div class="w-0.5 h-1 bg-blue-500 rounded"></div>
+            </div>
+            <div class="text-[6px] italic text-slate-600">"So first the AP clerk…"</div>
+          </div>
+          <!-- Output -->
+          <div class="bg-slate-900 text-white rounded p-1.5">
+            <div class="text-[5px] font-mono text-slate-400 mb-0.5">SOP-001</div>
+            <div class="text-[6px] font-bold mb-0.5">Invoice Approval</div>
+            <div class="space-y-0.5">
+              <div class="flex gap-0.5 text-[5px] font-mono"><span class="text-blue-400">01</span><span class="text-slate-300">Receive invoice</span></div>
+              <div class="flex gap-0.5 text-[5px] font-mono"><span class="text-blue-400">02</span><span class="text-slate-300">Log in system</span></div>
+              <div class="flex gap-0.5 text-[5px] font-mono"><span class="text-amber-400">03</span><span class="text-amber-200">IF &gt; $5k</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-2 font-display text-base font-bold leading-none">3h <span class="text-slate-400 mx-0.5">→</span> <span class="text-blue-600">9 min</span></div>
+      </div>
+      <div class="p-5">
+        <div class="text-[10px] font-semibold uppercase tracking-wider text-blue-600 mb-1">Variant 3</div>
+        <h3 class="font-display text-lg font-bold text-slate-900 mb-2">Editorial Transform</h3>
+        <p class="text-sm text-slate-600 leading-relaxed mb-3">Huge headline + full-width input→output transform. Poster-style, most distinctive, most ambitious.</p>
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <span class="text-[10px] bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full font-medium">Most distinctive</span>
+          <span class="text-[10px] bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full font-medium">High effort</span>
+        </div>
+        <div class="mt-4 text-sm font-medium text-blue-600 group-hover:text-blue-700">View full preview →</div>
+      </div>
+    </a>
+
+  </div>
+
+  <div class="mt-12 p-6 rounded-2xl bg-white border border-slate-200">
+    <h3 class="font-display text-lg font-bold text-slate-900 mb-3">How to evaluate</h3>
+    <ul class="space-y-2 text-sm text-slate-600">
+      <li class="flex items-start gap-2"><span class="text-blue-600 font-bold mt-0.5">1.</span> <span>Which one makes your headline feel <strong>strongest</strong>, not most crowded?</span></li>
+      <li class="flex items-start gap-2"><span class="text-blue-600 font-bold mt-0.5">2.</span> <span>Which one, shown to a stranger for 3 seconds, would make them say <em>"oh, I get what this does"</em>?</span></li>
+      <li class="flex items-start gap-2"><span class="text-blue-600 font-bold mt-0.5">3.</span> <span>Which one feels most like <strong>Stepease</strong> and least like every other AI SaaS landing page?</span></li>
+    </ul>
+  </div>
+</div>
+
+</body>
+</html>

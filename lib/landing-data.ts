@@ -16,74 +16,71 @@ import {
 export const features = [
   {
     icon: Bot,
-    title: "Just Talk, We'll Write",
+    title: "Capture the process in one conversation",
     description:
-      "Describe your process like you'd explain it to a colleague. AI captures every detail so you never miss a critical step.",
+      "Describe the workflow once and Stepease turns it into structured steps, roles, and decision points without a blank page.",
   },
   {
     icon: Upload,
-    title: "Fix Outdated Docs Fast",
+    title: "Turn stale SOPs into current ones fast",
     description:
-      "Drop your old SOPs and get actionable fixes in minutes so outdated documentation becomes your best one.",
+      "Upload the docs your team already has and get clear gaps, outdated steps, and suggested fixes in minutes.",
   },
   {
     icon: Download,
-    title: "Universal Export",
-    description: "One click to PDF, Word, or Markdown. Easily paste into Notion, Confluence, or SharePoint.",
+    title: "Publish where your team already works",
+    description: "Export to PDF, Word, or Markdown and move the final SOP into Notion, Confluence, or SharePoint without reformatting.",
   },
   {
     icon: FileText,
-    title: "Activity & Version Control",
-    description: "Every action is logged. Revise an approved SOP, provide a reason, and auto-generate linked versions seamlessly.",
+    title: "Keep every revision audit-ready",
+    description: "Every update is logged with a reason, so approved SOPs stay traceable, reviewable, and easy to defend.",
   },
   {
     icon: GitBranch,
-    title: "Chat-Based Revisions",
-    description: "Don't rewrite documents manually. Reopen an approved SOP, tell the AI what changed, and let it update the exact steps for you.",
+    title: "Update approved SOPs without rewriting",
+    description: "Tell Stepease what changed and it rewrites the exact sections that need edits instead of making you start over.",
   },
   {
     icon: Shield,
-    title: "Public Viewing & Sharing",
-    description: "Generate secure, read-only links to share your final procedures with team members instantly.",
+    title: "Share the final version with confidence",
+    description: "Send secure, read-only SOP links to teammates so everyone follows the same source of truth.",
   },
 ]
 
 export const steps = [
   {
     number: "01",
-    title: "Context",
-    subtitle: "Define your goal",
-    description: "Tell the AI who the SOP is for and what it should achieve. Set the stage for success.",
+    title: "Set the scope",
+    subtitle: "Start with context",
+    description: "Tell Stepease what process you are documenting, who runs it, and where the procedure applies before the interview begins.",
+    detail: "Templates, audience, department, and compliance context shape the interview from the first prompt.",
     icon: MessageSquare,
   },
   {
     number: "02",
-    title: "Interview",
-    subtitle: "Answer smart questions",
-    description: "The AI conducts a structured interview to extract every step, role, and troubleshooting tip.",
+    title: "Run the interview",
+    subtitle: "Answer one question at a time",
+    description: "The AI asks focused follow-ups so it can capture steps, ownership, decision points, tools, and failure paths without guessing.",
+    detail: "Every answer is turned into structured notes while the conversation is still happening.",
     icon: Bot,
   },
   {
     number: "03",
-    title: "Review",
-    subtitle: "Verify the logic",
-    description: "See structured notes in real-time. The AI highlights gaps before writing a single word.",
+    title: "Review the notes",
+    subtitle: "Verify coverage before writing",
+    description: "Open the grouped note review to inspect what was captured, see which SOP sections are covered, and catch missing details before generation.",
+    detail: "Notes are grouped by SOP section so the logic can be checked before a draft is created.",
     icon: Eye,
   },
   {
     number: "04",
-    title: "Generate",
-    subtitle: "Instant Documentation",
-    description: "One click transforms your structured notes into a polished, professional PDF or Word doc.",
+    title: "Generate and publish",
+    subtitle: "Move from draft to final SOP",
+    description: "Generate the first draft, review it in preview mode, then export, share, or revise the SOP without starting over.",
+    detail: "Preview, markdown, export, share links, and version history stay connected to the same document.",
     icon: Sparkles,
   },
-]
-
-export const statsData = [
-  { prefix: "<", value: 10, suffix: " min", label: "Average SOP creation", isTime: true },
-  { prefix: "", value: 12, suffix: "+ hrs", label: "Saved per document", isTime: true },
-  { prefix: "", value: 500, suffix: "+", label: "Teams trust us", isTime: false },
-  { prefix: "", value: 50000, suffix: "+", label: "SOPs created", isTime: false },
 ]
 
 export const testimonials = [

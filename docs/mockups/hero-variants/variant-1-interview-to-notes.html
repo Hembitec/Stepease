@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Variant 1 — Interview → Notes</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  body { font-family: 'Inter', system-ui, sans-serif; }
+  .font-display { font-family: 'Bricolage Grotesque', sans-serif; }
+
+  @keyframes bubble-in {
+    0%   { opacity: 0; transform: translateY(8px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes note-slide-in {
+    0%   { opacity: 0; transform: translateX(20px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 0.4; }
+    50%      { opacity: 1; }
+  }
+  @keyframes extract-line {
+    0%   { stroke-dashoffset: 200; opacity: 0; }
+    30%  { opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 0.6; }
+  }
+
+  .bubble-user   { animation: bubble-in 0.5s ease-out 0.2s both; }
+  .bubble-ai     { animation: bubble-in 0.5s ease-out 0.7s both; }
+  .note-1        { animation: note-slide-in 0.6s ease-out 1.2s both; }
+  .note-2        { animation: note-slide-in 0.6s ease-out 1.6s both; }
+  .note-3        { animation: note-slide-in 0.6s ease-out 2.0s both; }
+  .phase-pulse   { animation: pulse-dot 1.8s ease-in-out infinite; }
+  .line-extract  { stroke-dasharray: 200; animation: extract-line 1.5s ease-out 1.0s both; }
+
+  .topographic {
+    background-image:
+      radial-gradient(ellipse 600px 400px at 80% 30%, rgba(59, 130, 246, 0.04), transparent),
+      radial-gradient(ellipse 400px 300px at 20% 70%, rgba(99, 102, 241, 0.03), transparent);
+  }
+  .dot-matrix {
+    background-image: radial-gradient(circle at 1px 1px, rgba(15, 23, 42, 0.06) 1px, transparent 0);
+    background-size: 24px 24px;
+  }
+</style>
+</head>
+<body class="bg-white">
+
+<div class="mx-auto max-w-[1440px] px-6 py-4">
+  <div class="mb-8 text-xs uppercase tracking-[0.2em] text-slate-400">Variant 1 — Interview to Structured Notes (shows real product flow)</div>
+
+  <!-- HERO SECTION -->
+  <section class="relative overflow-hidden rounded-3xl border border-slate-200 bg-white">
+    <div class="absolute inset-0 topographic pointer-events-none"></div>
+    <div class="absolute inset-0 dot-matrix opacity-40 pointer-events-none"></div>
+
+    <div class="relative px-8 lg:px-16 pt-16 pb-20">
+      <div class="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+
+        <!-- LEFT: Copy column -->
+        <div class="lg:col-span-6">
+          <div class="inline-flex items-center gap-2 bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full text-sm font-medium mb-5 border border-slate-200">
+            <span class="flex h-2 w-2 rounded-full bg-blue-600"></span>
+            <span>Your team's knowledge lives in people's heads. That's a risk.</span>
+          </div>
+
+          <h1 class="font-display text-5xl lg:text-7xl font-bold text-slate-900 tracking-tight leading-[0.95] mb-5">
+            Stop explaining things<br />
+            <span class="text-blue-600">over and over.</span>
+          </h1>
+
+          <p class="text-xl text-slate-600 leading-relaxed max-w-xl mb-7">
+            Describe your process out loud. Get a polished, audit-ready SOP in under 10 minutes.
+          </p>
+
+          <div class="flex flex-col sm:flex-row items-start gap-4 mb-5">
+            <button class="bg-slate-900 hover:bg-slate-800 text-white px-7 h-14 text-base font-medium rounded-xl inline-flex items-center gap-2">
+              Build Your First SOP Free →
+            </button>
+            <button class="px-7 h-14 text-base font-medium text-slate-600 hover:text-slate-900 rounded-xl inline-flex items-center gap-2">
+              ▶  Watch It Work
+            </button>
+          </div>
+
+          <div class="flex items-center gap-6 text-sm text-slate-500">
+            <span class="flex items-center gap-1.5">✓ No credit card required</span>
+            <span class="flex items-center gap-1.5">✓ Free forever</span>
+          </div>
+        </div>
+
+        <!-- RIGHT: Graphic -->
+        <div class="lg:col-span-6 relative min-h-[500px]">
+
+          <!-- Phase badge floating top -->
+          <div class="absolute top-0 left-1/2 -translate-x-1/2 z-20 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-200 shadow-sm">
+            <span class="phase-pulse w-2 h-2 rounded-full bg-blue-600"></span>
+            <span class="text-sm font-semibold text-blue-900">Process phase</span>
+            <span class="text-xs text-blue-600 font-medium">35%</span>
+            <div class="flex items-center gap-1 ml-1">
+              <span class="h-1.5 w-5 rounded-full bg-emerald-500"></span>
+              <span class="h-1.5 w-4 rounded-full bg-blue-600"></span>
+              <span class="h-1.5 w-4 rounded-full bg-slate-200"></span>
+              <span class="h-1.5 w-4 rounded-full bg-slate-200"></span>
+              <span class="h-1.5 w-4 rounded-full bg-slate-200"></span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-5 pt-16">
+            <!-- Left column: Chat -->
+            <div class="space-y-3">
+              <div class="text-xs text-slate-400 uppercase tracking-wide font-semibold mb-2">Conversation</div>
+
+              <!-- User bubble -->
+              <div class="bubble-user flex justify-end">
+                <div class="max-w-[95%] px-3 py-2.5 rounded-2xl rounded-tr-sm bg-blue-600 text-white text-[13px] leading-relaxed shadow-sm">
+                  So after the invoice arrives by email, the AP clerk logs it in our tracking system.
+                </div>
+              </div>
+
+              <!-- AI bubble -->
+              <div class="bubble-ai flex items-start gap-2">
+                <div class="w-7 h-7 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/></svg>
+                </div>
+                <div class="max-w-[90%] px-3 py-2.5 rounded-2xl rounded-tl-sm bg-slate-100 text-slate-800 text-[13px] leading-relaxed">
+                  Got it — invoice via email, logged by AP. Who reviews it next, and is there a dollar threshold that changes approval?
+                </div>
+              </div>
+            </div>
+
+            <!-- Right column: Extracted notes -->
+            <div class="relative space-y-2.5">
+              <div class="text-xs text-slate-400 uppercase tracking-wide font-semibold mb-2 flex items-center gap-2">
+                Extracted Notes
+                <span class="inline-flex items-center gap-1 text-[10px] text-emerald-600 font-medium bg-emerald-50 px-1.5 py-0.5 rounded">
+                  <span class="w-1 h-1 rounded-full bg-emerald-500"></span>
+                  Live
+                </span>
+              </div>
+
+              <!-- Note 1 -->
+              <div class="note-1 bg-white border border-slate-200 rounded-lg p-2.5 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="px-1.5 py-0.5 rounded text-[9px] font-semibold tracking-wide bg-blue-50 text-blue-700">PROCEDURE STEPS</span>
+                  <span class="text-[10px] font-bold text-red-600 flex items-center gap-1">● HIGH</span>
+                </div>
+                <p class="text-xs text-slate-700 leading-snug">Step 1: Receive invoice via email. Step 2: AP Clerk logs invoice in tracking system.</p>
+              </div>
+
+              <!-- Note 2 -->
+              <div class="note-2 bg-white border border-slate-200 rounded-lg p-2.5 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="px-1.5 py-0.5 rounded text-[9px] font-semibold tracking-wide bg-emerald-50 text-emerald-700">ROLES</span>
+                  <span class="text-[10px] font-bold text-amber-600">● MED</span>
+                </div>
+                <p class="text-xs text-slate-700 leading-snug">Accounts Payable Clerk owns invoice intake &amp; logging.</p>
+              </div>
+
+              <!-- Note 3 -->
+              <div class="note-3 bg-white border border-slate-200 rounded-lg p-2.5 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-center justify-between mb-1.5">
+                  <span class="px-1.5 py-0.5 rounded text-[9px] font-semibold tracking-wide bg-purple-50 text-purple-700">MATERIALS</span>
+                  <span class="text-[10px] font-bold text-amber-600">● MED</span>
+                </div>
+                <p class="text-xs text-slate-700 leading-snug">Required: Email access, invoice tracking system.</p>
+              </div>
+
+              <!-- Next note placeholder (ghost) -->
+              <div class="border-2 border-dashed border-slate-200 rounded-lg p-2.5 flex items-center justify-center gap-2">
+                <svg class="w-3 h-3 text-slate-300 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                <span class="text-[10px] text-slate-400 font-medium">Extracting next…</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Decorative connector SVG between columns -->
+          <svg class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-8 w-16 h-12 pointer-events-none hidden xl:block" viewBox="0 0 80 60" fill="none">
+            <path class="line-extract" d="M 8 30 Q 40 10, 72 30" stroke="rgb(148 163 184)" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="3 4" />
+            <circle cx="72" cy="30" r="2" fill="rgb(59 130 246)" />
+          </svg>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Caption -->
+  <div class="mt-8 max-w-2xl mx-auto text-center">
+    <h3 class="text-lg font-semibold text-slate-900 mb-2">Variant 1 — The "real product flow" approach</h3>
+    <p class="text-sm text-slate-600 leading-relaxed">
+      Left shows a real chat bubble exchange (matching your <code class="text-xs bg-slate-100 px-1 rounded">MessageBubble</code> component).
+      Right shows extracted notes with category tags and priority dots — same styling as your actual NotesPanel.
+      A phase badge up top ties it together. This is <strong>what nothing else looks like</strong>: the AI interviews
+      and tags information simultaneously. Sequential entrance animation shows the "live extraction" feeling.
+    </p>
+    <div class="mt-4 flex items-center justify-center gap-4 text-xs text-slate-500">
+      <span class="inline-flex items-center gap-1">✓ Shows actual product</span>
+      <span class="inline-flex items-center gap-1">✓ No generic SaaS tropes</span>
+      <span class="inline-flex items-center gap-1">✓ Self-explanatory</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

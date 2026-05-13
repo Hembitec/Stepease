@@ -67,6 +67,12 @@ export const DEMO_PHASES: DemoPhase[] = [
                 content: "Audience: HR coordinators and engineering team leads",
                 color: "bg-purple-100 text-purple-700",
             },
+            {
+                category: "METADATA",
+                label: "Metadata",
+                content: "Departments involved: Engineering, People Operations, IT",
+                color: "bg-slate-100 text-slate-700",
+            },
         ],
     },
     {
@@ -120,6 +126,12 @@ export const DEMO_PHASES: DemoPhase[] = [
                 content: "First PR review within Week 1 as milestone check",
                 color: "bg-amber-100 text-amber-700",
             },
+            {
+                category: "MATERIALS_RESOURCES",
+                label: "Resources",
+                content: "Systems required: laptop image, email, Slack, GitHub, HRIS checklist",
+                color: "bg-cyan-100 text-cyan-700",
+            },
         ],
     },
     {
@@ -150,6 +162,12 @@ export const DEMO_PHASES: DemoPhase[] = [
                 label: "Roles",
                 content: "HR Coordinator → welcome session, benefits enrollment, IT ticket",
                 color: "bg-green-100 text-green-700",
+            },
+            {
+                category: "DEFINITIONS_REFERENCES",
+                label: "Definitions",
+                content: "Assigned buddy = designated engineer who owns Week 1 technical ramp",
+                color: "bg-indigo-100 text-indigo-700",
             },
         ],
     },
@@ -182,6 +200,12 @@ export const DEMO_PHASES: DemoPhase[] = [
                 content: "30-day check-in survey to measure onboarding effectiveness",
                 color: "bg-teal-100 text-teal-700",
             },
+            {
+                category: "QUALITY_SUCCESS",
+                label: "Quality",
+                content: "Success metric: first pull request merged within 7 days of start date",
+                color: "bg-teal-100 text-teal-700",
+            },
         ],
     },
     {
@@ -192,10 +216,17 @@ export const DEMO_PHASES: DemoPhase[] = [
             {
                 role: "ai",
                 content:
-                    "Excellent! I've captured 12 structured notes across all categories. Your SOP covers the full onboarding lifecycle. Ready to generate your document!",
+                    "Excellent. I've captured ownership, tooling, quality checks, and fallback paths. Let's review the notes once before I generate the SOP.",
             },
         ],
-        notes: [],
+        notes: [
+            {
+                category: "METADATA",
+                label: "Metadata",
+                content: "Review cadence: update this SOP quarterly or after onboarding process changes",
+                color: "bg-slate-100 text-slate-700",
+            },
+        ],
     },
 ]
 
@@ -204,33 +235,54 @@ export const DEMO_PHASES: DemoPhase[] = [
 // ---------------------------------------------------------------------------
 
 export const GENERATED_SOP_PREVIEW = `# Engineering Employee Onboarding Process
+**Document ID:** SOP-ENG-001
+**Version:** 1.0
+**Effective Date:** May 13, 2026
+**Document Owner:** Engineering Operations
 
-## 1. Purpose & Scope
-This SOP defines the standard onboarding process for new engineering team members, ensuring a consistent and welcoming experience from Day 1 through the first 30 days.
+## 1. Purpose
+Standardize how new engineers are onboarded so access, orientation, and technical ramp-up happen on time and in the same order for every hire.
 
-## 2. Roles & Responsibilities
+## 2. Scope
+Applies to HR coordinators, engineering managers, onboarding buddies, and IT support for all new engineering hires.
+
+## 3. Roles & Responsibilities
 | Role | Responsibility |
 |------|---------------|
-| HR Coordinator | Welcome session, benefits, IT ticket |
-| Engineering Manager | Buddy assignment, technical oversight |
-| Assigned Buddy | Codebase walkthrough, dev environment |
+| HR Coordinator | Welcome session, benefits enrollment, IT ticket |
+| Engineering Manager | Buddy assignment, milestone oversight |
+| Assigned Buddy | Codebase walkthrough, dev environment setup |
+| IT Support | Laptop image, account provisioning, loaner fallback |
 
-## 3. Procedure
-### Pre-Start (3 days before)
-- [ ] HR submits IT provisioning ticket
-- [ ] Engineering Manager assigns onboarding buddy
-- [ ] HR prepares welcome packet
+## 4. Procedure
+### Pre-start: 3 days before Day 1
+1. HR submits the provisioning ticket with start date, manager, and team.
+2. Engineering manager assigns an onboarding buddy and confirms Week 1 availability.
+3. IT images the laptop and prepares email, Slack, GitHub, and HRIS access.
 
 ### Day 1
-- [ ] IT delivers laptop with all accounts configured
-- [ ] HR conducts welcome session (benefits, policies)
-- [ ] Team introductions and workspace tour
+- [ ] Deliver the laptop and verify account sign-in.
+- [ ] Run the HR welcome session and benefits overview.
+- [ ] Introduce the hire to the team and share the first-week checklist.
 
 ### Week 1
-- [ ] Buddy conducts codebase walkthrough
-- [ ] Dev environment setup and verification
-- [ ] First PR review (milestone checkpoint)
+1. Buddy walks through the codebase, local setup, and pull request process.
+2. New hire completes the development environment checklist.
+3. Manager reviews the first PR milestone before the end of the week.
 
-## 4. Troubleshooting
-- **Laptop not ready** → Use loaner from IT pool
-- **Buddy unavailable** → Manager steps in as backup`
+## 5. Quality Checks
+- [ ] All access requests completed before start date
+- [ ] First PR opened within 7 days
+- [ ] 30-day onboarding survey collected
+
+## 6. Troubleshooting
+| Issue | Possible Cause | Resolution |
+|------|---------------|------------|
+| Laptop not ready | Imaging delay | Issue a loaner machine from the IT pool |
+| Buddy unavailable | PTO or scheduling conflict | Engineering manager steps in as backup |
+| Missing GitHub access | Provisioning ticket incomplete | IT verifies group membership and re-runs access sync |
+
+## 7. Revision History
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.0 | May 13, 2026 | Stepease AI | Initial draft generated from structured interview |`

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Variant 2 — Single Document</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  body { font-family: 'Inter', system-ui, sans-serif; }
+  .font-display { font-family: 'Bricolage Grotesque', sans-serif; }
+
+  @keyframes fade-up {
+    0%   { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes check-pop {
+    0%   { opacity: 0; transform: scale(0.3); }
+    60%  { opacity: 1; transform: scale(1.2); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  @keyframes type-line {
+    0%   { width: 0; }
+    100% { width: 100%; }
+  }
+  @keyframes caret-blink {
+    0%, 49%  { opacity: 1; }
+    50%, 100% { opacity: 0; }
+  }
+
+  .card-enter  { animation: fade-up 1s ease-out 0.3s both; }
+  .check-1     { animation: check-pop 0.4s cubic-bezier(.5,1.8,.5,1) 1.0s both; }
+  .check-2     { animation: check-pop 0.4s cubic-bezier(.5,1.8,.5,1) 1.6s both; }
+  .check-3     { animation: check-pop 0.4s cubic-bezier(.5,1.8,.5,1) 2.2s both; }
+  .typing-line { animation: type-line 1.4s steps(40, end) 2.8s both; overflow: hidden; white-space: nowrap; }
+  .caret       { animation: caret-blink 1s infinite 2.8s; }
+
+  .topographic {
+    background-image:
+      radial-gradient(ellipse 700px 500px at 75% 25%, rgba(59, 130, 246, 0.05), transparent),
+      radial-gradient(ellipse 500px 400px at 20% 80%, rgba(99, 102, 241, 0.03), transparent);
+  }
+  .dot-matrix {
+    background-image: radial-gradient(circle at 1px 1px, rgba(15, 23, 42, 0.06) 1px, transparent 0);
+    background-size: 24px 24px;
+  }
+</style>
+</head>
+<body class="bg-white">
+
+<div class="mx-auto max-w-[1440px] px-6 py-4">
+  <div class="mb-8 text-xs uppercase tracking-[0.2em] text-slate-400">Variant 2 — Single Document Preview (quiet confidence)</div>
+
+  <!-- HERO SECTION -->
+  <section class="relative overflow-hidden rounded-3xl border border-slate-200 bg-white">
+    <div class="absolute inset-0 topographic pointer-events-none"></div>
+    <div class="absolute inset-0 dot-matrix opacity-40 pointer-events-none"></div>
+
+    <div class="relative px-8 lg:px-16 pt-16 pb-20">
+      <div class="grid lg:grid-cols-12 gap-8 lg:gap-16 items-center">
+
+        <!-- LEFT: Copy column -->
+        <div class="lg:col-span-7">
+          <div class="inline-flex items-center gap-2 bg-slate-100 text-slate-700 px-3 py-1.5 rounded-full text-sm font-medium mb-5 border border-slate-200">
+            <span class="flex h-2 w-2 rounded-full bg-blue-600"></span>
+            <span>Your team's knowledge lives in people's heads. That's a risk.</span>
+          </div>
+
+          <h1 class="font-display text-5xl lg:text-[5.5rem] font-bold text-slate-900 tracking-tight leading-[0.95] mb-5">
+            Stop explaining things<br />
+            <span class="text-blue-600">over and over.</span>
+          </h1>
+
+          <p class="text-xl text-slate-600 leading-relaxed max-w-xl mb-7">
+            Describe your process out loud. Get a polished, audit-ready SOP in under 10 minutes.
+          </p>
+
+          <div class="flex flex-col sm:flex-row items-start gap-4 mb-5">
+            <button class="bg-slate-900 hover:bg-slate-800 text-white px-7 h-14 text-base font-medium rounded-xl inline-flex items-center gap-2">
+              Build Your First SOP Free →
+            </button>
+            <button class="px-7 h-14 text-base font-medium text-slate-600 hover:text-slate-900 rounded-xl inline-flex items-center gap-2">
+              ▶  Watch It Work
+            </button>
+          </div>
+
+          <div class="flex items-center gap-6 text-sm text-slate-500">
+            <span class="flex items-center gap-1.5">✓ No credit card required</span>
+            <span class="flex items-center gap-1.5">✓ Free forever</span>
+          </div>
+        </div>
+
+        <!-- RIGHT: Single document card -->
+        <div class="lg:col-span-5 relative min-h-[520px] flex items-center justify-center">
+
+          <!-- Soft glow behind card -->
+          <div class="absolute inset-0 flex items-center justify-center">
+            <div class="w-80 h-80 rounded-full bg-blue-500/10 blur-3xl"></div>
+          </div>
+
+          <!-- Document card -->
+          <div class="card-enter relative w-full max-w-[420px] bg-white rounded-2xl shadow-[0_25px_60px_-20px_rgba(15,23,42,0.25)] border border-slate-200 overflow-hidden">
+
+            <!-- Document "window" chrome -->
+            <div class="flex items-center justify-between px-5 py-3 border-b border-slate-100 bg-slate-50/50">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-md bg-blue-600 flex items-center justify-center">
+                  <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+                <div class="flex flex-col leading-tight">
+                  <span class="text-[11px] font-semibold text-slate-900">Invoice Approval Procedure</span>
+                  <span class="text-[10px] text-slate-400">v1 · Ready to publish</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-red-400"></span>
+                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              </div>
+            </div>
+
+            <!-- Document body -->
+            <div class="px-6 py-5 space-y-5">
+
+              <!-- Header section -->
+              <div>
+                <div class="text-[9px] font-bold tracking-[0.15em] text-blue-600 uppercase mb-1.5">Section 3 · Procedure</div>
+                <h3 class="font-display text-xl font-bold text-slate-900 leading-tight">Invoice Approval Workflow</h3>
+              </div>
+
+              <!-- Step list with animated checks -->
+              <div class="space-y-3">
+                <div class="flex items-start gap-3">
+                  <div class="check-1 mt-0.5 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                  <div class="flex-1">
+                    <div class="text-[11px] font-semibold text-slate-500 mb-0.5">Step 1</div>
+                    <div class="text-sm text-slate-800 leading-snug">AP Clerk receives invoice via shared email inbox and logs it in the tracking system within 2 business hours.</div>
+                  </div>
+                </div>
+
+                <div class="flex items-start gap-3">
+                  <div class="check-2 mt-0.5 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                  <div class="flex-1">
+                    <div class="text-[11px] font-semibold text-slate-500 mb-0.5">Step 2</div>
+                    <div class="text-sm text-slate-800 leading-snug">Verify vendor details and match against approved vendor list.</div>
+                  </div>
+                </div>
+
+                <div class="flex items-start gap-3">
+                  <div class="check-3 mt-0.5 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                  <div class="flex-1">
+                    <div class="text-[11px] font-semibold text-slate-500 mb-0.5">Step 3 — Decision point</div>
+                    <div class="text-sm text-slate-800 leading-snug">Route based on amount: &lt;$1k to Supervisor, $1k–$5k to Manager, &gt;$5k to Director.</div>
+                  </div>
+                </div>
+
+                <!-- Typing-in step (in progress) -->
+                <div class="flex items-start gap-3">
+                  <div class="mt-0.5 w-5 h-5 rounded-full border-2 border-blue-400 flex items-center justify-center flex-shrink-0 bg-white">
+                    <div class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></div>
+                  </div>
+                  <div class="flex-1">
+                    <div class="text-[11px] font-semibold text-slate-500 mb-0.5">Step 4</div>
+                    <div class="text-sm text-slate-800 leading-snug">
+                      <span class="typing-line inline-block">Approver signs and returns via DocuSign within</span><span class="caret inline-block w-0.5 h-4 bg-blue-500 translate-y-[3px] ml-0.5"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Footer meta -->
+              <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+                <div class="flex items-center gap-2">
+                  <div class="flex -space-x-1.5">
+                    <div class="w-5 h-5 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 border border-white"></div>
+                    <div class="w-5 h-5 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 border border-white"></div>
+                    <div class="w-5 h-5 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 border border-white"></div>
+                  </div>
+                  <span class="text-[10px] text-slate-500">3 roles assigned</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] font-semibold text-emerald-600 inline-flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    100% complete
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Floating format badges below card -->
+          <div class="card-enter absolute bottom-4 right-6 flex items-center gap-2" style="animation-delay: 0.8s;">
+            <div class="bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 shadow-md text-[10px] font-semibold text-slate-700">PDF</div>
+            <div class="bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 shadow-md text-[10px] font-semibold text-slate-700">DOCX</div>
+            <div class="bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 shadow-md text-[10px] font-semibold text-slate-700">.md</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Caption -->
+  <div class="mt-8 max-w-2xl mx-auto text-center">
+    <h3 class="text-lg font-semibold text-slate-900 mb-2">Variant 2 — The "finished product" approach</h3>
+    <p class="text-sm text-slate-600 leading-relaxed">
+      One realistic document preview with a <strong>real SOP excerpt</strong> (Invoice Approval Procedure, Step 1–4).
+      Sequential checkmarks pop in as if being verified live, and Step 4 is "typing" to show it's still generating.
+      Format badges (PDF · DOCX · .md) hint at the universal export feature. <strong>Much calmer than Variant 1</strong> — lets the headline lead.
+    </p>
+    <div class="mt-4 flex items-center justify-center gap-4 text-xs text-slate-500">
+      <span class="inline-flex items-center gap-1">✓ Quieter, premium feel</span>
+      <span class="inline-flex items-center gap-1">✓ Shows real output</span>
+      <span class="inline-flex items-center gap-1">✓ Doesn't compete with headline</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

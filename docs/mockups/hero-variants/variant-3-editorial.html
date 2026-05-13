@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Variant 3 — Editorial Transform</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  body { font-family: 'Inter', system-ui, sans-serif; }
+  .font-display { font-family: 'Bricolage Grotesque', sans-serif; }
+  .font-mono    { font-family: 'JetBrains Mono', monospace; }
+
+  @keyframes fade-up { 0% { opacity:0; transform: translateY(12px);} 100% {opacity:1; transform: translateY(0);} }
+  @keyframes waveform {
+    0%, 100% { transform: scaleY(0.3); }
+    50%      { transform: scaleY(1); }
+  }
+  @keyframes arrow-draw {
+    0%   { stroke-dashoffset: 300; opacity: 0; }
+    30%  { opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 1; }
+  }
+  @keyframes num-roll {
+    0%   { opacity: 0; transform: translateY(8px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  .el-1 { animation: fade-up 0.8s ease-out 0.2s both; }
+  .el-2 { animation: fade-up 0.8s ease-out 0.5s both; }
+  .el-3 { animation: fade-up 0.8s ease-out 0.9s both; }
+  .el-4 { animation: fade-up 0.8s ease-out 1.2s both; }
+  .arrow-draw { stroke-dasharray: 300; animation: arrow-draw 1.4s ease-out 0.8s both; }
+  .wave-bar { transform-origin: center; animation: waveform 1.2s ease-in-out infinite; }
+  .num-1 { animation: num-roll 0.5s ease-out 1.0s both; }
+  .num-2 { animation: num-roll 0.5s ease-out 1.3s both; }
+  .num-3 { animation: num-roll 0.5s ease-out 1.6s both; }
+
+  .topographic {
+    background-image:
+      radial-gradient(ellipse 800px 600px at 70% 20%, rgba(59, 130, 246, 0.06), transparent),
+      radial-gradient(ellipse 600px 500px at 15% 90%, rgba(99, 102, 241, 0.04), transparent);
+  }
+  .dot-matrix {
+    background-image: radial-gradient(circle at 1px 1px, rgba(15, 23, 42, 0.05) 1px, transparent 0);
+    background-size: 20px 20px;
+  }
+  .grid-lines {
+    background-image:
+      linear-gradient(to right, rgba(15,23,42,0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(15,23,42,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+</style>
+</head>
+<body class="bg-white">
+
+<div class="mx-auto max-w-[1440px] px-6 py-4">
+  <div class="mb-8 text-xs uppercase tracking-[0.2em] text-slate-400">Variant 3 — Editorial Transform (poster-style, full-width)</div>
+
+  <!-- HERO SECTION -->
+  <section class="relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-b from-slate-50 via-white to-white">
+    <div class="absolute inset-0 grid-lines opacity-60 pointer-events-none"></div>
+    <div class="absolute inset-0 topographic pointer-events-none"></div>
+
+    <div class="relative px-8 lg:px-16 pt-14 pb-20">
+
+      <!-- Top row: Badge + micro-copy -->
+      <div class="flex items-start justify-between mb-10">
+        <div class="inline-flex items-center gap-2 bg-slate-900 text-white px-3 py-1.5 rounded-full text-sm font-medium">
+          <span class="flex h-2 w-2 rounded-full bg-blue-400 animate-pulse"></span>
+          <span>Your team's knowledge lives in people's heads. That's a risk.</span>
+        </div>
+        <div class="hidden lg:flex items-center gap-3 text-xs font-mono text-slate-400 uppercase tracking-widest">
+          <span>Stepease · 2024</span>
+          <span class="w-1 h-1 rounded-full bg-slate-300"></span>
+          <span>SOP Builder · v3</span>
+        </div>
+      </div>
+
+      <!-- HEADLINE - full width, huge -->
+      <h1 class="el-1 font-display text-[4rem] lg:text-[8.5rem] font-bold text-slate-900 tracking-[-0.03em] leading-[0.88] mb-10">
+        Stop explaining things<br />
+        <span class="text-blue-600">over and over.</span>
+      </h1>
+
+      <!-- The transform bar: input → output -->
+      <div class="grid grid-cols-12 gap-6 items-center mb-12">
+
+        <!-- Left: Input (voice/transcript) -->
+        <div class="el-2 col-span-12 lg:col-span-5">
+          <div class="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-400 mb-3">01 · Input</div>
+          <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+            <div class="flex items-center gap-3 mb-3">
+              <!-- Animated waveform -->
+              <div class="flex items-center gap-0.5 h-8">
+                <div class="wave-bar w-1 h-full bg-blue-500 rounded-full" style="animation-delay: 0s;"></div>
+                <div class="wave-bar w-1 h-full bg-blue-500 rounded-full" style="animation-delay: 0.15s;"></div>
+                <div class="wave-bar w-1 h-full bg-blue-500 rounded-full" style="animation-delay: 0.3s;"></div>
+                <div class="wave-bar w-1 h-full bg-blue-500 rounded-full" style="animation-delay: 0.45s;"></div>
+                <div class="wave-bar w-1 h-full bg-blue-500 rounded-full" style="animation-delay: 0.6s;"></div>
+                <div class="wave-bar w-1 h-full bg-blue-500 rounded-full" style="animation-delay: 0.3s;"></div>
+                <div class="wave-bar w-1 h-full bg-blue-500 rounded-full" style="animation-delay: 0.15s;"></div>
+              </div>
+              <div class="flex-1">
+                <div class="text-xs font-semibold text-slate-900">You, talking</div>
+                <div class="text-[10px] text-slate-500">02:47 · 438 words so far</div>
+              </div>
+            </div>
+            <blockquote class="font-display text-xl lg:text-2xl text-slate-700 leading-snug italic border-l-2 border-blue-500 pl-4">
+              "So first the AP clerk gets the invoice by email, logs it, checks the vendor, and then routes it based on the amount…"
+            </blockquote>
+          </div>
+        </div>
+
+        <!-- Middle: Animated arrow -->
+        <div class="hidden lg:flex col-span-2 items-center justify-center">
+          <svg viewBox="0 0 120 60" class="w-full h-20" fill="none">
+            <path class="arrow-draw" d="M 10 30 Q 60 10, 110 30" stroke="rgb(15 23 42)" stroke-width="1.5" stroke-linecap="round" />
+            <path d="M 102 22 L 110 30 L 102 38" stroke="rgb(15 23 42)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+        </div>
+        <div class="lg:hidden col-span-12 flex justify-center py-2">
+          <svg class="w-6 h-6 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="19 12 12 19 5 12"/><line x1="12" y1="5" x2="12" y2="19"/></svg>
+        </div>
+
+        <!-- Right: Output (polished document) -->
+        <div class="el-3 col-span-12 lg:col-span-5">
+          <div class="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-400 mb-3">02 · Output</div>
+          <div class="bg-slate-900 text-white rounded-2xl p-5 shadow-xl relative overflow-hidden">
+            <div class="absolute top-0 right-0 px-2 py-1 bg-emerald-500 text-[9px] font-mono uppercase tracking-wider font-bold rounded-bl-lg">LIVE</div>
+            <div class="text-[10px] font-mono text-slate-400 mb-2">SOP-001 · v1 · Invoice Approval</div>
+            <h3 class="font-display text-xl font-bold mb-3 leading-tight">Accounts Payable — Invoice Approval Procedure</h3>
+            <div class="space-y-1.5 text-[13px] text-slate-300 font-mono leading-relaxed">
+              <div class="flex gap-2"><span class="text-blue-400 font-bold">01</span><span>Receive invoice via <span class="text-white">shared@ap.inbox</span></span></div>
+              <div class="flex gap-2"><span class="text-blue-400 font-bold">02</span><span>Log in tracking system <span class="text-slate-500">(2hr SLA)</span></span></div>
+              <div class="flex gap-2"><span class="text-blue-400 font-bold">03</span><span>Match against approved vendor list</span></div>
+              <div class="flex gap-2"><span class="text-amber-400 font-bold">04</span><span class="text-amber-200">IF amount &gt; $5k → Director approval</span></div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-700 flex items-center gap-2 text-[10px] font-mono text-slate-400">
+              <span class="inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>Clarity 98</span>
+              <span class="inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>Actionable 95</span>
+              <span class="inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>12/12 sections</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom: CTAs + proof -->
+      <div class="el-4 grid grid-cols-12 gap-6 items-end">
+        <div class="col-span-12 lg:col-span-7">
+          <p class="text-xl text-slate-600 leading-relaxed max-w-xl mb-6">
+            Describe your process out loud. Get a polished, audit-ready SOP in under 10 minutes.
+          </p>
+          <div class="flex flex-col sm:flex-row items-start gap-4">
+            <button class="bg-slate-900 hover:bg-slate-800 text-white px-7 h-14 text-base font-medium rounded-xl inline-flex items-center gap-2">
+              Build Your First SOP Free →
+            </button>
+            <button class="px-7 h-14 text-base font-medium text-slate-600 hover:text-slate-900 rounded-xl inline-flex items-center gap-2 border border-slate-200 hover:border-slate-300">
+              ▶  Watch It Work
+            </button>
+          </div>
+          <div class="mt-4 flex items-center gap-6 text-sm text-slate-500">
+            <span class="flex items-center gap-1.5">✓ No credit card required</span>
+            <span class="flex items-center gap-1.5">✓ Free forever</span>
+          </div>
+        </div>
+
+        <!-- Inline dramatic stat -->
+        <div class="col-span-12 lg:col-span-5 lg:text-right">
+          <div class="inline-block text-left lg:text-right">
+            <div class="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-400 mb-2">Average time</div>
+            <div class="font-display text-5xl lg:text-6xl font-bold text-slate-900 leading-none">
+              <span class="num-1 inline-block">3</span><span class="num-2 inline-block">h</span><span class="text-slate-300 mx-2">→</span><span class="num-3 inline-block text-blue-600">9 min</span>
+            </div>
+            <div class="text-xs text-slate-500 mt-2">From "I need to write this" to "Done."</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Caption -->
+  <div class="mt-8 max-w-2xl mx-auto text-center">
+    <h3 class="text-lg font-semibold text-slate-900 mb-2">Variant 3 — The "editorial poster" approach</h3>
+    <p class="text-sm text-slate-600 leading-relaxed">
+      Massive headline dominates. A full-width <strong>input → output transform</strong> tells the whole story in one glance:
+      quoted voice transcript with waveform on the left, polished dark "terminal-style" SOP on the right, bold arrow between them.
+      A big <strong>3h → 9 min</strong> stat replaces the inline stats row. Feels like a Linear/Vercel/Resend landing page — editorial and confident.
+    </p>
+    <div class="mt-4 flex items-center justify-center gap-4 text-xs text-slate-500">
+      <span class="inline-flex items-center gap-1">✓ Most distinctive</span>
+      <span class="inline-flex items-center gap-1">✓ Strong visual hierarchy</span>
+      <span class="inline-flex items-center gap-1">⚠ Most ambitious to build</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
